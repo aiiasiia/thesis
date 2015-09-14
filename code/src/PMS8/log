@@ -1,0 +1,4 @@
+make -C Debug/
+make[1]: Entering directory `/home/aia/Desktop/thesis/code/src/PMS8/Debug'
+make[1]: Nothing to be done for `src/MyString.d'.
+make[1]: Leaving directory `/home/aia/Desktop/thesis/code/src/PMS8/Debug'

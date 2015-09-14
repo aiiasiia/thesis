@@ -1,0 +1,53 @@
+\documentclass[oneside,12pt]{DISCSthesis}
+ \usepackage{graphicx}
+% \usepackage{multirow}
+ %\usepackage{fancyvrb}
+ %\usepackage{rotating}
+ \usepackage{longtable}
+ \usepackage{pdflscape}
+ %\usepackage[justification=centering]{caption}
+ %\usepackage[titletoc]{appendix}
+ %\usepackage{pdfpages}
+
+%\documentclass{article}
+\begin{document}
+\ThesisAuthor{\textbf{Maria Clara Isabel D. Sia}}
+\ThesisTitle{\textbf{An Efficient Exact Solution for the ($l$, $d$)-Planted Motif Problem}}
+\ThesisArea{Computer Science}
+\ThesisDefenseYear{2015}
+% \DefenseDate{10 July 2013}
+% \ThesisGrade{Very Good}
+
+\DepartmentHead{MARLENE M. DE LEON, Ph.D.}
+\SchoolHead{EVANGELINE P. BAUTISTA, Ph.D.}
+\ThesisAdviser{PROCESO L. FERNANDEZ, JR., Ph.D.}
+\FirstPanelMember{XXX, Ph.D.}
+\SecondPanelMember{XXX, Ph.D.}
+\ThirdPanelMember{XXX, Ph.D.}
+
+\ThesisStyle{MS}{Draft}{-10pt}{15pt}
+% Choices for the 1st argument: MS, PhD
+% Choices for the 2nd argument: Final, FinalWithCorner, Draft
+
+\FrontMatter
+% \input{acknowledgements}
+\input{chapters/abstract}
+\tableofcontents
+% \listoffigures
+% \listoftables
+
+\MainMatter
+\input{chapters/1_intro}
+\input{chapters/2_relatedlit}
+\input{chapters/3_framework}
+\input{chapters/4_method}
+\input{chapters/5_results}
+\input{chapters/6_conclusions}
+
+%\BackMatter
+\bibliographystyle{plain}
+\bibliography{sources}
+%\addappheadtotoc
+%\input{APPENDIX}
+
+\end{document}

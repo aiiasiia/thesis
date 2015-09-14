@@ -1,0 +1,10 @@
+sources/
+*~
+*.aux
+*.bbl
+*.blg
+*.latexmk
+*.fdb_latexmk
+*.log
+*.gz
+
