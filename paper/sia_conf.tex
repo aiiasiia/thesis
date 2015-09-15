@@ -108,7 +108,8 @@
 		Our Java implementation of EMS-GT operates mainly on a compact, bit-based enumerative representation of the motif search space. Since a significant part of runtime is spent locating and setting bits in the bit-based representation, optimizations were explored for the bit-setting portion of the algorithm. We investigated the properties of some Hamming distance-based patterns occurring in the search space, then formulated a speed-up technique that exploits these patterns to set bits more quickly and in contiguous blocks.
 
 	\subsection{Evaluation}
-		EMS-GT was compared to known state-of-the-art algorithms PMS8 and qPMS9 by benchmarking their performance on challenging instances of the ($l, d$) planted motif problem. An ($l$, $d$) problem instance is defined to be a challenging instance if $d$ is the largest value for which the expected number of $l$-length motifs that would occur in the input by random chance does not exceed some limit---typically 500 random motifs \cite{pms2015}. The instances used are (9,2), (11,3), (13,4), (14,4), (15,5), (16,5) and (17,6), as identified in \cite{pms2015,pms2007}. 
+		EMS-GT was compared to known state-of-the-art algorithms PMS8 and qPMS9 by benchmarking their performance on challenging instances of the ($l, d$) planted motif problem. An ($l$, $d$) problem instance is defined to be a challenging instance if $d$ is the largest value for which the expected number of $l$-length motifs that would occur in the input by random chance does not exceed some limit---typically 500 random motifs \cite{pms2015}. The instances used are (9,2), (11,3), (13,4), (15,5), and (17,6), as identified in \cite{pms2015,pms2007}. 
+		%(14,4), (15,5), (16,5) and (17,6), as identified in \cite{pms2015,pms2007}. 
 		% EMS-GT was also tested for recall of known motifs in real DNA datasets.
 
 \section{Results}
@@ -249,7 +250,7 @@
 				\text{ for any $l$-mer }x'.
 				\end{equation*}
 			We find that if we divide this bit array $N$ into consecutive blocks of $4^{k}$ flags each, for some $k$, $0 < k < l$, each block will conform to one of ($k + 2$) possible bit patterns. We exploit this regularity to build $N$ in blocks.\newline\newline
-			Say we wish to generate $N(x,d)$ for some $l$-mer $x$. We first divide $x$ into its {\boldmath\bf prefix $y$} (first $l-k$ characters) and its {\boldmath\bf k-suffix $z$} (last $k$ characters).\newline\newline	
+			Say we wish to generate $N(x,d)$ for some $l$-mer $x$. We first divide $x$ into its {\boldmath\bf prefix $y$} (first $l-k$ characters) and its {\boldmath\bf $k$-suffix $z$} (last $k$ characters).\newline\newline	
 				{\small 
 					Ex. Setting $k$ = 5, $x$ = \texttt{acgtacgtacgt}\newline
 					\hspace*{18pt}is divided into $y$ = \texttt{acgtacg} and $z$ = \texttt{tacgt}.}\newline\newline
@@ -302,7 +303,7 @@
 				\caption{Bit patterns followed by blocks of size $4^{5}=32\times32$ in the bit-based representation of $\mathcal{N}(\texttt{acgtacgtacgt},5)$. Black signifies a 1. There are $(5+2)=7$ possible patterns---the empty pattern (all 0s) is not shown.}
 				\end{figure}
 			\newpage
-			To build the bit-array representing $N$, we simply assign the correct bit patterns to non-empty blocks. Non-empty blocks fulfill the condition $d-d_{y'} \geq 0$, i.e., the block prefix $y'$ is a $d$-neighbor of $x$'s prefix $y$. We can use our recursive procedure (Alg. 2) to generate $N(y,d)$, thus giving us the prefixes of all non-empty blocks in $N$.
+			To build the bit-array representing $N$, we simply assign the correct bit patterns to non-empty blocks. Non-empty blocks fulfill the condition $d-d_{y'} \geq 0$, i.e., the block prefix $y'$ is a $d$-neighbor of $x$'s prefix $y$. We can use our recursive procedure (Alg. 2) to generate $N(y,d)$, thus giving us the prefixes of all non-empty blocks in $N$.\newline
 
 			\begin{table}[h] %neighbors_blockmasking
 				\renewcommand{\arraystretch}{1.3}
@@ -317,15 +318,18 @@
 				 9,2 &         351  &       66 & 81.2\%\\
 				11,3 &       4,983  &      693 & 86.1\%\\
 				13,4 &      66,378  &    7,458 & 88.8\%\\
-				14,4 &      91,770  &   12,825 & 86.0\%\\
+				% 14,4 &      91,770  &   12,825 & 86.0\%\\
 				15,5 &     853,569  &   81,921 & 90.4\%\\
-				16,5 &   1,225,092  &  143,979 & 88.2\%\\
+				% 16,5 &   1,225,092  &  143,979 & 88.2\%\\
 				17,6 &  10,738,203  &  912,717 & 91.5\%\\
 				\hline\end{tabular}
 				\end{table}
 
-			Table ~\ref{tbl:neighbors_blockmasking} shows us that identifying non-empty blocks requires much fewer individual neighbors to be generated---when $k$=5, $N(y,d)$ is only about 10-20\% of the entire neighborhood $N(x,d)$. The rest of the work to build $N$ is done by repeatedly copying known bit patterns into these non-empty blocks. \bigskip\newline
-			Note that in EMS-GT, building the bit-array $N$ for the neighborhood $N(x,d)$ of a single $l$-mer $x$ is just part of a larger goal, which is to build the bit-array $\mathcal{N}$ for the neighborhood $\mathcal{N}(S,d)$ of $S$, the sequence containing $x$. It is thus more efficient to generate $\mathcal{N}$. For each $x$ in $S$, we \emph{mask} the bit patterns that represent $N(x,d)$ onto the bit-array $\mathcal{N}$. This masking effectively performs $\mathcal{N}(S,d) \leftarrow \mathcal{N}(S,d) \cup N(x,d)$ for each $x$ in $S$, as specified in lines 4-7 and 11-14 of EMS-GT (Alg. 1).
+			Table ~\ref{tbl:neighbors_blockmasking} shows us that identifying non-empty blocks requires much fewer individual neighbors to be generated---when $k$=5, $N(y,d)$ is only about 10-20\% of the entire neighborhood $N(x,d)$. The rest of the work to build $N$ is done by repeatedly masking known bit patterns onto these non-empty blocks. \newline
+
+			The block-masking optimization entails non-negligible space and time requirements; both are a function of the suffix length $k$. Storing all possible ``non-trivial'' block patterns---a set which excludes the ``empty'' block, the ``full'' block, and blocks in which only one bit is set (the case when $d_{y'} = d$)---requires $4^{2k}\times (k-1)$ bits. Generating these non-trivial patterns takes $O(4^{2k})$ time, and applying these patterns to the bit-array takes $O(4^{k} \times \sum_{i=0}^{l-k} \binom{l-k}{i} 3^{i})$ time. \newline
+
+			Still, for most values of $(l,d)$ building the neighborhood bit-array in blocks proves faster than recursively generating each individual neighbor and setting its bit flag. This is shown in Table ~\ref{tbl:speedup_blockmasking}, which lists average runtimes of EMS-GT with and without the block-based optimization, run on 20 synthetic datasets per ($l,d$) challenge instance.\newline
 
 			\begin{table}[h] %speedup_blockmasking
 				\renewcommand{\arraystretch}{1.3}
@@ -339,31 +343,33 @@
 				 9,2 &   0.06 s &    0.11 s &     --  \\
 				11,3 &   0.22 s &    0.20 s &    6.7\%\\
 				13,4 &   1.98 s &    1.04 s &   47.5\%\\
-				14,4 &   3.53 s &    2.55 s &   27.8\%\\
+				% 14,4 &   3.53 s &    2.55 s &   27.8\%\\
 				15,5 &  25.06 s &   15.51 s &   38.1\%\\
-				16,5 &  41.63 s &   29.03 s &   30.3\%\\
+				% 16,5 &  41.63 s &   29.03 s &   30.3\%\\
 				17,6 & 308.61 s &  175.85 s &   43.0\%\\
 				\hline\end{tabular}
-				\end{table}	
+				\end{table}
 
-			
-			The block-masking optimization entails non-negligible space and time requirements; both are a function of the suffix length $k$. Storing all possible ``non-trivial'' block patterns---a set which excludes the ``empty'' block, the ``full'' block, and blocks in which only one bit is set (the case when $d_{y'} = d$)---requires $4^{2k}\times (k-1)$ bits. Generating these non-trivial patterns takes $O(4^{2k})$ time, and applying these patterns to the bit-array takes $O(4^{k} \times \sum_{i=0}^{l-k} \binom{l-k}{i} 3^{i})$ time. \newline
+			Finally, an implementation note: in EMS-GT, building the bit-array $N$ for the neighborhood $N(x,d)$ of a single $l$-mer $x$ is just part of a larger goal, which is to build the bit-array $\mathcal{N}$ for the neighborhood $\mathcal{N}(S,d)$ of $S$, the sequence containing $x$. It is thus more efficient to build $\mathcal{N}$ iteratively, than to generate each individual $N$.\newline
 
-			Still, for most values of $(l,d)$ building the neighborhood bit-array in blocks proves faster than recursively generating each individual neighbor and setting its bit flag. This is shown in Table ~\ref{tbl:speedup_blockmasking}, which lists average runtimes of EMS-GT with and without the block-based optimization, run on 20 synthetic datasets per ($l,d$) challenge instance.
+			For each $x$ in $S$, we \emph{mask} the bit patterns that represent $N(x,d)$ onto the bit-array $\mathcal{N}$. This masking effectively performs $\mathcal{N}(S,d) \leftarrow \mathcal{N}(S,d) \cup N(x,d)$ for each $x$ in $S$, as specified in lines 4-7 and 11-14 of EMS-GT (Alg. 1).			
 			\end{enumerate}	
 
-		% In sum: 
-		% We created an enumeration scheme that represents...
-		% We identified recurring block patterns in $l$-mer neighborhoods, and recognized their origin in the additive property of Hamming distances. We developed a bit-masking scheme which: 
+		% In summary, we created an enumeration scheme that represents l-mers...
+		% We identified recurring block patterns in $l$-mer neighborhoods, 
+		% and recognized their origin in the additive property of Hamming distances. 
+		% We developed a bit-masking scheme which: 
 		% \begin{enumerate}[label={(\arabic*)}]
-		% \item generates all $4^{k}$ unique Hamming distance distributions in a block, and the resulting  $4^{k}(k+2)$ bit patterns; 
-		% \item locates non-empty blocks in $N(x,d)$ for a given $x=yz$, by generating $d$-neighbors of $x$'s prefix $y$; and 
-		% \item sets bits in the non-empty blocks of $N(x,d)$ by referring to the pre-generated patterns for $x's$ suffix $z$. 
-		% \end{enumerate}
+		% \item generates all $4^{k}$ unique Hamming distance distributions in a block, 
+		% and the resulting  $4^{k}(k+2)$ bit patterns; 
+		% \item locates non-empty blocks in $N(x,d)$ for a given $x=yz$, 
+		% by generating $d$-neighbors of $x$'s prefix $y$; and 
+		% \item sets bits in the non-empty blocks of $N(x,d)$ 
+		% by referring to the pre-generated patterns for $x's$ suffix $z$.
 
 	\newpage
 	\subsection{Performance of EMS-GT}
-		EMS-GT and two competitor algorithms were run on an Intel Xeon, \hl{insert details} machine. Their performance, averaged over 20 synthetic datasets for each $(l,d)$ challenge instance, is outlined in Table~\ref{tbl:runtimes_v_pms}:
+		EMS-GT and two competitor algorithms were run on an Intel Xeon, \hl{insert details} machine. Their performance, averaged over 20 synthetic datasets for each $(l,d)$ challenge instance, is outlined in Table~\ref{tbl:runtimes_v_pms}:\newline
 
 		\begin{table}[ht] %runtimes
 			\renewcommand{\arraystretch}{1.3}
@@ -376,26 +382,25 @@
 			 9,2 &  0.74 s  &  0.47 s & {\bf 0.11 s}\\
 			11,3 &  1.58 s  &  1.06 s & {\bf 0.20 s}\\
 			13,4 &  5.39 s  &  4.52 s & {\bf 1.04 s}\\
-			14,4 &  1.29 s  &  1.02 s &      2.55 s\\
+			% 14,4 &  1.29 s  &  1.02 s &      2.55 s\\
 			15,5 & 36.45 s  & 24.63 s & {\bf15.51 s}\\
-			16,5 &  4.79 s  &  2.96 s &     29.03 s\\
+			% 16,5 &  4.79 s  &  2.96 s &     29.03 s\\
 			17,6 &  3.91 min & 1.96 min & \textbf{\emph{2.93 min}}\\
 			\hline\end{tabular}
 			\end{table}
 
 		Observe that EMS-GT is only run on problem instances where $l \leq 17$. This is because when we reach $l$=18, the size of the integer array needed to represent the entire search space ($\frac{4^{18}}{32} = \frac{2^{36}}{2^{5}} = 2^{31}$ integers) begins to exceed the maximum size for Java arrays ($2^{31} - 1$).
 
-		We also revisit the definition of \emph{challenge instances} for the planted motif problem. 
+		% We also revisit the definition of \emph{challenge instances} for the planted motif problem. Consider that both PMS8 and qPMS9 record significantly lower runtimes for (14,4) than (13,4), and for (16,5) than (15,5), indicating that these instances are less challenging for these algorithms. The same is not true for EMS-GT---its runtime increases with $l$, thus it is at a disadvantage for these instances.
 		% are 14,4 and 16,5 really challenge instances?
 
-		% motifs are usually short anyways
+		% motifs are usually short
 
 
 \section{Conclusion}
 	In this paper we propose a novel algorithm for the planted motif problem. A Java implementation run on various challenge problem instances shows the proposed algorithm to be very competitive against state-of-the-art exact algorithms PMS8 and qPMS9. We find EMS-GT works extremely well for problems involving short motifs, outperforming the current best algorithm for the challenge problem instances (9,2), (11,3), (13,4) and (15,5) with a run-time reduction of 87\%, 79\%, 77\% and 37\% respectively for these instances, 
 	while ranking second to qPMS9 for test instance (17,6). Directions for further research include: refining the bit-based storage mechanism to be able to represent the search space for $l > 17$; creating a multiprocessor version of EMS-GT to solve in parallel for larger values of ($l$,$d$); and delegating the bit-masking optimization and other bulk bit operations to the graphics card, as explored in \cite{dasari2010efficient}, for faster performance.
 
-\newpage
 \bibliographystyle{IEEEtran}
 \bibliography{IEEEabrv,sources}
 
