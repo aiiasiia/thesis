@@ -1,4 +1,4 @@
-# EMS-GT: Exact Motif Search - Generate and Test
+# EMS-GT: Exact Motif Search
 
 A solution to the (l,d) planted motif problem for any arbitrary instance, l <= 17.
 

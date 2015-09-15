@@ -377,19 +377,21 @@
 			\label{tbl:runtimes_v_pms}
 			\centering
 			\begin{tabular}{|c|c|c|c|}
-			\hline \bfseries\boldmath $(l,d)$ & \bfseries PMS8 & \bfseries qPMS9 & \bfseries EMS-GT\\
+			\hline \bfseries\boldmath $(l,d)$ & \bfseries PMS8 & \bfseries qPMS9 & \bfseries EMS-GT & \bfseries Speedup\\
 			\hline
-			 9,2 &  0.74 s  &  0.47 s & {\bf 0.11 s}\\
-			11,3 &  1.58 s  &  1.06 s & {\bf 0.20 s}\\
-			13,4 &  5.39 s  &  4.52 s & {\bf 1.04 s}\\
+			 9,2 &  0.74 s  &  0.47 s & {\bf 0.11 s} & 76.6\%\\
+			11,3 &  1.58 s  &  1.06 s & {\bf 0.20 s} & 81.1\%\\
+			13,4 &  5.39 s  &  4.52 s & {\bf 1.04 s} & 77.0\%\\
 			% 14,4 &  1.29 s  &  1.02 s &      2.55 s\\
-			15,5 & 36.45 s  & 24.63 s & {\bf15.51 s}\\
+			15,5 & 36.45 s  & 24.63 s & {\bf15.51 s} & 37.0\%\\
 			% 16,5 &  4.79 s  &  2.96 s &     29.03 s\\
-			17,6 &  3.91 min & 1.96 min & \textbf{\emph{2.93 min}}\\
+			17,6 &  3.91 min & \textbf{1.96 min} & {\emph{2.93 min}} & --\\
 			\hline\end{tabular}
 			\end{table}
 
-		Observe that EMS-GT is only run on problem instances where $l \leq 17$. This is because when we reach $l$=18, the size of the integer array needed to represent the entire search space ($\frac{4^{18}}{32} = \frac{2^{36}}{2^{5}} = 2^{31}$ integers) begins to exceed the maximum size for Java arrays ($2^{31} - 1$).
+		
+		For every challenge instance except (17,6) EMS-GT outperforms qPMS9; it outperforms PMS8 for instance (17,6). EMS-GT was run including the block-masking optimization, with the default suffix length of $k$=5. Observe that our EMS-GT implementation can only solve problem instances where $l \leq 17$. This is because when we reach $l$=18, the size of the integer array needed to represent the entire search space ($\frac{4^{18}}{32} = \frac{2^{36}}{2^{5}} = 2^{31}$ integers) begins to exceed the maximum size for Java arrays, which is ($2^{31} - 1$) elements.\newline
+
 
 		% We also revisit the definition of \emph{challenge instances} for the planted motif problem. Consider that both PMS8 and qPMS9 record significantly lower runtimes for (14,4) than (13,4), and for (16,5) than (15,5), indicating that these instances are less challenging for these algorithms. The same is not true for EMS-GT---its runtime increases with $l$, thus it is at a disadvantage for these instances.
 		% are 14,4 and 16,5 really challenge instances?
@@ -398,7 +400,7 @@
 
 
 \section{Conclusion}
-	In this paper we propose a novel algorithm for the planted motif problem. A Java implementation run on various challenge problem instances shows the proposed algorithm to be very competitive against state-of-the-art exact algorithms PMS8 and qPMS9. We find EMS-GT works extremely well for problems involving short motifs, outperforming the current best algorithm for the challenge problem instances (9,2), (11,3), (13,4) and (15,5) with a run-time reduction of 87\%, 79\%, 77\% and 37\% respectively for these instances, 
+	In this paper we propose a novel algorithm for the planted motif problem. A Java implementation run on various challenge problem instances shows the proposed algorithm to be very competitive against state-of-the-art exact algorithms PMS8 and qPMS9. We find EMS-GT works extremely well for problems involving short motifs, outperforming the current best algorithm for the challenge problem instances (9,2), (11,3), (13,4) and (15,5) with a run-time reduction of 76\%, 81\%, 77\% and 37\% respectively for these instances, 
 	while ranking second to qPMS9 for test instance (17,6). Directions for further research include: refining the bit-based storage mechanism to be able to represent the search space for $l > 17$; creating a multiprocessor version of EMS-GT to solve in parallel for larger values of ($l$,$d$); and delegating the bit-masking optimization and other bulk bit operations to the graphics card, as explored in \cite{dasari2010efficient}, for faster performance.
 
 \bibliographystyle{IEEEtran}
