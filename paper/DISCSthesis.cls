@@ -146,7 +146,7 @@
 %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  \NeedsTeXFormat{LaTeX2e}
- \ProvidesClass{discsthesis}[2005/05/11 v3.0 Ateneo de Manila University DISCS Thesis Class]
+ \ProvidesClass{DISCSthesis}[2005/05/11 v3.0 Ateneo de Manila University DISCS Thesis Class]
 % \RequirePackage{amsmath,fancyhdr,newcent,curves,epic,eepic,floatfig,epsfig,
  %                amssymb,calc,multicol,array,rotating,tabularx,pifont,fancybox,
   %               ulem,enumerate,latexsym,ifthen}

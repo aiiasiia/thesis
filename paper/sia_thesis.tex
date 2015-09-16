@@ -8,6 +8,14 @@
  %\usepackage[justification=centering]{caption}
  %\usepackage[titletoc]{appendix}
  %\usepackage{pdfpages}
+\usepackage{setspace}
+\usepackage{enumitem}	\setlist[itemize]{leftmargin=*,itemsep=5pt}
+\usepackage{color,soul}
+\usepackage{amsmath}
+\usepackage{algpseudocode}
+	\renewcommand{\algorithmiccomment}[1]{\hskip0em$\triangleright$ \emph{#1}}
+	\renewcommand{\algorithmicrequire}{\hspace*{6pt}\textbf{Input:}}
+	\renewcommand{\algorithmicensure}{\hspace*{6pt}\textbf{Output:}}
 
 %\documentclass{article}
 \begin{document}
@@ -31,18 +39,18 @@
 
 \FrontMatter
 % \input{acknowledgements}
-\input{chapters/abstract}
+\input{abstract}
 \tableofcontents
 % \listoffigures
 % \listoftables
 
 \MainMatter
-\input{chapters/1_intro}
-\input{chapters/2_relatedlit}
-\input{chapters/3_framework}
-\input{chapters/4_method}
-\input{chapters/5_results}
-\input{chapters/6_conclusions}
+\input{1_intro}
+% \input{2_relatedlit}
+% \input{3_framework}
+% \input{4_method}
+% \input{5_results}
+% \input{6_conclusions}
 
 %\BackMatter
 \bibliographystyle{plain}
