@@ -107,7 +107,8 @@
 			\end{itemize}
 			\vspace{-3mm}
 	Two distinct $d$-neighbors of a motif--both counting as valid occurrences of the motif--might differ in as many as 2$d$ characters! This shows why ($l$, $d$)-motifs are sometimes called ``subtle'' signals in DNA  \cite{pevzner2000combinatorial}, and why finding them is difficult and computationally expensive.
-	In this paper, we propose EMS-GT, a novel algorithm that solves the planted motif problem for any arbitrary problem instance up to $l$=17. EMS-GT operates on a compact bit-based representation of the search space, and takes advantage of distance-related patterns in this representation to compute the exact solution. Section 2 discusses related literature, focusing on exact motif finding approaches. Section 3 details our methods. Section 4 describes our implementation of EMS-GT, and compares it against state-of-the-art exact algorithms. Section 5 presents our conclusions and recommendations.
+
+	In this paper, we propose EMS-GT, a novel algorithm that solves the planted motif problem for any arbitrary problem instance up to $l$=17. Exact Motif Search - Generate and Test (EMS-GT) operates on a compact bit-based representation of the search space, and takes advantage of distance-related patterns in this representation to compute the exact solution. Section 2 discusses related literature, focusing on exact motif finding approaches. Section 3 details our methods. Section 4 describes our implementation of EMS-GT, and compares it against state-of-the-art exact algorithms. Section 5 presents our conclusions and recommendations.
 
 \section{Review of Related Literature}
 
@@ -162,7 +163,7 @@
 			\noindent \hspace*{6pt}{\bf Algorithm 1} EMS-GT
 			\begin{algorithmic}[1]
 			\Require set $\mathcal{S} = \{S_{1},S_{2},...,S_{n}\}$ of $L$-length sequences, \newline \hspace*{25pt}motif length $l$, allowable mismatches $d$
-			\Ensure set M of candidate motifs\vspace*{6pt}
+			\Ensure set $M$ of candidate motifs\vspace*{6pt}
 			\State \Comment{generate candidates}
 			\State $C \leftarrow \{\}$
 			\State $\mathcal{N}(S_{1},d) \leftarrow \{\}$
@@ -248,7 +249,7 @@
 				\Require DNA sequence $S$, motif length $l$, mismatches $d$
 				\Ensure bit-array $\mathcal{N}$ representing $\mathcal{N}(S,d)$ \vspace*{6pt}
 				% \For{$i \leftarrow$ 1 to $4^{l}$}
-				\State $\mathcal{N}[i] \leftarrow 0,\ \ \forall i < 4^{l}$ 
+				\State $\mathcal{N}[lmer] \leftarrow 0,\ \ \forall lmer \in $ search space 
 				% \EndFor
 				\For{each $l$-mer $x$ in $S$}
 				\State \textsc{AddNeighbors}($x$, 0, $d$) \hspace*{9pt}\Comment{recursive procedure}
@@ -256,8 +257,8 @@
 				\State \Comment{make $d$ changes in $l$-mer $x$, from position $s$ onward}
 				\Procedure{AddNeighbors}{$x$, $s$, $d$}
 					\For{$i \leftarrow s$ to $l$}
-						\State $\Sigma \leftarrow$ \{\texttt{a}, \texttt{g}, \texttt{c}, \texttt{t}\} $- x_{i}$ \hspace*{6pt}\Comment{$i^{th}$ character in $x$}
-						\For{$j \leftarrow 1$ to $|\Sigma|$}
+						\State $\Sigma' \leftarrow$ \{\texttt{a}, \texttt{g}, \texttt{c}, \texttt{t}\} $- x_{i}$ \hspace*{4pt}\Comment{\small remove $i^{th}$ character in $x$}
+						\For{$j \leftarrow 1$ to $|\Sigma'|$}
 							\State $neighbor \leftarrow concatenate(x_{1...i-1},\Sigma_{j},x_{i+1...l})$
 							\State $\mathcal{N}[neighbor] \leftarrow 1$
 							\If{$d > 1$ and $i < l$}
