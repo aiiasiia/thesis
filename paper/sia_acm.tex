@@ -42,7 +42,7 @@
 \begin{abstract}
 	DNA motif finding is widely recognized as a difficult problem in computational biology and computer science. Because of the usual large search space involved, exact solutions typically require a significant amount of execution time before discovering a motif of length $l$ that occurs in an input set $\{S_{1} ,...,S_{n}\}$ of sequences, allowing for at most $d$ substitutions. In this paper, we propose EMS-GT, a novel algorithm that operates on a compact bit-based representation of the search space and takes advantage of distance-related patterns in this representation to compute the exact solution for any arbitrary problem instance up to $l$=17. A Java implementation
 	% ---run on synthetic datasets for various challenge instances of the ($l,d$) planted motif problem---
-	is shown to be highly competitive against PMS8 and qPMS9, two current state-of-the-art exact motif search algorithms. EMS-GT works extremely well for problems involving short motifs, outperforming both competitors for challenge instances with ($l,d$) values (9,2), (11,3), (13,4) and (15,5), showing runtime reductions of at least 87\%, 79\%, 77\% and 37\% respectively for these instances, while ranking second to qPMS9 for the challenge instance (17,6).
+	is shown to be highly competitive against PMS8 and qPMS9, two current state-of-the-art exact motif search algorithms. EMS-GT works extremely well for problems involving short motifs, outperforming both competitors for challenge instances with ($l,d$) values (9,2), (11,3), (13,4) and (15,5), showing runtime reductions of at least 76\%, 81\%, 77\% and 37\% respectively for these instances, while ranking second to qPMS9 for the challenge instance (17,6).
 \end{abstract}
 
 \section{Introduction}
@@ -64,7 +64,9 @@
 	\end{minipage}
 	}
 
-	The planted motif problem simply asks: ``\emph{Given a set of DNA sequences, can we find an unknown motif of length $l$ that appears at different positions in each of the sequences} \cite{pevzner2000combinatorial}?'' Initially it seems an exhaustive string search will suffice for this problem. However, due to biological mutation, motif occurrences in DNA are allowed to differ from the original motif by up to $d$ characters. This greatly impacts complexity; brute-force solutions quickly become infeasible as values of $l$ and $d$ increase. In fact, the problem has already been shown to be NP-complete \cite{pms2014}. We define the planted motif problem more formally as follows:
+	The planted motif problem simply asks: ``\emph{Given a set of DNA sequences, can we find an unknown motif of length $l$ that appears at different positions in each of the sequences} \cite{pevzner2000combinatorial}?'' Initially it seems an exhaustive string search will suffice for this problem. However, due to biological mutation, motif occurrences in DNA are allowed to differ from the original motif by up to $d$ characters. This greatly impacts complexity; brute-force solutions quickly become infeasible as values of $l$ and $d$ increase. In fact, the problem has already been shown to be NP-complete \cite{pms2014}. 
+
+	We define the planted motif problem formally as follows:
 
 	\noindent
 	\fbox{\small
