@@ -8,3 +8,6 @@ sources/
 *.log
 *.gz
 *.sh
+*.lof
+*.lot
+*.toc
