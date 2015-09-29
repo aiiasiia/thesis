@@ -1,5 +1,6 @@
 \documentclass[oneside,12pt]{DISCSthesis}
  \usepackage{graphicx}
+% \usepackage{subcaption}
 % \usepackage{multirow}
  %\usepackage{fancyvrb}
  %\usepackage{rotating}
@@ -285,42 +286,6 @@
 				\end{algorithmic}
 			}
 
-	% \section{Block-based patterns in Hamming distances}
-		% 	We can represent the neighborhood $N(x,d)$ of an $l$-mer $x$ as an array $N$ of $4^{l}$ bit flags, set to 1 if the corresponding $l$-mer is a neighbor and 0 otherwise.
-			
-		% 	\begin{equation*}
-		% 		N_{x'} = \left\{
-		% 		\begin{array}{rl}
-		% 			1 & \text{if } dH(x,x') \leq d,\\
-		% 			0 & \text{otherwise.}%\text{if } dH(x,x') > d.
-		% 		\end{array} \right.
-		% 		\text{ for any $l$-mer }x'.
-		% 		\end{equation*}
-
-		% 	\noindent If we divide $N$ into consecutive blocks of $4^{k}$ flags each, for some {\bf\boldmath block degree $k$}, $0 < k < l$, each block will conform to at most $(k+2)$ bit patterns. We explain that this is due to the alphabetical enumeration of $l$-mers followed in $N$.
-
-		% 	\subsection{Additive property of Hamming distances}
-		% 		\noindent Consider $N$ for a certain $l$-mer $x = yz$, where $y$ is the {\bf prefix} (first $l-k$ characters) of $x$, and $z$ is the {\boldmath\bf $k$-suffix} (last $k$ characters) of $x$.
-		% 		\vspace{3mm}\newline
-		% 		\hspace*{50pt} Ex. For $k$ = 5,\ \ $x$ = \texttt{acgtacgtacgt} $\rightarrow$\ \  $y$ = \texttt{acgtacg}, $z$ = \texttt{tacgt}.
-		% 		\vspace{3mm}
-
-
-				
-		% 		\noindent We can infer that the distance between two $l$-mers is the sum of the distance between their prefixes and the distance between their suffixes; thus the distance between $x$ and any other $l$-mer $x'=y'z'$ is given by:
-		% 		\vspace{-5mm}
-		% 		\begin{equation} dH(x,x') = dH(y,y') + dH(z,z') \end{equation}
-		% 		\noindent This means we can redefine the criteria for setting a bit in $N$:
-		% 		\begin{equation*}
-		% 				N_{x'} = \left\{
-		% 				\begin{array}{rl}
-		% 					1 & \text{if } dH(y,y') + dH(z,z') \leq d,\\
-		% 					0 & \text{otherwise.}%\text{if } d_{y'} + \mathcal{D}(z)_{z'} > d.
-		% 				\end{array} \right.
-		% 				\text{ for }x' = y'z'.
-		% 				\end{equation*}
-		% 	\subsection{Alphabetical enumeration scheme}
-
 \chapter{Methodology}
 	This section briefly describes the procedure used to evaluate the optimized version of the EMS-GT algorithm.
 
@@ -337,149 +302,165 @@
 		\bigskip
 
 \chapter{Results and Analysis}
-	\section{Pattern-based optimization for EMS-GT}
-		
-		% ALGO??? UGHHHH
-			% \newpage{\setstretch{1.0}\small
-			% 	\noindent \hspace*{6pt}{\bf Algorithm 4.1} \textsc{Block-based neighborhood generation}\vspace*{6pt}
-			% 	\begin{algorithmic}[1]\label{alg:block-nbr-gen}
-			% 		\Require DNA sequence $S$, motif length $l$, mismatches $d$
-			% 		\Ensure bit-array $\mathcal{N}$ representing $\mathcal{N}(S,d)$ \vspace*{6pt}
-					
-			% 		\State Comment{compute }
+	This section provides a step-by-step derivation of the distance-related patterns that occur within a bit-array representing an $l$-mer neighborhood in EMS-GT. It describes how an optimization for EMS-GT based on these patterns was implemented. Finally, it quantifies the performance improvement due to this optimization.
+	
+	\section{\boldmath Deriving distance-related patterns in $l$-mer neighborhoods}
+		\begin{enumerate}
+			\item We can represent the neighborhood $N(x,d)$ of an $l$-mer $x$ as an array $N$ of $4^{l}$ bit flags, set to 1 if the corresponding $l$-mer is a neighbor and 0 otherwise.
+				\begin{equation*}
+					N_{x'} = \left\{
+					\begin{array}{rl}
+						1 & \text{if } dH(x,x') \leq d,\\
+						0 & \text{otherwise.}%\text{if } dH(x,x') > d.
+					\end{array} \right.
+					\text{ for any $l$-mer }x'.
+					\end{equation*}
 
-			% 		% \For{$i \leftarrow$ 1 to $4^{l}$}
-			% 		\State $\mathcal{N}[lmer] \leftarrow 0,\ \ \forall lmer \in $ search space 
-			% 		% \EndFor
-			% 		\For{each $l$-mer $x$ in $S$}
-			% 		\State $y \leftarrow x_{1...l-k}$ 
-			% 		\State \textsc{SetBlocks}($y$, 0, $d$) \hspace*{9pt}\Comment{recursive procedure}
-			% 		\EndFor
-			% 		\State \Comment{make $d$ changes in prefix $y$, from position $s$ onward}
-			% 		\Procedure{SetBlocks}{$x$, $s$, $d$}
-			% 			\For{$i \leftarrow s$ to $l$}
-			% 				\State $\Sigma' \leftarrow$ \{\texttt{a}, \texttt{g}, \texttt{c}, \texttt{t}\} $- x_{i}$ \hspace*{4pt}\Comment{\small remove $i^{th}$ character in $x$}
-			% 				\For{$j \leftarrow 1$ to $|\Sigma'|$}
-			% 					\State $neighbor \leftarrow concatenate(x_{1...i-1},\Sigma_{j},x_{i+1...l})$
-			% 					\State $\mathcal{N}[neighbor] \leftarrow 1$
-			% 					\If{$d > 1$ and $i < l$}
-			% 						\State \textsc{AddNeighbors}($neighbor$, $i+1$, $d-1$)
-			% 					\EndIf
-			% 				\EndFor
-			% 			\EndFor
-			% 		\EndProcedure
-			% 		\State\Return $\mathcal{N}$
-			% 		\end{algorithmic}
+			\item We find that if we divide this bit-array $N$ into consecutive blocks of $4^{k}$ flags each, for some {\b\boldmath block degree $k$}, $0 < k < l$, each block will conform to one of at most ($k + 2$) possible bit patterns. We exploit this regularity to build $N$ in blocks.
 
-			% 	}\newpage
+			\item Say we wish to generate $N(x,d)$ for some $l$-mer $x$. We divide $x$ into its {\bf\boldmath prefix $y$ }(first $l - k$ characters) and its {\bf\boldmath $k$-suffix $z$} (last $k$ characters).
 
-		% HUGE WALL OF COMMENT TEXT
-			% We can represent the neighborhood $N(x,d)$ of an $l$-mer $x$ as an array $N$ of $4^{l}$ bit flags, set to 1 if the corresponding $l$-mer is a neighbor and 0 otherwise.
-			% \begin{equation*}
-			% 	N_{x'} = \left\{
-			% 	\begin{array}{rl}
-			% 		1 & \text{if } dH(x,x') \leq d,\\
-			% 		0 & \text{otherwise.}%\text{if } dH(x,x') > d.
-			% 	\end{array} \right.
-			% 	\text{ for any $l$-mer }x'.
-			% 	\end{equation*}\newline		
-			% We find that if we divide this bit array $N$ into consecutive blocks of $4^{k}$ flags each, for some $k$, $0 < k < l$, each block will conform to one of at most ($k + 2$), possible bit patterns. We exploit this regularity in order to generate $N$ in blocks.
-			% Say we wish to generate $N(x,d)$ for some $l$-mer $x$. We perform the following steps:
+				{\small\hspace*{40pt}Ex. For $k$ = 5,\ \ $x$ = \texttt{acgtacgtacgt} $\rightarrow$ \ \ $y$ = \texttt{acgtacg} and $z$ = \texttt{tacgt}.}
 
-			% \begin{enumerate}
-			% 	\item We select a value for the {\bf\boldmath block degree $k$}, and divide $x$ into its {\boldmath\bf prefix $y$} (first $l-k$ characters) and its {\boldmath\bf $k$-suffix $z$} (last $k$ characters).\newline
-			% 	{\small\hspace*{40pt}Ex. Choose $k$ = 5;\ \ $x$ = \texttt{acgtacgtacgt} $\rightarrow$ \ \  $y$ = \texttt{acgtacg} and $z$ = \texttt{tacgt}.}
-			% 	% \newline\hspace*{58pt}divides into }\newline\newline
+			As later explained in steps 7-8, the prefix will decide which of ($k + 2$) patterns is applicable in a particular block in $N$, while the $k$-suffix will determine the structure of these ($k + 2$) patterns.
 
-			% 	\item We generate the {\boldmath\bf distribution $\mathcal{D}(z)$} of Hamming distances from $z$ to all $4^{k}$ possible $k$-suffixes, in which $\mathcal{D}(z)_{z'} = dH(z,z')$ for any $k$-suffix $z'$.
+			\item We generate the distribution $D(z)$ of Hamming distances from $z$ to all $4^{k}$ possible $k$-suffixes. We consider this distribution to be ``centered'' at $z$.
 
-			% 	\item For a given block in $N$, we compute the {\boldmath\bf prefix distance $d_{y'}$}, which is simply the Hamming distance $dH(y,y')$ between $x$'s prefix $y$ and the block's common prefix $y'$. (The $l$-mers of a block in $N$ all have the same prefix, due to the strictly alphabetical enumeration scheme.)
+				\begin{figure}[h] \label{fig:D_tacgt}
+					\
+					\includegraphics[width=6.0in]{img/D(tacgt)_marked_2}
+					\caption{Distance distribution from \texttt{tacgt} to all $4^{5} = 32 \times 32$ $k$-suffixes, $k$=5.}
+					\end{figure}
 
-			% 	\item Given $d_{y'}$ and $\mathcal{D}(z)$, we can compute the Hamming distance from $x$ to any $l$-mer $x' = y'z'$ in the given block as:
-			% 	\begin{equation}
-			% 		dH(x,x') = d_{y'} + \mathcal{D}(z)_{z'}
-			% 		\end{equation}
-				
-			% 	\item With the above equation, we redefine the criteria for setting a bit in $N$:
-			% 	\begin{equation*}
-			% 		N_{x'} = \left\{
-			% 		\begin{array}{rl}
-			% 			1 & \text{if } d_{y'} + \mathcal{D}(z)_{z'} \leq d,\\
-			% 			0 & \text{otherwise.}%\text{if } d_{y'} + \mathcal{D}(z)_{z'} > d.
-			% 		\end{array} \right.
-			% 		\text{ for }x' = y'z'.
-			% 		\end{equation*}
+			The value in the $p^{th}$ cell---found at row $\frac{p}{32}$, column $p\ \emph{mod}\ 32$---of the $32 \times 32$ table in Figure 4.\ref{fig:D_tacgt} is the distance $dH (z, z’)$ from $z$ = \texttt{tacgt} to the $k$-suffix $z'$ which maps to the binary number $p$.
 
-			% 	\item From this we see that a bit at position $z'$ within a block with prefix $y'$ will be set if and only if $D(z)_{z'} \leq d-d_{y'}$.
-			% 	Knowing that the values in $D(z)$ range from 0 to $k$, we have three cases for the value of $d-d_{y'}$:
+				{\small\hspace*{40pt}Ex. $D(\texttt{tacgt})_{100}$\ \ \ \ \ = $dH(\texttt{tacgt}, \texttt{0b0001100100})$
+				\newline\hspace*{137pt} = $dH(\texttt{tacgt}, \texttt{acgca})$
+				\newline\hspace*{137pt} = 5 ,\ \ \ \ at row $\frac{100}{32} = 3$, column $(100\ \emph{mod}\ 32) = 4$
+				}\newline
 
-			% 	\noindent{\small
-			% 		\hspace*{5pt} when \hspace*{17.5pt} $d-d_{y'} < 0$, 	\hspace*{6.5pt}no bits in the block are set;\newline
-			% 		\hspace*{35pt} 	$0 \leq d-d_{y'} < k$,					\hspace*{6.5pt}some bits are set (there are $k$ possible configurations);\newline
-			% 		\hspace*{35pt} 	\hspace*{17.5pt} $d-d_{y'} \geq k$, 	\hspace*{6.5pt}all bits in the block are set. \newline}
-			% 	This results in a maximum of ($k + 2$) possible patterns of bits.
-			% 	Note that, if we choose $k$ greater than $d$, only up to ($d + 1$) .
+			\item Due to the alphabetical enumeration, the $4^k\ l-$mers grouped together in a block will all begin with the same ($l - k$) characters, which we will call the {\bf\boldmath block prefix $y'$}. We can compute a single prefix distance $d_{y'}$ for an entire block: this is simply the distance $dH(y, y')$ between $x$'s prefix and the block prefix.
 
-			% 	\end{enumerate}
+				{\small\hspace*{40pt} Ex.\ \ \ \ For the block containing $l$-mers \{\texttt{acgttgcaaaaa} to \texttt{acgttgcttttt}\},
+				\newline\hspace*{70pt} the prefix distance from $z$ = \texttt{acgtacgtacgt} is 
+				\newline\hspace*{70pt} $d_{y'} = dH(\texttt{acgtacg}, \texttt{acgttgc}) = 3.$
+				}
+
+			\item We can infer that the distance between any two $l$-mers is equal to the sum of the distance between their prefixes and the distance between their $k$-suffixes %(in other words, Hamming distances are additive);
+			; thus, knowing $d_{y'}$ and $\mathcal{D}(z)$for any $l$-mer $x' = y'z'$ in the search space, we can compute the distance from $x$ as:
+				\begin{equation}
+					dH(x,x') = d_{y'} + \mathcal{D}(z)_{z'}
+					\end{equation}
+
+			\item We can now redefine the criteria for setting a bit in $N$:
+				\begin{equation*}
+					N_{x'} = \left\{
+					\begin{array}{rl}
+						1 & \text{if } d_{y'} + \mathcal{D}(z)_{z'} \leq d,\\
+						0 & \text{otherwise.}%\text{if } d_{y'} + \mathcal{D}(z)_{z'} > d.
+					\end{array} \right.
+					\text{ for }x' = y'z'.
+					\end{equation*}
+				From this we see that a bit at position $z'$ within a block with prefix $y'$ will be set if and only if $D(z)_{z'} \leq d-d_{y'}$. The values in $D(z)$ range from 0 to $k$; therefore, we examine ($k + 2$) cases for the value of ($d - d_{y'}$) with respect to the range (0, ..., $k$):
+
+					{\small
+					\hspace*{40pt}{\bf\boldmath Case $-1$:}
+					\hspace*{54pt} $d-d_{y'} < 0$, \hspace*{24pt}no bits in the block are set;\newline
+					\hspace*{40pt}{\bf\boldmath Case 0:}
+					\hspace*{66pt} $d-d_{y'} = 0$, \hspace*{24pt}the ``center'' bit (at position $z$) is set;\newline
+					\hspace*{40pt}{\bf\boldmath\boldmath Cases 1 to $k-1$:}
+					\hspace*{11.5pt} $1 \leq d-d_{y'} < k$, \hspace*{5pt}some of the bits are set; and\newline
+					\hspace*{40pt}{\bf\boldmath Case $k$:}
+					\hspace*{66pt}$d-d_{y'} \geq k$, \hspace*{24pt}all bits in the block are set.}
+
+			\item We see that the ($k + 2$) patterns of blocks in $N$ correspond to the ($k + 2$) cases listed in step 7, and thus the pattern to be used in a certain block is indicated by the value of ($d - d_{y'}$). Meanwhile, the polarity (0 or 1) of a bit in one of these patterns is determined by the value of $D(z)$ at the corresponding position.
+		\end{enumerate}
+			\begin{figure}[h]
+				\centering
+				\begin{minipage}{.33\textwidth}\centering \includegraphics[width=0.95\textwidth]{img/0} $d-d_{y'} = 0$ \end{minipage}% 
+				\begin{minipage}{.33\textwidth} \centering \includegraphics[width=0.95\textwidth]{img/1} $d-d_{y'} = 1$ \end{minipage}% 
+				\begin{minipage}{.33\textwidth} \centering \includegraphics[width=0.95\textwidth]{img/2} $d-d_{y'} = 2$ \end{minipage}
+				\newline\vspace*{20pt}\newline
+				\begin{minipage}{.33\textwidth} \centering \includegraphics[width=0.95\textwidth]{img/3} $d-d_{y'} = 3$ \end{minipage}%
+				\begin{minipage}{.33\textwidth} \centering \includegraphics[width=0.95\textwidth]{img/4} $d-d_{y'} = 4$ \end{minipage}%
+				\begin{minipage}{.33\textwidth} \centering \includegraphics[width=0.95\textwidth]{img/5} $d-d_{y'} \geq 5$ \end{minipage}
+				\newline\newline
+				\caption{
+					Bit patterns followed by blocks in $N(\texttt{tacgt}, 5)$. Black signifies a bit set to 1. There are (5 + 2) = 7 possible patterns; the ``empty'' pattern (for $d - d_{y'} \leq 0$, in which all bits are 0) is not shown. Compare the structure of these patterns with the coloring of the distribution $D(\texttt{tacgt})$ in Figure 4.\ref{fig:D_tacgt}.
+					}
+			\end{figure}
+		\newpage
+	
+	\section{Implementing a pattern-based optimization for EMS-GT}
+	The previous section has shown that the bit-array $N$, representing the $d$-neighborhood of an $l$-mer, can be defined in terms of repeating block patterns. This definition can be used toward a larger goal---constructing the bit-array $\mathcal{N}$ which represents the $d$-neighborhood $\mathcal{N}(S,d)$ of a sequence $S$.
+
+	To do this, we first initialize the array $\mathcal{N}$ of $4^l$ bit flags, all set to zero. We select a value for the block degree $k$, and pre-generate all $4^k$ possible sets of block patterns (one set for each possible ``center'' $k$-suffix). Then, for every $l$-mer $x = yz$ in $S$:
+		\begin{enumerate}
+			\item We retrieve $\mathcal{P}(z) = \{P_{1}, ... , P_{k-1}\}$, the set of unique block patterns ``centered'' at $x$'s $k$-suffix $z$. For convenience, this set excludes three ``trivial'' patterns: the empty pattern $P_{-1}$ (all 0's), the full pattern $P_{k}$ (all 1's), and the pattern $P_{0}$ in which only the center bit (the bit at position $z$) is set.
+			\item For every $d$-neighbor $y'$ of $x$'s prefix $y$, we locate the block---$block(\mathcal{N}, y')$---in $\mathcal{N}$ whose block prefix is $y'$. We then apply the appropriate pattern to the block, based on the value of $d - d_{y'}$:
+			\begin{enumerate}
+				\item If $d - d_{y'} = 0$, we set the ``center'' bit, i.e. the bit at position $z$ in $block(\mathcal{N}, y')$.
+				\item If $0 < d - d_{y'} < k$, we mask the pattern $P_{d - d_{y'}}$ onto $block(\mathcal{N}, y')$.
+				% This means that, for every bit set to 1 in the pattern, the corresponding bit of $block(\mathcal{N}, y')$ will also be set.
+				\item If $d - d_{y'} \geq k$, we set all bits in $block(\mathcal{N}, y')$.
+			\end{enumerate}
+			% This traverses and masks all non-empty blocks---those which fulfill the condition $d - d_{y'} \geq 0$; in other words, those for which the block prefix $y'$ is a neighbor of $y$.
+		\end{enumerate}
+
+	\noindent This entire procedure effectively performs $\mathcal{N}(S,d) \leftarrow \mathcal{N}(S,d) \cup N(x,d)$ for each $l$-mer $x$ in $S$, as specified in lines 3-6 and 10-13 of EMS-GT (Algorithm 2.1).
+
+	Step 2 requires us to generate all $d$-neighbors of $x$'s prefix $y$.%, as this gives us the prefixes for non-empty blocks in $N$.
+	We can use our recursive procedure (Algorithm 2.3) to traverse the neighborhood $N(y,d)$; as Table \ref{tbl:neighbors_blockmasking} shows, this will require generating much fewer neighbors than traversing the entire neighborhood of $x$, $N(x,d)$. Note that, with $k$=5, $N(y,d)$ is only 10-20\% the size of $N(x,d)$! \newline
+
+	\begin{table}[h] %neighbors_blockmasking
+		\renewcommand{\arraystretch}{1.3}
+		\label{tbl:neighbors_blockmasking}
+		\centering
+		\begin{tabular}{|c|c|c|c|}
+		\hline 
+		\bfseries\boldmath $(l,d)$ & \bfseries\boldmath $N(x,d)$ & \bfseries\boldmath $N(y,d)$, $k$=5 & \bfseries \% reduction\\
+		\bfseries & \bfseries\boldmath $\sum_{i=0}^{l} \binom{l}{i} 3^{i}$ & \bfseries\boldmath $\sum_{i=0}^{l-k} \binom{l-k}{i} 3^{i}$ & \\
+		\hline
+		 9,2 &         351  &       66 & 81.2\%\\
+		11,3 &       4,983  &      693 & 86.1\%\\
+		13,4 &      66,378  &    7,458 & 88.8\%\\
+		% 14,4 &      91,770  &   12,825 & 86.0\%\\
+		15,5 &     853,569  &   81,921 & 90.4\%\\
+		% 16,5 &   1,225,092  &  143,979 & 88.2\%\\
+		17,6 &  10,738,203  &  912,717 & 91.5\%\\
+		\hline\end{tabular}
+
+		\caption{Number of individual neighbors generated for $N(x,d)$ vs. $N(y,d)$}
+		\end{table}
+
+		This large reduction in recursive neighbor generation explains why, for most $(l,d)$ values, building the neighborhood bit-array in blocks proves significantly faster than the current approach---recursively generating each individual neighbor, then locating and setting its bit flag. This is shown in Table ~\ref{tbl:speedup_blockmasking}, comparing EMS-GT's performance with and without the pattern-based optimization.\newline
+
+			\begin{table}[h] %speedup_blockmasking
+				\renewcommand{\arraystretch}{1.3}
+				\label{tbl:speedup_blockmasking}
+				\centering
+				\begin{tabular}{|c|c|c|c|}
+				\hline 
+				\bfseries\boldmath $(l,d)$ & \bfseries Without block-based & \bfseries With block-based & \bfseries speedup\\
+				\bfseries & \bfseries optimization & \bfseries\boldmath optimization, $k=5$ & \bfseries\\
+				\hline
+				 9,2 &   0.06 s &    0.11 s &     --  \\
+				11,3 &   0.22 s &    0.20 s &    6.7\%\\
+				13,4 &   1.98 s &    1.04 s &   47.5\%\\
+				% 14,4 &   3.53 s &    2.55 s &   27.8\%\\
+				15,5 &  25.06 s &   15.51 s &   38.1\%\\
+				% 16,5 &  41.63 s &   29.03 s &   30.3\%\\
+				17,6 & 308.61 s &  175.85 s &   43.0\%\\
+				\hline\end{tabular}
+
+				\caption{Performance of EMS-GT with vs. without block-masking optimization \newline
+				(runtimes averaged over 20 synthetic datasets for each $(l,d)$ instance).}
+				\end{table}
+
+	\section{Performance of optimized EMS-GT}
 
 
-			%  We exploit this regularity to build $N$ in blocks. Say we wish to generate $N(x,d)$ for some $l$-mer $x$. We first divide $x$ into its {\boldmath\bf prefix $y$} (first $l-k$ characters) and its {\boldmath\bf $k$-suffix $z$} (last $k$ characters).\newline\newline	
-			% 	{\small 
-			% 		Ex. Setting $k$ = 5, $x$ = \texttt{acgtacgtacgt}\newline
-			% 		\hspace*{18pt}is divided into $y$ = \texttt{acgtacg} and $z$ = \texttt{tacgt}.}\newline\newline
-			% We then generate the {\boldmath\bf distribution $\mathcal{D}(z)$} of Hamming distances from $z$ to all $4^{k}$ possible $k$-suffixes (Fig. 1).
-			% Within $\mathcal{D}(z)$ the minimum value is 0 (at $z$ itself) and the maximum is $k$.%
-			% \begin{figure}[h]
-			% 	\centering
-			% 	\label{fig:distribution}
-			% 	\includegraphics[width=2.5in]{img/D(tacgt)}
-			% 	\caption{\small
-			% 		Distribution $\mathcal{D}$(\texttt{tacgt}) of Hamming distances from \texttt{tacgt} 
-			% 		to all $4^{5} = 32\times32$ $k$-suffixes of length 5.
-			% 		The value in the $p^{th}$ cell of this $32\times32$ table (at row $\frac{p}{32}$, col $p$ \emph{mod} 32) is the Hamming distance from the \textbf{center} \texttt{tacgt} to the $k$-suffix that maps to the binary number $p$.
-			% 		%, i.e. $D(z)_{p} = dH(z,\emph{unmap}(p))$.\newline
-			% 		Ex. $\mathcal{D}(\texttt{tacgt})_{100} = dH(\texttt{tacgt}, \texttt{acgca}) = 5$.\newline
-			% 		%$D(\texttt{tacgt})_{24,27} = dH(\texttt{tacgt}, \emph{unmap}(795)) = dH(\texttt{tacgt}, \texttt{tacgt}) = 0$.
-			% 	}
-			% 	\end{figure}\newline
-			% Due to the alphabetical enumeration, the $4^{k}$ $l$-mers grouped together in a block will all begin with the same ($l-k$) characters---the {\boldmath\bf block prefix $y'$}. The block's {\boldmath\bf prefix distance $d_{y'}$} is just the Hamming distance $dH(y,y')$ between $x$'s prefix and the block prefix.\newline\newline
-			% 	{\small
-			% 		Ex. For block \{\texttt{acgttgcaaaaa} to \texttt{acgttgcttttt}\}\newline
-			% 		\hspace*{18pt} the prefix distance from $x$ = \texttt{acgtacgtacgt} is\newline
-			% 		\hspace*{21pt} $d_{y'} = dH(\texttt{acgtacg}, \texttt{acgttgc}) = 3$. } \newline\newline
-			% We can infer that the distance between any two $l$-mers is equal to the sum of the distance between their prefixes and the distance between their $k$-suffixes; thus, given $d_{y'}$ and $\mathcal{D}(z)$, we can compute the distance from $x$ to any $l$-mer $x' = y'z'$ in a block as:
-			% \begin{equation}
-			% 	dH(x,x') = d_{y'} + \mathcal{D}(z)_{z'}
-			% 	\end{equation}
-			% We can now redefine the criteria for setting a bit in $N$:
-			% \begin{equation*}
-			% 	N_{x'} = \left\{
-			% 	\begin{array}{rl}
-			% 		1 & \text{if } d_{y'} + \mathcal{D}(z)_{z'} \leq d,\\
-			% 		0 & \text{otherwise.}%\text{if } d_{y'} + \mathcal{D}(z)_{z'} > d.
-			% 	\end{array} \right.
-			% 	\text{ for }x' = y'z'.
-			% 	\end{equation*}
-			% From this we see that a bit at position $z'$ within a block with prefix $y'$ will be set if and only if $D(z)_{z'} \leq d-d_{y'}$. The values in $D(z)$ range from 0 to $k$; therefore\newline
-
-			% 	{\small
-			% 		\hspace*{5pt} when $d-d_{y'} < 0$, 		\hspace*{24pt}no bits in the block are set;\newline
-			% 		\hspace*{5pt} when $0 \leq d-d_{y'} < k$,	\hspace*{6.5pt}some bits are set ($k$ ways); and\newline
-			% 		\hspace*{5pt} when $d-d_{y'} \geq k$, 		\hspace*{24pt}all bits in the block are set. \newline}
-			
-			% This allows for ($k + 2$) unique patterns of bits, including ``empty'' (all 0's) and ``full'' (all 1's), for blocks in $N$.\newline
-			% \begin{figure}[h]
-			% 	\centering
-			% 	\label{fig:bit_patterns}
-			% 	\includegraphics[width=3.1in]{img/0-1}\vspace*{5pt}
-			% 	\includegraphics[width=3.1in]{img/2-3}\vspace*{5pt}
-			% 	\includegraphics[width=3.1in]{img/4-5}
-			% 	\caption{\small Bit patterns followed by blocks of size $4^{5}=32\times32$ in the bit-based representation of $\mathcal{N}(\texttt{acgtacgtacgt},5)$. Black signifies a 1. There are $(5+2)=7$ possible patterns---the empty pattern (all 0s) is not shown.}
-			% 	\end{figure}
-			% \newpage
-
-	\section{Performance of EMS-GT, with optimization}
-		EMS-GT and two competitor algorithms were run an Intel Xeon, 2.10 GHz machine (single-core only). Their performance, averaged over 20 synthetic datasets for each $(l,d)$ challenge instance, is outlined in Table~\ref{tbl:runtimes_v_pms}:\newline
+		Finally, the optimized EMS-GT and two competitor algorithms were run on an Intel Xeon, 2.10 GHz processor (single core only). Their performance, averaged over 20 synthetic datasets for each $(l,d)$ challenge instance, is outlined in Table~\ref{tbl:runtimes_v_pms}:\newline
 
 		\begin{table}[ht] %runtimes
 			\renewcommand{\arraystretch}{1.3}
@@ -500,10 +481,9 @@
 			\caption{Runtimes of PMS8, qPMS9 and EMS-GT}
 			\end{table}
 
-		
-		For every challenge instance except (17,6) EMS-GT outperforms qPMS9; it outperforms PMS8 for instance (17,6). EMS-GT was run including the block-masking optimization, with the default suffix length of $k$=5. Observe that our EMS-GT implementation can only solve problem instances where $l \leq 17$. This is because when we reach $l$=18, the size of the integer array needed to represent the entire search space ($\frac{4^{18}}{32} = \frac{2^{36}}{2^{5}} = 2^{31}$ integers) begins to exceed the maximum size for Java arrays, which is ($2^{31} - 1$) elements.\newline
+		For every challenge instance except (17,6) EMS-GT outperforms qPMS9; it outperforms PMS8 for (17,6). EMS-GT was run including the block-masking optimization, with the default suffix length of $k=5$. Observe that our EMS-GT implementation can only solve problem instances where $l \leq 17$. This is because when we reach $l$=18, the size of the integer array needed to represent the entire search space ($\frac{4^{18}}{32} = \frac{2^{36}}{2^{5}} = 2^{31}$ integers) begins to exceed the maximum size for Java arrays, which is ($2^{31} - 1$) elements.\newline
 
-\chapter{Conclusions}
+% \chapter{Conclusions}
 
 %\BackMatter
 \bibliographystyle{plain}
