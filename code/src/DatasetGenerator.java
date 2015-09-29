@@ -42,6 +42,13 @@ public class DatasetGenerator {
 			d = Integer.parseInt( args[1] );
 			set = Integer.parseInt( args[2] );
 		}
+		else {
+			System.out.println("Usage:")
+			System.out.println("\t    java DatasetGenerator <t> <n> <l> <d>");
+			System.out.println("\t or java DatasetGenerator <l> <d> <set>,\t t=20, n=600");
+			return;
+		}
+
 		seqS = new char[t][n];
 		motif = new char[l];
 		mutationSite = new int[d];
