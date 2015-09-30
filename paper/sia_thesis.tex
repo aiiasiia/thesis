@@ -1,17 +1,7 @@
 \documentclass[oneside,12pt]{DISCSthesis}
- \usepackage{graphicx}
-% \usepackage{subcaption}
-% \usepackage{multirow}
- %\usepackage{fancyvrb}
- %\usepackage{rotating}
- \usepackage{longtable}
- \usepackage{pdflscape}
- % \usepackage[justification=centering]{caption}
- %\usepackage[titletoc]{appendix}
- %\usepackage{pdfpages}
+\usepackage{graphicx}
+\usepackage{longtable}
 \usepackage{setspace}
-% \usepackage{enumitem}	\setlist[itemize]{leftmargin=*,itemsep=5pt}
-% \usepackage{color,soul} % produces conflicts with
 \usepackage{soul}
 \usepackage{amsmath}
 \usepackage{algpseudocode}
@@ -22,11 +12,11 @@
 %\documentclass{article}
 \begin{document}
 \ThesisAuthor{\textbf{Maria Clara Isabel D. Sia}}
-\ThesisTitle{\textbf{Optimizing An Exact Solution to the ($l$, $d$)-Planted Motif Problem}}
+\ThesisTitle{\textbf{Improving An Exact Solution to the ($l$, $d$)-Planted Motif Problem}}
 \ThesisArea{Computer Science}
 \ThesisDefenseYear{2015}
 % \DefenseDate{10 July 2013}
-% \ThesisGrade{Very Good}
+% \ThesisGrade{}
 
 \DepartmentHead{MARLENE M. DE LEON, Ph.D.}
 \SchoolHead{EVANGELINE P. BAUTISTA, Ph.D.}
@@ -45,7 +35,7 @@
 \begin{abstract}
 	DNA motif finding is widely recognized as a difficult problem in computational biology and computer science. Because of the usual large search space involved, exact solutions typically require a significant amount of execution time before discovering a motif of length $l$ that occurs in an input set $\{S_{1} ,...,S_{n}\}$ of sequences, allowing for at most $d$ substitutions. 
 
-	This study implements a novel optimization to EMS-GT, a motif search algorithm which operates on a compact bit-based representation of the search space. The optimization takes advantage of distance-related patterns in the search space, in order to speed up the bulk bit-setting operations performed by the algorithm. A Java implementation
+	This study implements a novel improvement to EMS-GT, a motif search algorithm which operates on a compact bit-based representation of the search space. The improvement takes advantage of distance-related patterns in the search space, in order to speed up the bulk bit-setting operations performed by the algorithm. A Java implementation
 	% ---run on synthetic datasets for various challenge instances of the ($l,d$) planted motif problem---
 	is shown to be highly competitive against PMS8 and qPMS9, two current state-of-the-art exact algorithms. EMS-GT works extremely well for problems involving short motifs, outperforming both competitors for challenge instances with ($l,d$) values (9,2), (11,3), (13,4) and (15,5), showing runtime reductions of 76\%, 81\%, 77\% and 37\% respectively for these instances, while ranking second to qPMS9 for challenge instance (17,6).
 	\end{abstract}
@@ -68,7 +58,7 @@
 
 		The planted motif problem simply asks: ``\emph{Given a set of DNA sequences, can we find an unknown motif of length $l$ that appears at different positions in each of the sequences} \cite{pevzner2000combinatorial}?'' Initially it seems an exhaustive string search will suffice for this problem. However, due to biological mutation, motif occurrences in DNA are allowed to differ from the original motif by up to $d$ characters. This greatly impacts complexity: two distinct variants of a motif---both counting as valid occurrences of the motif---might differ in as many as 2$d$ characters! Brute-force solutions quickly become infeasible as values of $l$ and $d$ increase. All of this shows why ($l$, $d$)-motifs are sometimes called ``subtle'' signals in DNA  \cite{pevzner2000combinatorial}, and why finding them is difficult and computationally expensive. In fact, the motif finding problem has already been shown to be NP-complete \cite{pms2014}. 
 
-		This study is concerned with the EMS-GT (\emph{Exact Motif Search - Generate and Test}) algorithm \cite{nabos2015dissertation}, which solves the planted motif problem for any arbitrary instance up to $l$=17. This study investigates certain Hamming distance-related patterns appearing in EMS-GT's bit-based representation of the motif search space, and uses these to develop a novel optimization for EMS-GT.
+		This study is concerned with the EMS-GT (\emph{Exact Motif Search - Generate and Test}) algorithm \cite{nabos2015dissertation}, which solves the planted motif problem for any arbitrary instance up to $l$=17. This study investigates certain Hamming distance-related patterns appearing in EMS-GT's bit-based representation of the motif search space, and uses these to develop a novel speedup technique for EMS-GT.
 
 	\section{Context of the Study}
 		This section formally defines the planted motif problem. It also defines key terms used throughout this paper in discussing exact motif-search algorithms.
@@ -99,9 +89,9 @@
 	\section{Objectives of the Study}
 		The main objective of this study is to improve the performance of the EMS-GT algorithm. Specifically, it aims:
 		\begin{enumerate}
-		\item To develop an optimization for EMS-GT that takes advantage of distance-related patterns in the motif search space.
-		\item To evaluate the resulting optimization with regard to improvement in runtime and solvable problem instances.
-		\item To evaluate the optimized version of EMS-GT against state-of-the-art motif search algorithms.
+		\item To develop a speedup technique for EMS-GT that takes advantage of distance-related patterns in the motif search space.
+		\item To evaluate the resulting technique with regard to improvement in runtime and solvable problem instances.
+		\item To evaluate the improved version of EMS-GT against state-of-the-art motif search algorithms.
 		\end{enumerate}
 
 	\section{Research Questions}
@@ -109,19 +99,19 @@
 		Specifically, it aims to answer the following:
 
 		\begin{enumerate}
-		\item How can distance-related patterns observed within the motif search space be exploited in an optimization for EMS-GT?
-		\item What performance improvement does a pattern-based optimization produce, with regard to runtime and solvable problem instances?
-		\item How does the optimized version of EMS-GT compare with state-of-the-art motif search algorithms?
+		\item How can distance-related patterns observed within the motif search space be exploited in a speedup technique for EMS-GT?
+		\item What performance improvement does a pattern-based speedup technique, with regard to runtime and solvable problem instances?
+		\item How does the improved version of EMS-GT compare with state-of-the-art motif search algorithms?
 		\end{enumerate}
 
 	\section{Significance of the Study}
 		Motif finding in DNA and other types of nucleotide sequences is an important task in bioinformatics. Genome analysis requires fast, efficient algorithms to identify biological motifs which may be linked to protein synthesis, gene function, or even disease and targets for medical treatment. 
 
-		Optimizing the EMS-GT algorithm, which was shown to be competitive with the state-of-the-art, results in an improved option for real-world motif finding applications. Furthermore, this study's investigation and insights regarding distance-related patterns within an organized search space may prove applicable to other types of search tasks, pattern-matching tasks, and problems involving Hamming distances.
+		Improvinging the EMS-GT algorithm, which was shown to be competitive with the state-of-the-art, results in an even faster option for real-world motif finding applications. Furthermore, this study's investigation and insights regarding distance-related patterns within an organized search space may prove applicable to other types of search tasks, pattern-matching tasks, and problems involving Hamming distances.
 
 	\section{Scope and Limitations of the Study}
-		This study is concerned with integrating a novel bit-masking optimization into the existing Java implementation of EMS-GT. The optimized version is benchmarked by its runtime on synthetic datasets for challenging instances of the problem. (Unoptimized EMS-GT had been previously tested for correctness, using real biological data containing known motifs; re-testing would be redundant since the optimization does not change the algorithm's logic.)	
-		Furthermore, the performance of EMS-GT is compared to that of PMS8 and qPMS9 running on a single core. Although both competitor algorithms are also capable of using multiple procesors, parallelization is beyond the current scope of the optimizations explored for EMS-GT.
+		This study is concerned with integrating a novel bit-masking speedup technique into the existing Java implementation of EMS-GT. The improved version is benchmarked by its runtime on synthetic datasets for challenging instances of the problem. (EMS-GT had been previously tested for correctness using real biological data with known motifs; re-testing would be redundant since the speedup technique does not change the logic of the algorithm.)	
+		Furthermore, the performance of EMS-GT is compared to that of PMS8 and qPMS9 running on a single core. Although both competitor algorithms are also capable of using multiple procesors, parallelization is beyond the current scope of the speedup techniques explored for EMS-GT.
 
 \chapter{Review of Related Literature}
 	Motif finding is a well-studied problem in computing. Various motif search algorithms have been developed,
@@ -132,7 +122,7 @@
 		Heuristic algorithms perform an iterative local search, for instance by repeatedly refining an input sampling or projection until 
 		a motif is found. 
 
-		Gibbs sampling \cite{lawrence1993detecting} and Expectation Maximization (EM), used in the motif-finding tool MEME \cite{lawrence1990expectation,bailey1995unsupervised} both use probabilistic computations to optimize an initial random alignment. (An alignment is simply a vector $(a_{1}, a_{2},...,a_{n})$ of $n$ positions, which predicts that the motif occurs at position $a_{i}$ in the given sequence $S_{i}$.) Gibbs sampling attempts to refine the alignment one position at a time; %in contrast,
+		Gibbs sampling \cite{lawrence1993detecting} and Expectation Maximization (EM), used in the motif-finding tool MEME \cite{lawrence1990expectation,bailey1995unsupervised} both use probabilistic computations to improve an initial random alignment. (An alignment is simply a vector $(a_{1}, a_{2},...,a_{n})$ of $n$ positions, which predicts that the motif occurs at position $a_{i}$ in the given sequence $S_{i}$.) Gibbs sampling attempts to refine the alignment one position at a time; %in contrast,
 		EM may recompute the entire alignment in a single iteration. 
 
 		Projection \cite{blanchette2002discovery} combines a pattern-based approach with EM's probabilistic approach, trying to guess every successive character of a tentative motif and using EM to verify its guesses. GARPS \cite{huo2009combining} uses a random version of the projection strategy, in tandem with the iteratively self-correcting Genetic Algorithm (GA), for yet another iterative approach. These are just some of many successful heuristic algorithms for motif finding.
@@ -142,18 +132,40 @@
 
 		WINNOWER \cite{pevzner2000combinatorial} and its successor MITRA \cite{eskin2002finding} are exact algorithms that look at pairwise $l$-mer similarity to find motifs. In a set of DNA sequences, there are numerous pairs of ``similar'' $l$-mers, which come from different sequences and have Hamming distances of at most 2$d$ from each other (meaning that they could possibly be two $d$-neighbors of the same $l$-mer). WINNOWER represents these pairs in a graph, with $l$-mers as nodes and edges connecting $l$-mer pairs. It then prunes the graph to identify ``cliques'' of pairs that indicate a motif. MITRA refines this graph representation into a mismatch tree containing all possible $l$-mers, organized by prefix. The tree structure allows MITRA to eliminate entire branches at a time, making it significantly faster than WINNOWER at removing the many spurious edges that are not part of any motif clique.
 
-		The current state-of-the-art in exact motif search is qPMS9, the most recent in a series \cite{pms2007,pms2014,pms2015} of Planted Motif Search algorithms. It performs a sample-driven step, which generates a $k$-tuple of $l$-mers from each of $k$ input strings, followed by a pattern-driven step, which generates the common $d$-neighborhood of the tuple and then checks whether any of the $l$-mers in this common neighborhood is a motif. To identify neighbors, qPMS9 efficiently traverses the tree of all possible $l$-mers, using certain pruning criteria explored by predecessors PMSPrune and qPMS7 \cite{pms2007} to quickly discard non-neighbor branches. Sampling in qPMS9 is an improvement on its predecessor PMS8 \cite{pms2014}; in building a $k$-tuple, qPMS9 intelligently prioritizes $l$-mers that have fewer matches with the $l$-mers already selected, such that the common $d$-neighborhood becomes smaller and thus faster to check through.  Finally, both PMS8 and qPMS9 have been implemented to run on multiple processors, allowing them to solve problem instances with ($l, d$) as large as (50, 21) in a few hours.
+		The BitBased algorithm \cite{dasari2010efficient} uses approaches that are similar to EMS-GT's (see subsection 2.3.1): it maps $l$-mers to binary strings of length $2l$, and represents the motif search space with an array of bits. The main difference is that BitBased is optimized for parallel computation on multiple cores, requiring specialized GPU hardware (Nvidia Tesla C1060 or S1070). BitBased is able to solve the challenge problem instance (21,8) in 1.1 hours.
 
-		The BitBased algorithm \cite{dasari2010efficient} uses similar approaches to EMS-GT (see subsection 2.3.1): it also maps $l$-mers to binary strings, and uses an array of bits to represent the motif search space. The main difference is that BitBased is optimized for parallel computation on multiple cores, requiring specialized GPU hardware (Nvidia Tesla C1060 or S1070). BitBased is able to solve the challenge problem instance (21,8) in 1.1 hours.
+	\subsection{PMS8 and qPMS9}
+		The current state-of-the-art exact algorithms are PMS8 and qPMS9, from the Panoptic Motif Search (PMS) series
+		 developed by Rajasekaran et al
+		\cite{pms2007,pms2014,pms2015}. The idea in both PMS8 and qPMS9 is to form all possible tuples of $n'$ ``similar'' $l$-mers, for some $n' < n$, and then determine whether the common neighbors of $l$-mers in these tuples are motifs. This approach proceeds in two main steps:
+
+		\begin{enumerate}
+			\item {\em Sample-driven step}\newline
+			This step chooses a tuple $T$ of $n'$ ``similar'' $l$-mers from $n'$ distinct DNA sequences in the set $\mathcal{S}$. Similarity means that the $l$-mers in the tuple have a common neighbor; this implies that the distance between any two $l$-mers in $T$ must be less than $2d$.
+			%To build $T$, the algorithm repeatedly chooses an $l$-mer from a different sequence each time, avoiding $l$-mers with distances over $2d$ from any of the $l$-mers already in $T$. This ensures that new $l$-mers have neighbors in common with the others.
+			\begin{equation} T = \{l_{1}, l_{2}, ..., l_{n'}\},\ \ \ \ \ \ 
+			dH(l_{i}, l_{j}) \leq 2d\ \ \forall\ l_{i}, l_{j} \in T \end{equation}
+
+			\item {\em Pattern-driven step}\newline
+			This step intersects the $d$-neighborhoods of $l_{1}, l_{2}, ..., l_{n'}$ to form the set $C$ of their common neighbors. It then checks each $l$-mer $c$ in $C$, to determine whether a $d$-neighbor of $c$ appears in all of the $n-n'$ remaining sequences (i.e., those sequences which did not initially contribute an $l$-mer to $T$). If this is the case, $c$ is accepted as a motif.
+			\begin{equation} C = N(l_{1}, d) \cap N(l_{2}, d) \cap...\cap N(l_{n'}, d). \end{equation}
+		\end{enumerate}
+		\vspace{-5mm}
+		\noindent Exhaustively building all ``similar'' $n'$-tuples requires significant runtime and many false starts (i.e., the algorithm starts building a tuple to size $m < n'$, only to find that no further similar $l$-mers can be found).
+		PMS8 reduces this by improving the search for additional $l$-mers, using stricter pruning conditions for similarity % ---the presence of common neighbors---
+		between {\em three} $l$-mers (two from the tuple, and the one to be added). This method of testing similarity for $l$-mer triples, instead of pairs, quickly recognizes and discards false starts. For even greater efficiency, qPMS9 intelligently prioritizes adding $l$-mers that are highly distant from those already in the tuple, such that common neighborhood becomes smaller and faster to check through.
+		In practice, both PMS8 and qPMS9 have been implemented to run on multiple processors with the OpenMPI C library, allowing them to solve highly challenging problem instances with ($l, d$) as large as (50, 21) in a few hours.
 
 	\newpage
 	\section{EMS-GT}
-		EMS-GT \cite{nabos2015dissertation} is an exact motif search algorithm based on the candidate generate-and-test principle.
-		It operates on a compact bit-based representation of the search space, identifying the common $d$-neighbors of the $n$ given DNA sequences as motifs. The main idea of EMS-GT is to narrow down the search space to a small set of ``candidate'' motifs based on the first $n'$ sequences, then do a brute-force search for each candidate on the remaining $(n - n')$ sequences to confirm whether or not it is a motif. 
+		EMS-GT, first developed by Nabos \cite{nabos2015dissertation}, is an exact motif search algorithm based on the candidate generate-and-test principle.
+		It operates on a compact bit-based representation of the search space.
+		% , identifying the common $d$-neighbors of the $n$ given DNA sequences as motifs. 
+		Similar to PMS8 and qPMS9, the main idea of EMS-GT is to narrow down the search space to a small set of ``candidate'' motifs based on the first $n'$ sequences, then to do a brute-force search for neighbors of each candidate in the remaining $(n - n')$ sequences to confirm whether or not the candidate is a motif.
 		EMS-GT's approach proceeds in two main steps:
 		\begin{enumerate} %[label={\em (\alph*)}]
 			\item {\em Generate candidates}\newline
-			This step takes the intersection of the $d$-neighborhoods of the first $n'$ sequences $S_{1},S_{2},...,S_{n'}$. Every $l$-mer in the resulting set $C$ is a candidate motif.
+			This step intersects the $d$-neighborhoods of the first $n'$ sequences $S_{1},S_{2},...,S_{n'}$. Every $l$-mer in the resulting set $C$ is a candidate motif.
 				\begin{equation} C = \mathcal{N}(S_{1}, d) \cap \mathcal{N}(S_{2}, d) \cap...\cap \mathcal{N}(S_{n'}, d). \end{equation}
 			\item {\em Test candidates}\newline
 			This step simply checks each candidate motif $c$ in $C$, to determine whether a $d$-neighbor of $c$ appears in all of the remaining sequences $S_{n'+1},S_{n'+2},...,S_{n}$. If this is the case, $c$ is accepted as a motif in set $M$.
@@ -287,7 +299,7 @@
 			}
 
 \chapter{Methodology}
-	This section briefly describes the procedure used to evaluate the optimized version of the EMS-GT algorithm.
+	This section briefly describes the procedure used to evaluate the improved version of the EMS-GT algorithm.
 
 	\section{Datasets}
 		Synthetic datasets were created using a DNA sequence generator written in Java. Each nucleotide character in a sequence is randomly generated; \{\texttt{a}, \texttt{g}, \texttt{c}, \texttt{t}\} each have a 25\% chance of being selected, independent from other characters in the sequence.
@@ -295,26 +307,31 @@
 
 	\section{Implementation}
 		Thee Java implementation of EMS-GT operates on a compact, bit-based enumerative representation of the motif search space. 
-		Since a significant part of runtime is spent locating and setting bits in this bit-based representation, optimizations were explored for the bit-setting portion of the algorithm. Investigation of some Hamming distance-based patterns in the search space led to the development and integration of a bit-masking speed-up technique, which exploits these patterns to set bits in entire blocks.
+		Since a significant part of runtime is spent locating and setting bits in this bit-based representation, speedup techniques were explored for the bit-setting portion of the algorithm.
+
+
+
+
+		Investigation of some Hamming distance-based patterns in the search space led to the development and integration of a bit-masking speed-up technique, which exploits these patterns to set bits in entire blocks.
 
 	\section{Evaluation}
-		The optimized version of EMS-GT was compared to the original EMS-GT algorithm, as well as to the state-of-the-art algorithms PMS8 and qPMS9, by benchmarking their performance on challenging instances of the ($l, d$) planted motif problem. An ($l$, $d$) problem instance is defined to be a challenging instance if $d$ is the largest value for which the expected number of $l$-length motifs that would occur in the input by random chance does not exceed some limit---typically 500 random motifs \cite{pms2015}. The specific challenge instances used were (9,2), (11,3), (13,4), (15,5), and (17,6), as identified in \cite{pms2015,pms2007}. 
+		The improved version of EMS-GT was compared to the original EMS-GT algorithm, as well as to the state-of-the-art algorithms PMS8 and qPMS9, by benchmarking their performance on challenging instances of the ($l, d$) planted motif problem. An ($l$, $d$) problem instance is defined to be a challenging instance if $d$ is the largest value for which the expected number of $l$-length motifs that would occur in the input by random chance does not exceed some limit---typically 500 random motifs \cite{pms2015}. The specific challenge instances used were (9,2), (11,3), (13,4), (15,5), and (17,6), as identified in \cite{pms2015,pms2007}. 
 		\bigskip
 
 \chapter{Results and Analysis}
-	This section provides a step-by-step derivation of the distance-related patterns that occur within a bit-array representing an $l$-mer neighborhood in EMS-GT. It describes how an optimization for EMS-GT based on these patterns was implemented. Finally, it quantifies the performance improvement due to this optimization.
+	This section provides a step-by-step derivation of the distance-related patterns that occur within a bit-array representing an $l$-mer neighborhood in EMS-GT. It then describes how a speedup technique for EMS-GT based on these patterns was implemented. Finally, it quantifies the performance improvement due to this technique.
 	
 	\section{\boldmath Deriving distance-related patterns in $l$-mer neighborhoods}
 		\begin{enumerate}
 			\item We can represent the neighborhood $N(x,d)$ of an $l$-mer $x$ as an array $N$ of $4^{l}$ bit flags, set to 1 if the corresponding $l$-mer is a neighbor and 0 otherwise.
-				\begin{equation*}
+				\begin{equation}
 					N_{x'} = \left\{
 					\begin{array}{rl}
 						1 & \text{if } dH(x,x') \leq d,\\
 						0 & \text{otherwise.}%\text{if } dH(x,x') > d.
 					\end{array} \right.
 					\text{ for any $l$-mer }x'.
-					\end{equation*}
+					\end{equation}
 
 			\item We find that if we divide this bit-array $N$ into consecutive blocks of $4^{k}$ flags each, for some {\b\boldmath block degree $k$}, $0 < k < l$, each block will conform to one of at most ($k + 2$) possible bit patterns. We exploit this regularity to build $N$ in blocks.
 
@@ -347,20 +364,20 @@
 				}
 
 			\item We can infer that the distance between any two $l$-mers is equal to the sum of the distance between their prefixes and the distance between their $k$-suffixes %(in other words, Hamming distances are additive);
-			; thus, knowing $d_{y'}$ and $\mathcal{D}(z)$for any $l$-mer $x' = y'z'$ in the search space, we can compute the distance from $x$ as:
+			; thus, knowing $d_{y'}$ and $\mathcal{D}(z)$ for some $l$-mer $x' = y'z'$ in the search space, we can compute its distance from $x$ as:
 				\begin{equation}
 					dH(x,x') = d_{y'} + \mathcal{D}(z)_{z'}
 					\end{equation}
 
-			\item We can now redefine the criteria for setting a bit in $N$:
-				\begin{equation*}
+			\item With Equations (4.1) and (4.2), we can redefine the criteria for setting a bit in $N$:
+				\begin{equation}
 					N_{x'} = \left\{
 					\begin{array}{rl}
 						1 & \text{if } d_{y'} + \mathcal{D}(z)_{z'} \leq d,\\
 						0 & \text{otherwise.}%\text{if } d_{y'} + \mathcal{D}(z)_{z'} > d.
 					\end{array} \right.
 					\text{ for }x' = y'z'.
-					\end{equation*}
+					\end{equation}
 				From this we see that a bit at position $z'$ within a block with prefix $y'$ will be set if and only if $D(z)_{z'} \leq d-d_{y'}$. The values in $D(z)$ range from 0 to $k$; therefore, we examine ($k + 2$) cases for the value of ($d - d_{y'}$) with respect to the range (0, ..., $k$):
 
 					{\small
@@ -391,7 +408,10 @@
 			\end{figure}
 		\newpage
 	
-	\section{Implementing a pattern-based optimization for EMS-GT}
+
+
+	\newpage
+	\section{Implementing a pattern-based speedup technique for EMS-GT}
 	The previous section has shown that the bit-array $N$, representing the $d$-neighborhood of an $l$-mer, can be defined in terms of repeating block patterns. This definition can be used toward a larger goal---constructing the bit-array $\mathcal{N}$ which represents the $d$-neighborhood $\mathcal{N}(S,d)$ of a sequence $S$.
 
 	To do this, we first initialize the array $\mathcal{N}$ of $4^l$ bit flags, all set to zero. We select a value for the block degree $k$, and pre-generate all $4^k$ possible sets of block patterns (one set for each possible ``center'' $k$-suffix). Then, for every $l$-mer $x = yz$ in $S$:
@@ -409,8 +429,9 @@
 
 	\noindent This entire procedure effectively performs $\mathcal{N}(S,d) \leftarrow \mathcal{N}(S,d) \cup N(x,d)$ for each $l$-mer $x$ in $S$, as specified in lines 3-6 and 10-13 of EMS-GT (Algorithm 2.1).
 
-	Step 2 requires us to generate all $d$-neighbors of $x$'s prefix $y$.%, as this gives us the prefixes for non-empty blocks in $N$.
-	We can use our recursive procedure (Algorithm 2.3) to traverse the neighborhood $N(y,d)$; as Table \ref{tbl:neighbors_blockmasking} shows, this will require generating much fewer neighbors than traversing the entire neighborhood of $x$, $N(x,d)$. Note that, with $k$=5, $N(y,d)$ is only 10-20\% the size of $N(x,d)$! \newline
+	\section{Performance improvement with pattern-based technique}
+	The pattern-based technique requires examining all $d$-neighbors of $x$'s prefix $y$.%, as this gives us the prefixes for non-empty blocks in $N$.
+	We can use our recursive procedure (Algorithm 2.3) to traverse the neighborhood $N(y,d)$; as Table \ref{tbl:neighbors_blockmasking} shows, this will require generating much fewer neighbors than for the entire neighborhood of $x$. Observe that, with $k$=5, $N(y,d)$ is only 10-20\% the size of $N(x,d)$. \newline
 
 	\begin{table}[h] %neighbors_blockmasking
 		\renewcommand{\arraystretch}{1.3}
@@ -433,7 +454,7 @@
 		\caption{Number of individual neighbors generated for $N(x,d)$ vs. $N(y,d)$}
 		\end{table}
 
-		This large reduction in recursive neighbor generation explains why, for most $(l,d)$ values, building the neighborhood bit-array in blocks proves significantly faster than the current approach---recursively generating each individual neighbor, then locating and setting its bit flag. This is shown in Table ~\ref{tbl:speedup_blockmasking}, comparing EMS-GT's performance with and without the pattern-based optimization.\newline
+		This large reduction in recursive neighbor generation explains why, for most $(l,d)$ values, building the neighborhood in blocks proves significantly faster than the current approach---recursively generating each individual neighbor, then locating and setting its bit flag. This is shown in Table ~\ref{tbl:speedup_blockmasking}, comparing EMS-GT's performance with and without the pattern-based procedure.\newline
 
 			\begin{table}[h] %speedup_blockmasking
 				\renewcommand{\arraystretch}{1.3}
@@ -441,8 +462,8 @@
 				\centering
 				\begin{tabular}{|c|c|c|c|}
 				\hline 
-				\bfseries\boldmath $(l,d)$ & \bfseries Without block-based & \bfseries With block-based & \bfseries speedup\\
-				\bfseries & \bfseries optimization & \bfseries\boldmath optimization, $k=5$ & \bfseries\\
+				\bfseries\boldmath $(l,d)$ & \bfseries Without pattern-based & \bfseries With pattern-based & \bfseries speedup\\
+				\bfseries & \bfseries procedure & \bfseries\boldmath procedure, $k=5$ & \bfseries\\
 				\hline
 				 9,2 &   0.06 s &    0.11 s &     --  \\
 				11,3 &   0.22 s &    0.20 s &    6.7\%\\
@@ -453,14 +474,15 @@
 				17,6 & 308.61 s &  175.85 s &   43.0\%\\
 				\hline\end{tabular}
 
-				\caption{Performance of EMS-GT with vs. without block-masking optimization \newline
+				\caption{Performance of EMS-GT with vs. without pattern-based speedup \newline
 				(runtimes averaged over 20 synthetic datasets for each $(l,d)$ instance).}
 				\end{table}
 
-	\section{Performance of optimized EMS-GT}
+	\newpage
+	\section{Performance of improved EMS-GT}
 
 
-		Finally, the optimized EMS-GT and two competitor algorithms were run on an Intel Xeon, 2.10 GHz processor (single core only). Their performance, averaged over 20 synthetic datasets for each $(l,d)$ challenge instance, is outlined in Table~\ref{tbl:runtimes_v_pms}:\newline
+		Finally, the improved EMS-GT and two competitor algorithms were run on an Intel Xeon, 2.10 GHz processor (single core only). Their performance, averaged over 20 synthetic datasets for each $(l,d)$ challenge instance, is outlined in Table~\ref{tbl:runtimes_v_pms}:\newline
 
 		\begin{table}[ht] %runtimes
 			\renewcommand{\arraystretch}{1.3}
@@ -481,7 +503,7 @@
 			\caption{Runtimes of PMS8, qPMS9 and EMS-GT}
 			\end{table}
 
-		For every challenge instance except (17,6) EMS-GT outperforms qPMS9; it outperforms PMS8 for (17,6). EMS-GT was run including the block-masking optimization, with the default suffix length of $k=5$. Observe that our EMS-GT implementation can only solve problem instances where $l \leq 17$. This is because when we reach $l$=18, the size of the integer array needed to represent the entire search space ($\frac{4^{18}}{32} = \frac{2^{36}}{2^{5}} = 2^{31}$ integers) begins to exceed the maximum size for Java arrays, which is ($2^{31} - 1$) elements.\newline
+		For every challenge instance except (17,6) EMS-GT outperforms qPMS9; it outperforms PMS8 for (17,6). EMS-GT was run including the pattern-based speedup technique, with the default suffix length of $k=5$. Observe that our EMS-GT implementation can only solve problem instances where $l \leq 17$. This is because when we reach $l$=18, the size of the integer array needed to represent the entire search space ($\frac{4^{18}}{32} = \frac{2^{36}}{2^{5}} = 2^{31}$ integers) begins to exceed the maximum size for Java arrays, which is ($2^{31} - 1$) elements.\newline
 
 % \chapter{Conclusions}
 
