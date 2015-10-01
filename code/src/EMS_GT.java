@@ -39,9 +39,6 @@ public class EMS_GT {
 	public static void main(String args[]) throws Exception {
 		if( args.length > 0 ) {
 			inputFileName = args[0];
-			if( args.length > 1 ) {
-				blockDegree = Integer.parseInt(args[1]);
-			}
 		}
 
 		readInput( inputFileHeader + inputFileName );

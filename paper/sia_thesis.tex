@@ -308,15 +308,23 @@
 	\section{Improving EMS-GT}
 		Thee Java implementation of EMS-GT operates on a compact, bit-based enumerative representation of the motif search space. Since a significant part of runtime is spent locating and setting bits in this bit-based representation, speedup techniques were explored for the bit-setting portion of the algorithm.
 
-		\section{Exploring features of data structures in EMS-GT}
-		Printouts of the bit-array $N$ for certain neighborhoods $N(x,d)$ were generated and examined for features that might allow for further efficiency strategies.
-		As recurring patterns in blocks of $N$ emerged, printouts of the underlying distribution of Hamming distances (from $x$ to all other $l$-mers in the search space) were used to derive a proof for the occurrence of these patterns.
+		\section{Exploring features of the EMS-GT data structure}
+		Printouts of the bit-array $N$ for certain neighborhoods $N(x,d)$ were generated and examined for features that might allow for further efficiency strategies. When repeated block patterns were observed in $N$, the underlying distribution of Hamming distances (from $x$ to all other $l$-mers in the search space) was also examined to seek a derivation for the patterns.
 
-		Proof of correctness for 
+		Ultimately, by referencing (1) EMS-GT's alphabetical $l$-mer enumeration scheme and (2) the additive property of Hamming distances, we were able to prove the following general statement:
+
+			A bit-array $N$ (representing the neighborhood $N(x,d)$)
+				can be divided into consecutive blocks of $4^k$ bits each, where
+				each of the blocks will conform to one of at most ($k+2$) patterns.
+
+		We then developed a procedure (Algorithm 4.1) that generates the ($k+2$) patterns
 
 
 
-		Investigation of some Hamming distance-based patterns in the search space led to the development and integration of a bit-masking speed-up technique, which exploits these patterns to set bits in entire blocks.
+
+
+
+		% Investigation of some Hamming distance-based patterns in the search space led to the development and integration of a bit-masking speed-up technique, which exploits these patterns to set bits in entire blocks.
 
 	\section{Evaluation}
 		The improved version of EMS-GT was compared to the original EMS-GT algorithm, as well as to the state-of-the-art algorithms PMS8 and qPMS9, by benchmarking their performance on challenging instances of the ($l, d$) planted motif problem. An ($l$, $d$) problem instance is defined to be a challenging instance if $d$ is the largest value for which the expected number of $l$-length motifs that would occur in the input by random chance does not exceed some limit---typically 500 random motifs \cite{pms2015}. The specific challenge instances used were (9,2), (11,3), (13,4), (15,5), and (17,6), as identified in \cite{pms2015,pms2007}. 

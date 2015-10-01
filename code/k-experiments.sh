@@ -20,20 +20,36 @@ cd datasets
 for l in 9 11 13 15 17 # only include (17,6) for systems with > 10GB RAM
 do
 	((d++))
-	for k in 3 4 6 7 8
-		# print headers in EMS_GT result files
-		echo "l,d,run,time(s),time(min),memuse,memuse after GC,motif,motifs found" > ../results/EMS_GT-$l,$d
-		echo "l,d,run,time(s),time(min),memuse,memuse after GC,motif,motifs found" > ../results/EMS_GT_32-$l,$d
-		echo "l,d,run,time(s),time(min),memuse,memuse after GC,motif,motifs found" > ../results/EMS_GT_64-$l,$d
-		# start r runs
-		for((i=1; i <= r; i++)) do
-			# generate a unique (l,d) dataset for this run
-			java -cp ../bin DatasetGenerator  $l $d $i
-			# test all programs on this dataset
-			java -cp ../bin EMS_GT    $l,$d,$i $k	>> ../results/EMS_GT-$l,$d--k$k
-			java -cp ../bin EMS_GT_32 $l,$d,$i $k	>> ../results/EMS_GT_32-$l,$d--k$k
-			java -cp ../bin EMS_GT_64 $l,$d,$i $k	>> ../results/EMS_GT_64-$l,$d--k$k
+	# print headers in EMS_GT result files
+	# echo "l,d,run,time(s),time(min),memuse,memuse after GC,motif,motifs found" > ../results/E00-$l,$d,k=$k
+	
+	# start r runs
+	for((i=1; i <= r; i++)) do
+		# generate a unique (l,d) dataset for this run
+		java -cp ../bin DatasetGenerator  $l $d $i
+
+		# test all programs on this dataset with all values of k	
+		for k in 3 4 6 7 8
+		do
+			if [ $d -gt 3 ] || [ $k -gt 4 ] # hey can i comment
+			then
+				java -cp ../bin EMS_GT    $l,$d,$i $k	>> ../results/E00-$l,$d,k=$k
+				java -cp ../bin EMS_GT_32 $l,$d,$i $k	>> ../results/E32-$l,$d,k=$k
+				java -cp ../bin EMS_GT_64 $l,$d,$i $k	>> ../results/E64-$l,$d,k=$k
+			fi
+			echo "k = $k : finished $l, $d, $i"
 		done
 	done
 done
+
+echo "l,d,run,time(s),time(min),memuse,memuse after GC,motif,motifs found" > ../results/E64-18,6,k=
+for((i=1; i <= r; i++)) do
+	# generate a unique (l,d) dataset for this run
+	java -cp ../bin DatasetGenerator  18 6 $i
+		# test all programs on this dataset
+	for k in 3 4 6 7 8 do
+		java -cp ../bin EMS_GT_64 $l,$d,$i $k	>> ../results/E64-18,6,k=$k
+	done
+done
+
 cd ..
