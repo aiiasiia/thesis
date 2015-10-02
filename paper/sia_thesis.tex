@@ -306,25 +306,17 @@
 		The motif is then planted at a random position in the sequence. As prescribed in \cite{pevzner2000combinatorial} every dataset contains 20 DNA sequences each 600 bases long, with an ($l$, $d$) motif planted exactly once in each sequence.
 
 	\section{Improving EMS-GT}
-		Thee Java implementation of EMS-GT operates on a compact, bit-based enumerative representation of the motif search space. Since a significant part of runtime is spent locating and setting bits in this bit-based representation, speedup techniques were explored for the bit-setting portion of the algorithm.
+		Thee Java implementation of EMS-GT operates on a compact, bit-based enumerative representation of the motif search space. Since a significant part of runtime is spent finding and setting bits in this bit-based representation, speedup techniques were explored for the bit-setting portion of the algorithm.
 
 		\section{Exploring features of the EMS-GT data structure}
-		Printouts of the bit-array $N$ for certain neighborhoods $N(x,d)$ were generated and examined for features that might allow for further efficiency strategies. When repeated block patterns were observed in $N$, the underlying distribution of Hamming distances (from $x$ to all other $l$-mers in the search space) was also examined to seek a derivation for the patterns.
-
-		Ultimately, by referencing (1) EMS-GT's alphabetical $l$-mer enumeration scheme and (2) the additive property of Hamming distances, we were able to prove the following general statement:
+			Snapshots of EMS-GT's main data structure (an array of $4^l$ bit flags representing the entire search space) were taken at various times during program execution, and examined for features that might allow for further efficiency strategies. When it became clear that $l$-mer neighborhoods were made up of repeating block patterns, we examined the underlying distribution of Hamming distances in these blocks to seek an explanation. Ultimately, by referencing (1) EMS-GT's alphabetical $l$-mer enumeration scheme, and (2) the additive property of Hamming distances, we were able to justify the original observation, which was:
 
 			A bit-array $N$ (representing the neighborhood $N(x,d)$)
 				can be divided into consecutive blocks of $4^k$ bits each, where
 				each of the blocks will conform to one of at most ($k+2$) patterns.
 
-		We then developed a procedure (Algorithm 4.1) that generates the ($k+2$) patterns
+			Working forwards, we then developed a procedure (Algorithm 4.1) that pre-generates all possible patterns. 
 
-
-
-
-
-
-		% Investigation of some Hamming distance-based patterns in the search space led to the development and integration of a bit-masking speed-up technique, which exploits these patterns to set bits in entire blocks.
 
 	\section{Evaluation}
 		The improved version of EMS-GT was compared to the original EMS-GT algorithm, as well as to the state-of-the-art algorithms PMS8 and qPMS9, by benchmarking their performance on challenging instances of the ($l, d$) planted motif problem. An ($l$, $d$) problem instance is defined to be a challenging instance if $d$ is the largest value for which the expected number of $l$-length motifs that would occur in the input by random chance does not exceed some limit---typically 500 random motifs \cite{pms2015}. The specific challenge instances used were (9,2), (11,3), (13,4), (15,5), and (17,6), as identified in \cite{pms2015,pms2007}. 
@@ -424,11 +416,36 @@
 		\begin{enumerate}
 			\setcounter{enumi}{\theenumTemp}
 			
-			\item There are $4^k$ possible values of 
+			\item There are $4^k$ possible sets of patterns, one set for each possible ``center'' $k$-suffix in the block. To generate these sets of patterns, we use Algorithm 4.1.
 
+			\bigskip\bigskip
 
+			{
+			\setstretch{1.0}
+			\noindent \hspace*{6pt}{\bf Algorithm 4.1}
+			\textsc{Block Pattern Generation}\small
+			\begin{algorithmic}[1]\label{alg:block-pattern-gen}
+				\Require block degree $k$
+				\Ensure 3D bit-array $\mathcal{P}$ containing all possible non-trivial block patterns \vspace*{6pt}
 
-			\item Finally, a note on the value of block degree $k$: we say at most $k + 2$
+				\State $\mathcal{P}[][][] \leftarrow \{\}$ \hspace*{90pt}
+				\Comment{retrieve a pattern $P$ as $\mathcal{P}[z][d - d_{y'}]$ }
+
+				\For {$z \leftarrow 0$ to $4^k$}
+				\For {$j \leftarrow 1$ to $k-1$}
+				\For {$z' \leftarrow 0$ to $4^k$}
+				\If{$dH(z,z') \leq j$} 
+					\State $\mathcal{P}[z][j][z'] \leftarrow 1$
+				\Else
+					\State $\mathcal{P}[z][j][z'] \leftarrow 0$
+				\EndIf\EndFor\EndFor\EndFor
+				\State\Return $\mathcal{P}$
+				\end{algorithmic}
+			}
+			\bigskip
+			\noindent After generating $\mathcal{P}$, we can retrieve the set of patterns centered at any $k$-suffix $z$ as $\mathcal{P}[z] = \{P_{1},...,P_{k-1}\}$. These can be used as bit-masks for blocks in the neighborhood bit-array of any $l$-mer $x$ ending in $z$.
+
+			Notice that the set $\mathcal{P}[z]$ does not include the empty pattern $P_{-1}$ (all 0's), the full pattern $P_{k}$ (all 1's), and the pattern $P_{0}$ in which only the center bit (the bit at position $z$) is set. This is to save space: since applying these patterns to blocks is trivial and does not require block masking, we need not generate them.
 
 		\end{enumerate}
 
