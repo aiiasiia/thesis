@@ -299,28 +299,24 @@
 			}
 
 \chapter{Methodology}
-	This section briefly describes the procedure used to evaluate the improved version of the EMS-GT algorithm.
-
-	\section{Datasets}
-		Synthetic datasets were created using a DNA sequence generator written in Java. Each nucleotide character in a sequence is randomly generated; \{\texttt{a}, \texttt{g}, \texttt{c}, \texttt{t}\} each have a 25\% chance of being selected, independent from other characters in the sequence.
-		The motif is then planted at a random position in the sequence. As prescribed in \cite{pevzner2000combinatorial} every dataset contains 20 DNA sequences each 600 bases long, with an ($l$, $d$) motif planted exactly once in each sequence.
+	This section briefly describes how a novel speedup technique for EMS-GT was explored and implemented.
+	It then describes the procedure for evaluating the improved version of the EMS-GT algorithm.
 
 	\section{Improving EMS-GT}
-		Thee Java implementation of EMS-GT operates on a compact, bit-based enumerative representation of the motif search space. Since a significant part of runtime is spent finding and setting bits in this bit-based representation, speedup techniques were explored for the bit-setting portion of the algorithm.
+		The Java implementation of EMS-GT operates on a compact, bit-based enumerative representation of the motif search space. Since a significant part of runtime is spent finding and setting bits in this bit-based representation, speedup techniques were explored for the bit-setting portion of the algorithm.
 
-		\section{Exploring features of the EMS-GT data structure}
-			Snapshots of EMS-GT's main data structure (an array of $4^l$ bit flags representing the entire search space) were taken at various times during program execution, and examined for features that might allow for further efficiency strategies. When it became clear that $l$-mer neighborhoods were made up of repeating block patterns, we examined the underlying distribution of Hamming distances in these blocks to seek an explanation. Ultimately, by referencing (1) EMS-GT's alphabetical $l$-mer enumeration scheme, and (2) the additive property of Hamming distances, we were able to justify the original observation, which was:
+		Snapshots of EMS-GT's main data structure (an array of $4^l$ bit flags representing the entire search space) were taken at various times during program execution, and examined for features that might allow for a more efficient algorithm. It became clear that $l$-mer neighborhoods, when represented in this data structure, were made up of repeating block patterns; we examined the underlying distribution of Hamming distances in these blocks to explain the patterns.
 
-			A bit-array $N$ (representing the neighborhood $N(x,d)$)
-				can be divided into consecutive blocks of $4^k$ bits each, where
-				each of the blocks will conform to one of at most ($k+2$) patterns.
-
-			Working forwards, we then developed a procedure (Algorithm 4.1) that pre-generates all possible patterns. 
-
+		By finding connections to (1) EMS-GT's alphabetical $l$-mer enumeration scheme and (2) the additive property of Hamming distances, we were able to justify the original observation, which was: ``A bit-array $N$ representing the neighborhood $N(x,d)$ can be divided into consecutive blocks of $4^k$ bits each, where each block will conform to one of at most ($k+2$) patterns.'' The full explanation of block patterns in $N$ is written out in Section 4.1.
+		
+		Working forwards, we then developed a procedure which quickly builds any neighborhood bit-array $N$ in blocks, referring to a pre-generated (using Algorithm 4.1) lookup table of the possible block patterns. This technique was integrated into the existing Java implementation of EMS-GT.
 
 	\section{Evaluation}
 		The improved version of EMS-GT was compared to the original EMS-GT algorithm, as well as to the state-of-the-art algorithms PMS8 and qPMS9, by benchmarking their performance on challenging instances of the ($l, d$) planted motif problem. An ($l$, $d$) problem instance is defined to be a challenging instance if $d$ is the largest value for which the expected number of $l$-length motifs that would occur in the input by random chance does not exceed some limit---typically 500 random motifs \cite{pms2015}. The specific challenge instances used were (9,2), (11,3), (13,4), (15,5), and (17,6), as identified in \cite{pms2015,pms2007}. 
-		\bigskip
+
+		\subsection{Synthetic Datasets}
+			Synthetic datasets were created using a DNA sequence generator written in Java. Each nucleotide character in a sequence is randomly generated; \{\texttt{a}, \texttt{g}, \texttt{c}, \texttt{t}\} each have a 25\% chance of being selected, independent from other characters in the sequence.
+			The motif is then planted at a random position in the sequence. As prescribed in \cite{pevzner2000combinatorial} every dataset contains 20 DNA sequences each 600 bases long, with an ($l$, $d$) motif planted exactly once in each sequence.
 
 \chapter{Results and Analysis}
 	This section provides a step-by-step derivation of the distance-related patterns that occur within a bit-array representing an $l$-mer neighborhood in EMS-GT. It then describes how a speedup technique for EMS-GT based on these patterns was implemented. Finally, it quantifies the performance improvement due to this technique.
@@ -416,7 +412,7 @@
 		\begin{enumerate}
 			\setcounter{enumi}{\theenumTemp}
 			
-			\item There are $4^k$ possible sets of patterns, one set for each possible ``center'' $k$-suffix in the block. To generate these sets of patterns, we use Algorithm 4.1.
+			\item There are $4^k$ possible sets of ($k+2$) patterns, one set for each possible ``center'' $k$-suffix in the block. To generate all such sets of patterns, we use Algorithm 4.1.
 
 			\bigskip\bigskip
 
@@ -443,21 +439,14 @@
 				\end{algorithmic}
 			}
 			\bigskip
-			\noindent After generating $\mathcal{P}$, we can retrieve the set of patterns centered at any $k$-suffix $z$ as $\mathcal{P}[z] = \{P_{1},...,P_{k-1}\}$. These can be used as bit-masks for blocks in the neighborhood bit-array of any $l$-mer $x$ ending in $z$.
-
-			Notice that the set $\mathcal{P}[z]$ does not include the empty pattern $P_{-1}$ (all 0's), the full pattern $P_{k}$ (all 1's), and the pattern $P_{0}$ in which only the center bit (the bit at position $z$) is set. This is to save space: since applying these patterns to blocks is trivial and does not require block masking, we need not generate them.
-
+			\noindent After generating $\mathcal{P}$, we can retrieve the set of patterns centered at any $k$-suffix $z$ as $\mathcal{P}[z] = \{P_{1},...,P_{k-1}\}$. These can be used as bit-masks for blocks in the neighborhood bit-array of any $l$-mer $x$ ending in $z$. Notice that the set $\mathcal{P}[z]$ does not include the empty pattern $P_{-1}$ (all 0's), the full pattern $P_{k}$ (all 1's), and the pattern $P_{0}$ in which only the center bit (the bit at position $z$) is set. This is to save space: since applying these patterns to blocks is trivial and does not require block masking, we need not generate and store them in $\mathcal{P}$.
 		\end{enumerate}
-
-		\newpage
-	
-
 
 	\newpage
 	\section{Implementing a pattern-based speedup technique for EMS-GT}
 		The previous section has shown that the bit-array $N$, representing the $d$-neighborhood of an $l$-mer, can be defined in terms of repeating block patterns. This definition can be used toward a larger goal---constructing the bit-array $\mathcal{N}$ which represents the $d$-neighborhood $\mathcal{N}(S,d)$ of a sequence $S$.
 
-		To do this, we first initialize the array $\mathcal{N}$ of $4^l$ bit flags, all set to zero. We select a value for the block degree $k$, and pre-generate all $4^k$ possible sets of block patterns (one set for each possible ``center'' $k$-suffix). Then, for every $l$-mer $x = yz$ in $S$:
+		To do this, we first initialize the array $\mathcal{N}$ of $4^l$ bit flags, all set to zero. We select a value for the block degree $k$, and pre-generate all $4^k$ possible sets of block patterns (using Algorithm 4.1). Then, for every $l$-mer $x = yz$ in $S$:
 		\begin{enumerate}
 			\item We retrieve $\mathcal{P}(z) = \{P_{1}, ... , P_{k-1}\}$, the set of unique block patterns ``centered'' at $x$'s $k$-suffix $z$. For convenience, this set excludes three ``trivial'' patterns: the empty pattern $P_{-1}$ (all 0's), the full pattern $P_{k}$ (all 1's), and the pattern $P_{0}$ in which only the center bit (the bit at position $z$) is set.
 			\item For every $d$-neighbor $y'$ of $x$'s prefix $y$, we locate the block---$block(\mathcal{N}, y')$---in $\mathcal{N}$ whose block prefix is $y'$. We then apply the appropriate pattern to the block, based on the value of $d - d_{y'}$:
@@ -472,64 +461,86 @@
 
 		\noindent This entire procedure effectively performs $\mathcal{N}(S,d) \leftarrow \mathcal{N}(S,d) \cup N(x,d)$ for each $l$-mer $x$ in $S$, as specified in lines 3-6 and 10-13 of EMS-GT (Algorithm 2.1).
 
-	\section{Performance improvement with pattern-based technique}
-		The pattern-based technique requires examining all $d$-neighbors of $x$'s prefix $y$.%, as this gives us the prefixes for non-empty blocks in $N$.
+	\section{Performance improvement with pattern-based speedup technique}
+		The pattern-based technique requires examining all $d$-neighbors of $x$'s prefix $y$.
 		We can use our recursive procedure (Algorithm 2.3) to traverse the neighborhood $N(y,d)$; as Table \ref{tbl:neighbors_blockmasking} shows, this will require generating much fewer neighbors than $N(x,d)$:\newline
-		 % than for the entire neighborhood of $x$. Observe that, with $k$=5, $N(y,d)$ is only 10-20\% the size of $N(x,d)$. \newline
 
-	\begin{table}[h] %neighbors_blockmasking
-		\small
-		\renewcommand{\arraystretch}{1.3}
-		\label{tbl:neighbors_blockmasking}
-		\centering
-		\begin{tabular}{|c|c|c|c|}
-		\hline 
-		\bfseries\boldmath $(l,d)$ & \bfseries\boldmath $N(x,d)$ & \bfseries\boldmath $N(y,d)$, $k$=5 & \bfseries \% reduction\\
-		\bfseries & \bfseries\boldmath $\sum_{i=0}^{l} \binom{l}{i} 3^{i}$ & \bfseries\boldmath $\sum_{i=0}^{l-k} \binom{l-k}{i} 3^{i}$ & \\
-		\hline
-		 9,2 &         351  &       66 & 81.2\%\\
-		11,3 &       4,983  &      693 & 86.1\%\\
-		13,4 &      66,378  &    7,458 & 88.8\%\\
-		% 14,4 &      91,770  &   12,825 & 86.0\%\\
-		15,5 &     853,569  &   81,921 & 90.4\%\\
-		% 16,5 &   1,225,092  &  143,979 & 88.2\%\\
-		17,6 &  10,738,203  &  912,717 & 91.5\%\\
-		\hline\end{tabular}
+		\begin{table}[h] %neighbors_blockmasking
+			\small
+			\renewcommand{\arraystretch}{1.3}
+			\label{tbl:neighbors_blockmasking}
+			\centering
+			\begin{tabular}{|c|c|c|c|}
+			\hline 
+			\bfseries\boldmath $(l,d)$ & \bfseries\boldmath $N(x,d)$ & \bfseries\boldmath $N(y,d)$, $k$=5 & \bfseries \% reduction\\
+			\bfseries & \bfseries\boldmath $\sum_{i=0}^{l} \binom{l}{i} 3^{i}$ & \bfseries\boldmath $\sum_{i=0}^{l-k} \binom{l-k}{i} 3^{i}$ & \\
+			\hline
+			 9,2 &         351  &       66 & 81.2\%\\
+			11,3 &       4,983  &      693 & 86.1\%\\
+			13,4 &      66,378  &    7,458 & 88.8\%\\
+			% 14,4 &      91,770  &   12,825 & 86.0\%\\
+			15,5 &     853,569  &   81,921 & 90.4\%\\
+			% 16,5 &   1,225,092  &  143,979 & 88.2\%\\
+			17,6 &  10,738,203  &  912,717 & 91.5\%\\
+			\hline\end{tabular}
 
-		\caption{\small Number of individual neighbors generated for $N(x,d)$ vs. $N(y,d)$}
-		\end{table}
+			\caption{\small Number of individual neighbors generated for $N(x,d)$ vs. $N(y,d)$}
+			\end{table}
 
+		\noindent This large reduction in neighbors generated partly explains why, for most $(l,d)$ values, building the neighborhood in blocks proves significantly faster (Table 4.\ref{tbl:speedup_blockmasking}) than recursively generating each individual neighbor, then locating and setting its bit flag. \newline 
 
-		\noindent This large reduction in neighbors generated partly explains why, for most $(l,d)$ values, building the neighborhood in blocks proves significantly faster (Table 4.\ref{tbl:speedup_blockmasking}) than recursively generating each individual neighbor, then locating and setting its bit flag. \newline
-		% This is shown in Table ~\ref{tbl:speedup_blockmasking}, comparing EMS-GT's performance with and without the pattern-based procedure.\newline
+		\begin{table}[h] %speedup_blockmasking
+			\small
+			\renewcommand{\arraystretch}{1.3}
+			\label{tbl:speedup_blockmasking}
+			\centering
+			\begin{tabular}{|c|c|c|c|}
+			\hline 
+			\bfseries\boldmath $(l,d)$ & \bfseries Without pattern-based & \bfseries With pattern-based & \bfseries speedup\\
+			\bfseries & \bfseries procedure & \bfseries\boldmath procedure, $k=5$ & \bfseries\\
+			\hline
+			 9,2 &   0.06 s &    0.11 s &     --  \\
+			11,3 &   0.22 s &    0.20 s &    6.7\%\\
+			13,4 &   1.98 s &    1.04 s &   47.5\%\\
+			% 14,4 &   3.53 s &    2.55 s &   27.8\%\\
+			15,5 &  25.06 s &   15.51 s &   38.1\%\\
+			% 16,5 &  41.63 s &   29.03 s &   30.3\%\\
+			17,6 & 308.61 s &  175.85 s &   43.0\%\\
+			\hline\end{tabular}
 
-			\begin{table}[h] %speedup_blockmasking
+			\caption{\small Performance of EMS-GT with vs. without pattern-based speedup
+			(runtimes averaged over 20 synthetic datasets for each $(l,d)$ instance).}
+			\end{table}
+
+		\subsection{Determining the optimum block size}
+			In all previous examples, the block degree $k$ is arbitrarily set to 5. However, as empirical results in Table 4.\ref{tbl:block-degree-tests} show,
+			this is actually an optimal value for the $(l,d)$ challenge instances examined in this paper.\newline
+
+			\begin{table}[h] %neighbors_blockmasking
 				\small
 				\renewcommand{\arraystretch}{1.3}
-				\label{tbl:speedup_blockmasking}
+				\label{tbl:block-degree-tests}
 				\centering
-				\begin{tabular}{|c|c|c|c|}
-				\hline 
-				\bfseries\boldmath $(l,d)$ & \bfseries Without pattern-based & \bfseries With pattern-based & \bfseries speedup\\
-				\bfseries & \bfseries procedure & \bfseries\boldmath procedure, $k=5$ & \bfseries\\
+				\begin{tabular}{|c|c|c|c|c|c|}
 				\hline
-				 9,2 &   0.06 s &    0.11 s &     --  \\
-				11,3 &   0.22 s &    0.20 s &    6.7\%\\
-				13,4 &   1.98 s &    1.04 s &   47.5\%\\
-				% 14,4 &   3.53 s &    2.55 s &   27.8\%\\
-				15,5 &  25.06 s &   15.51 s &   38.1\%\\
-				% 16,5 &  41.63 s &   29.03 s &   30.3\%\\
-				17,6 & 308.61 s &  175.85 s &   43.0\%\\
-				\hline\end{tabular}
-
-				\caption{\small Performance of EMS-GT with vs. without pattern-based speedup \newline
-				(runtimes averaged over 20 synthetic datasets for each $(l,d)$ instance).}
+				\bfseries\boldmath $(l,d)$ &
+				\bfseries\boldmath $k=3$ &
+				\bfseries\boldmath $k=4$ &
+				\bfseries\boldmath $k=5$ &
+				\bfseries\boldmath $k=6$ &
+				\bfseries\boldmath $k=7$ \\
+				\hline
+				 9,2 	&	&	&	&	&\\
+				11,3 	&	&	&	&	&\\
+				13,4 	&	&	&	&	&\\
+				15,5 	&	&	&	&	&\\
+				17,6 	&	&	&	&	&\\
+				\hline
+				\end{tabular}
 				\end{table}
 
 	\newpage
 	\section{Performance of improved EMS-GT}
-
-
 		Finally, the improved EMS-GT and two competitor algorithms were run on an Intel Xeon, 2.10 GHz processor (single core only). Their performance, averaged over 20 synthetic datasets for each $(l,d)$ challenge instance, is outlined in Table~\ref{tbl:runtimes_v_pms}:\newline
 
 		\begin{table}[ht] %runtimes
