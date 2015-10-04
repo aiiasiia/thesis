@@ -41,8 +41,8 @@
 	\end{abstract}
 
 \tableofcontents
-% \listoffigures
-% \listoftables
+\listoffigures
+\listoftables
 
 \MainMatter
 
@@ -151,7 +151,7 @@
 			\begin{equation} C = N(l_{1}, d) \cap N(l_{2}, d) \cap...\cap N(l_{n'}, d). \end{equation}
 		\end{enumerate}
 		\vspace{-5mm}
-		\noindent Exhaustively building all ``similar'' $n'$-tuples requires significant runtime and many false starts (i.e., the algorithm starts building a tuple to size $m < n'$, only to find that no further similar $l$-mers can be found).
+		\noindent Exhaustively building all ``similar'' $n'$-tuples requires significant runtime and many false starts (i.e., the algorithm has built a tuple to size $m < n'$, only to find that no further similar $l$-mers can be found).
 		PMS8 reduces this by improving the search for additional $l$-mers, using stricter pruning conditions for similarity % ---the presence of common neighbors---
 		between {\em three} $l$-mers (two from the tuple, and the one to be added). This method of testing similarity for $l$-mer triples, instead of pairs, quickly recognizes and discards false starts. For even greater efficiency, qPMS9 intelligently prioritizes adding $l$-mers that are highly distant from those already in the tuple, such that common neighborhood becomes smaller and faster to check through.
 		In practice, both PMS8 and qPMS9 have been implemented to run on multiple processors with the OpenMPI C library, allowing them to solve highly challenging problem instances with ($l, d$) as large as (50, 21) in a few hours.
@@ -309,7 +309,7 @@
 
 		By finding connections to (1) EMS-GT's alphabetical $l$-mer enumeration scheme and (2) the additive property of Hamming distances, we were able to justify the original observation, which was: ``A bit-array $N$ representing the neighborhood $N(x,d)$ can be divided into consecutive blocks of $4^k$ bits each, where each block will conform to one of at most ($k+2$) patterns.'' The full explanation of block patterns in $N$ is written out in Section 4.1.
 		
-		Working forwards, we then developed a procedure which quickly builds any neighborhood bit-array $N$ in blocks, referring to a pre-generated (using Algorithm 4.1) lookup table of the possible block patterns. This technique was integrated into the existing Java implementation of EMS-GT.
+		Working forwards, we then developed a procedure which can quickly build any neighborhood $N$ in blocks, referring to a pre-generated lookup table of the possible block patterns. This technique was integrated into the Java implementation of EMS-GT.
 
 	\section{Evaluation}
 		The improved version of EMS-GT was compared to the original EMS-GT algorithm, as well as to the state-of-the-art algorithms PMS8 and qPMS9, by benchmarking their performance on challenging instances of the ($l, d$) planted motif problem. An ($l$, $d$) problem instance is defined to be a challenging instance if $d$ is the largest value for which the expected number of $l$-length motifs that would occur in the input by random chance does not exceed some limit---typically 500 random motifs \cite{pms2015}. The specific challenge instances used were (9,2), (11,3), (13,4), (15,5), and (17,6), as identified in \cite{pms2015,pms2007}. 
@@ -473,7 +473,7 @@
 			\begin{tabular}{|c|c|c|c|}
 			\hline 
 			\bfseries\boldmath $(l,d)$ & \bfseries\boldmath $N(x,d)$ & \bfseries\boldmath $N(y,d)$, $k$=5 & \bfseries \% reduction\\
-			\bfseries & \bfseries\boldmath $\sum_{i=0}^{l} \binom{l}{i} 3^{i}$ & \bfseries\boldmath $\sum_{i=0}^{l-k} \binom{l-k}{i} 3^{i}$ & \\
+			\bfseries & \bfseries\boldmath $\sum_{i=0}^{d} \binom{l}{i} 3^{i}$ & \bfseries\boldmath $\sum_{i=0}^{d} \binom{l-k}{i} 3^{i}$ & \\
 			\hline
 			 9,2 &         351  &       66 & 81.2\%\\
 			11,3 &       4,983  &      693 & 86.1\%\\
@@ -513,10 +513,9 @@
 			\end{table}
 
 		\subsection{Determining the optimum block size}
-			In all previous examples, the block degree $k$ is arbitrarily set to 5. However, as empirical results in Table 4.\ref{tbl:block-degree-tests} show,
-			this is actually an optimal value for the $(l,d)$ challenge instances examined in this paper.\newline
+			In the previous sections on distance-based patterns, the block degree $k$ was set to 5, thus the size of blocks in $N$ was $4^5 = 32 \times 32$. Based on empirical results in Table 4.\ref{tbl:block-degree-tests},\ \ $k=5$ is in fact an optimal value for solving the $(l,d)$ challenge instances used for evaluation:\newline
 
-			\begin{table}[h] %neighbors_blockmasking
+			\begin{table}[h] %block-degree-tests
 				\small
 				\renewcommand{\arraystretch}{1.3}
 				\label{tbl:block-degree-tests}
@@ -529,19 +528,31 @@
 				\bfseries\boldmath $k=5$ &
 				\bfseries\boldmath $k=6$ &
 				\bfseries\boldmath $k=7$ \\
+
+				\bfseries &
+				\bfseries\boldmath $32 \times   2$ blk &
+				\bfseries\boldmath $32 \times   8$ blk &
+				\bfseries\boldmath $32 \times  32$ blk &
+				\bfseries\boldmath $32 \times 128$ blk &
+				\bfseries\boldmath $32 \times 512$ blk \\
 				\hline
-				 9,2 	&	&	&	&	&\\
-				11,3 	&	&	&	&	&\\
-				13,4 	&	&	&	&	&\\
-				15,5 	&	&	&	&	&\\
-				17,6 	&	&	&	&	&\\
+				 9,2 	&    -   &    -     & {\bf  0.11 s} &  0.57 s &  9.02 s \\
+				11,3 	&    -   &    -     & {\bf  0.20 s} &  0.70 s &  9.77 s \\
+				13,4 	&  1.74 s &  1.31 s & {\bf  1.04 s} &  2.19 s & 12.40 s \\
+				15,5 	& 23.43 s & 21.43 s & {\bf 15.51 s} & 24.28 s & 46.30 s \\
+				% 17,6 	&	&	&	&	&\\
 				\hline
 				\end{tabular}
+				\centering
+				\caption{\small Performance of EMS-GT (with pattern-based speedup) for different values of $k$. Shortest times are in bold text.}
 				\end{table}
 
-	\newpage
+			% Insight for why k=5 is optimal
+			% It appears $k=5$ allows for the best balance of block size and number of patterns.
+			When $k$ is lower, there are fewer and smaller block patterns to manage, but building $N$ requires many highly scattered array accesses to small blocks. When $k$ is higher, there are larger contiguous blocks and thus fewer accesses in $N$, but also a much larger set of block patterns to manage. It seems that $k=5$ allows for the most efficient balance between recursive neighbor generation (which identifies and accesses blocks according to their prefixes) and bit-masking operations (which selects and applies the correct pattern to each block), with a feasible number of block patterns. 
+
 	\section{Performance of improved EMS-GT}
-		Finally, the improved EMS-GT and two competitor algorithms were run on an Intel Xeon, 2.10 GHz processor (single core only). Their performance, averaged over 20 synthetic datasets for each $(l,d)$ challenge instance, is outlined in Table~\ref{tbl:runtimes_v_pms}:\newline
+		Finally, the improved EMS-GT and two competitor algorithms were run on an Intel Xeon, 2.10 GHz processor (single core only). Their performance, averaged over 20 synthetic datasets for each $(l,d)$ challenge instance, is outlined in Table 4.\ref{tbl:runtimes_v_pms}:\newline
 
 		\begin{table}[ht] %runtimes
 			\small
@@ -560,14 +571,34 @@
 			17,6 &  3.91 min & \textbf{1.96 min} & {\emph{2.93 min}} & --\\
 			\hline\end{tabular}
 
-			\caption{\small Runtimes of PMS8, qPMS9 and EMS-GT}
+			\caption{\small Runtimes of PMS8, qPMS9 and EMS-GT. Shortest times are in bold text.}
 			\end{table}
 
-		For every challenge instance except (17,6) EMS-GT outperforms qPMS9; it outperforms PMS8 for (17,6). EMS-GT was run including the pattern-based speedup technique, with the default suffix length of $k=5$. Observe that our EMS-GT implementation can only solve problem instances where $l \leq 17$. This is because when we reach $l$=18, the size of the integer array needed to represent the entire search space ($\frac{4^{18}}{32} = \frac{2^{36}}{2^{5}} = 2^{31}$ integers) begins to exceed the maximum size for Java arrays, which is ($2^{31} - 1$) elements.\newline
+		For every challenge instance except (17,6) the improved EMS-GT outperforms qPMS9; it outperforms PMS8 for (17,6). EMS-GT was run including the pattern-based speedup technique, with the default suffix length of $k=5$. Observe that EMS-GT can only solve problem instances where $l \leq 17$. This is because when we reach $l$=18, the size of the integer array needed to represent the entire search space ($\frac{4^{18}}{32} = \frac{2^{36}}{2^{5}} = 2^{31}$ integers) begins to exceed the maximum size for Java arrays, which is ($2^{31} - 1$) elements.\newline
 
-% \chapter{Conclusions}
+		\begin{table}[ht] %runtimes
+			\small
+			\renewcommand{\arraystretch}{1.3}
+			\label{tbl:runtimes_nonchallenge}
+			\centering
+			\begin{tabular}{|c|c|c|c|}
+			\hline \bfseries\boldmath $(l,d)$ & \bfseries PMS8 & \bfseries qPMS9 & \bfseries EMS-GT \\
+			\hline
+			14,4 &  1.29 s  &  1.02 s &      2.55 s\\
+			16,5 &  4.79 s  &  2.96 s &     29.03 s\\
+			\hline\end{tabular}
 
-%\BackMatter
+			\caption{\small Performance of PMS8, qPMS9 and EMS-GT on non-challenging ($l$,$d$).}
+			\end{table}
+
+		EMS-GT is highly competitive with PMS8 and qPMS9 on challenging problem instances, but as Table 4.\ref{tbl:runtimes_nonchallenge} shows, on non-challenging instances EMS-GT is not as efficient. This may be due to differing representations of the search space: while EMS-GT uses a fixed-size bit-array to represent the search space of all $4^l$ $l$-mers, PMS8 and qPMS9 have a dynamically-sized search space which, while easily managed for most ($l$,$d$) values, may be more inefficient to narrow down for challenging ($l$,$d$) values.
+
+\chapter{Conclusion}
+	This paper discusses a novel speedup technique for the EMS-GT algorithm, an exact solution to the planted motif problem. A Java implementation, run on various challenge problem instances, shows the improved algorithm to be very competitive against state-of-the-art exact algorithms PMS8 and qPMS9. The speedup technique allows EMS-GT to outperform the current best algorithm, qPMS9, for the challenge problem instances (9,2), (11,3), (13,4) and (15,5) with a run-time reduction of at least 76\%, 81\%, 77\% and 37\% respectively for these instances, while ranking second to qPMS9 for test instance (17,6). 
+
+	Directions for further research include: refining the bit-based storage mechanism to be able to represent the entire motif search space for $l > 17$; creating a multiprocessor version of EMS-GT to solve in parallel for larger values of ($l$,$d$); and delegating the bit-masking optimization and other bulk bit operations to the graphics card, as explored in \cite{dasari2010efficient}, for faster performance.
+
+\BackMatter
 \bibliographystyle{plain}
 \bibliography{sources}
 %\addappheadtotoc
