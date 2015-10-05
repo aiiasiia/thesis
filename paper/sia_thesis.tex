@@ -41,8 +41,8 @@
 	\end{abstract}
 
 \tableofcontents
-\listoffigures
-\listoftables
+% \listoffigures
+% \listoftables
 
 \MainMatter
 
@@ -395,7 +395,6 @@
 		\end{enumerate}
 
 			\begin{figure}[h]
-				\centering
 				\begin{minipage}{.33\textwidth}\centering \includegraphics[width=0.95\textwidth]{img/0} $d-d_{y'} = 0$ \end{minipage}% 
 				\begin{minipage}{.33\textwidth} \centering \includegraphics[width=0.95\textwidth]{img/1} $d-d_{y'} = 1$ \end{minipage}% 
 				\begin{minipage}{.33\textwidth} \centering \includegraphics[width=0.95\textwidth]{img/2} $d-d_{y'} = 2$ \end{minipage}
@@ -404,9 +403,7 @@
 				\begin{minipage}{.33\textwidth} \centering \includegraphics[width=0.95\textwidth]{img/4} $d-d_{y'} = 4$ \end{minipage}%
 				\begin{minipage}{.33\textwidth} \centering \includegraphics[width=0.95\textwidth]{img/5} $d-d_{y'} \geq 5$ \end{minipage}
 				\newline\newline
-				\caption{
-					Bit patterns followed by blocks in $N(\texttt{tacgt}, 5)$. Black signifies a bit set to 1. There are (5 + 2) = 7 possible patterns; the ``empty'' pattern (for $d - d_{y'} \leq 0$, in which all bits are 0) is not shown. Compare the structure of these patterns with the coloring of the distribution $D(\texttt{tacgt})$ in Figure 4.\ref{fig:D_tacgt}.
-					}
+				\caption{Bit patterns followed by blocks in $N(\texttt{tacgt}, 5)$. Black signifies a bit set to 1. There are (5 + 2) = 7 possible patterns; the ``empty'' pattern (in which all bits are 0) is not shown. Compare the structure of these patterns with the coloring of the distribution $D(\texttt{tacgt})$ in Figure 4.\ref{fig:D_tacgt}.}
 			\end{figure}
 
 		\begin{enumerate}
@@ -591,10 +588,10 @@
 			\caption{\small Performance of PMS8, qPMS9 and EMS-GT on non-challenging ($l$,$d$).}
 			\end{table}
 
-		EMS-GT is highly competitive with PMS8 and qPMS9 on challenging problem instances, but as Table 4.\ref{tbl:runtimes_nonchallenge} shows, on non-challenging instances EMS-GT is not as efficient. This may be due to differing representations of the search space: while EMS-GT uses a fixed-size bit-array to represent the search space of all $4^l$ $l$-mers, PMS8 and qPMS9 have a dynamically-sized search space which, while easily managed for most ($l$,$d$) values, may be more inefficient to narrow down for challenging ($l$,$d$) values.
+		EMS-GT is highly competitive with PMS8 and qPMS9 on challenging problem instances, but as Table 4.\ref{tbl:runtimes_nonchallenge} shows, on non-challenging instances EMS-GT is not as efficient. This may be due to differing representations of the search space: while EMS-GT uses a fixed-size bit-array to represent the search space of all $4^l$ $l$-mers, PMS8 and qPMS9 have a dynamically-sized search space which is efficient for most ($l$,$d$) values, but may be more costly to narrow down for challenging ($l$,$d$) values.
 
 \chapter{Conclusion}
-	This paper discusses a novel speedup technique for the EMS-GT algorithm, an exact solution to the planted motif problem. A Java implementation, run on various challenge problem instances, shows the improved algorithm to be very competitive against state-of-the-art exact algorithms PMS8 and qPMS9. The speedup technique allows EMS-GT to outperform the current best algorithm, qPMS9, for the challenge problem instances (9,2), (11,3), (13,4) and (15,5) with a run-time reduction of at least 76\%, 81\%, 77\% and 37\% respectively for these instances, while ranking second to qPMS9 for test instance (17,6). 
+	This paper discusses a novel speedup technique for the EMS-GT algorithm, an exact solution to the planted motif problem for any arbitrary instance, $l$=17. A Java implementation, run on various challenge problem instances, shows the improved algorithm to be very competitive against state-of-the-art exact algorithms PMS8 and qPMS9. The speedup technique allows EMS-GT to outperform the current best algorithm, qPMS9, for the challenge problem instances (9,2), (11,3), (13,4) and (15,5) with a run-time reduction of at least 76\%, 81\%, 77\% and 37\% respectively for these instances, while ranking second to qPMS9 for test instance (17,6). Note that EMS-GT does not outperform PMS8 and qPMS9 on non-challenging ($l$,$d$) instances.
 
 	Directions for further research include: refining the bit-based storage mechanism to be able to represent the entire motif search space for $l > 17$; creating a multiprocessor version of EMS-GT to solve in parallel for larger values of ($l$,$d$); and delegating the bit-masking optimization and other bulk bit operations to the graphics card, as explored in \cite{dasari2010efficient}, for faster performance.
 

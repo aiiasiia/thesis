@@ -5,7 +5,7 @@
   * Optimized with block masking.
   *
   * @author Aia Sia, Julieta Nabos
-  * @version 1.0 9/09/3025
+  * @version 1.0 9/09/2015
   */
 
 import java.io.*;
@@ -35,6 +35,7 @@ public class EMS_GT_64 {
 
 	// for masking
 	static int blockDegree = 5;
+	static int multByRow;
 	static int lmersInBlock;
 	static int rowsInBlock;
 	static int[][][] blockMasks;
@@ -86,10 +87,11 @@ public class EMS_GT_64 {
 		System.out.print(", " + memUse / 1024.0 / 1024.0);
 		System.out.print(", " + memUseGC / 1024.0 / 1024.0);
 
-		System.out.println(", " + plantedMotif + "," + foundMotifs);
+		System.out.print(", " + plantedMotif + "," + foundMotifs);
 	}
 
 	public static void generateBlockMasks() throws Exception {
+		multByRow = 2*blockDegree - 6;
 		lmersInBlock = 1 << (2 * blockDegree);		// 4 ^ blockDegree
 		rowsInBlock = lmersInBlock >> 6;			// 4 ^ blockDegree / 64
 		blockMasks = new int[lmersInBlock][blockDegree - 1][rowsInBlock];
@@ -134,7 +136,6 @@ public class EMS_GT_64 {
 			a++;
 		}		
 		plantedMotif = input.next().toUpperCase();
-
 		int n = 0;
 		while (input.hasNext()) {
 			String seq = input.next().toUpperCase();
@@ -161,7 +162,7 @@ public class EMS_GT_64 {
 	public static void generateNeighborhood(int s) throws Exception {
 		// System.out.println("genNeigbhorhood(" + s + ")");
 		currNeighborhood = new long[pmt];
-		//Arrays.fill(currNeighborhood,0);
+		// Arrays.fill(currNeighborhood,0);
 		char[] currSeq = seqS[s];
 
 		prefix = 0; 					 	// first < l-blockDegree > characters of l-mer
@@ -181,13 +182,13 @@ public class EMS_GT_64 {
 		}
 
 		// housekeeping: set blockOffsets, currBlockMasks
-		currBlockRow = (int) (suffix / 64);
+		currBlockRow = (int) (suffix / rowsInBlock);
 		currBlockCol = (int) (suffix % 64);
 		currBlockMasks = blockMasks[(int)suffix];
 		int blockStart = (int) (prefix << (2*blockDegree - 6));
 		for(int offset=0; offset < rowsInBlock; offset++) {
 			if(d >= blockDegree)
-				currNeighborhood[blockStart+offset] = 0xffff_ffff_ffff_ffffL;
+				currNeighborhood[blockStart+offset] = Long.MAX_VALUE;
 			else
 				currNeighborhood[blockStart+offset] = currBlockMasks[d-1][offset];
 		}
@@ -212,7 +213,7 @@ public class EMS_GT_64 {
 			}
 			
 			// housekeeping: set blockOffsets, currBlockMasks
-			currBlockRow = (int) suffix / 64;
+			currBlockRow = (int) suffix / rowsInBlock;
 			currBlockCol = (int) suffix % 64;
 			currBlockMasks = blockMasks[(int)suffix];
 			blockStart = (int) prefix << (2*blockDegree - 6);
@@ -234,7 +235,6 @@ public class EMS_GT_64 {
 			long alt2 = prefix ^ (((long) 2) << shift);
 			long alt3 = prefix ^ (((long) 3) << shift);
 
-			int multByRow = 2*blockDegree - 6;
 			int blockStart1 = (int) alt1 << multByRow;
 			int blockStart2 = (int) alt2 << multByRow;
 			int blockStart3 = (int) alt3 << multByRow;
@@ -329,6 +329,7 @@ public class EMS_GT_64 {
 					long candidate = base + j;
 					if( isMotif(candidate, tPrime) ) {
 						foundMotifs += " " + decode(candidate, l);
+						// System.out.println("Motif found:\t" + decode(candidate, l) );
 						numMotifs++;
 					}
 				}

@@ -35,6 +35,7 @@ public class EMS_GT_32 {
 
 	// for masking
 	static int blockDegree = 5;
+	static int multByRow;
 	static int lmersInBlock;
 	static int rowsInBlock;
 	static int[][][] blockMasks;
@@ -90,24 +91,22 @@ public class EMS_GT_32 {
 	}
 
 	public static void generateBlockMasks() throws Exception {
-		lmersInBlock = 1 << (2 * blockDegree);
-		rowsInBlock = lmersInBlock >> 5;			// 2^ (2*blockDegree - 5)
-		blockMasks = new int[lmersInBlock][blockDegree][rowsInBlock];
-
-		// System.out.printf("Generating " + lmersInBlock + " block masks...");
-
+		multByRow = 2*blockDegree - 5;
+		lmersInBlock = 1 << (2 * blockDegree);		// 4 ^ blockDegree
+		rowsInBlock = lmersInBlock >> 5;			// 4 ^ blockDegree / 32
+		blockMasks = new int[lmersInBlock][blockDegree - 1][rowsInBlock];
 		for(int i=0; i < lmersInBlock; i++) {
-			for(int k=0; k < blockDegree; k++) {
+			for(int k=0; k < blockDegree - 1; k++) {
 				Arrays.fill( blockMasks[i][k], 0);
 			}
 			for(int row=0; row < rowsInBlock; row++) {
-				for(int col=0; col < 32; col++) {
+				for(int col=31; col > -1; col--) {
 					int distance = computeHD(i, row*32+col);
-					for(int k=0; k < blockDegree; k++) {
-						if(distance <= k) {
+					for(int k=0; k < blockDegree - 1; k++) {
+						if(distance <= k+1) {
 							blockMasks[i][k][row]++;
 						}
-						if(col < 31) {
+						if(col > 0) {
 							blockMasks[i][k][row] = blockMasks[i][k][row] << 1;
 						}
 					}
@@ -137,7 +136,6 @@ public class EMS_GT_32 {
 			a++;
 		}		
 		plantedMotif = input.next().toUpperCase();
-		
 		int n = 0;
 		while (input.hasNext()) {
 			String seq = input.next().toUpperCase();
@@ -164,7 +162,7 @@ public class EMS_GT_32 {
 	public static void generateNeighborhood(int s) throws Exception {
 		// System.out.println("genNeigbhorhood(" + s + ")");
 		currNeighborhood = new int[pmt];
-		Arrays.fill(currNeighborhood,0);
+		// Arrays.fill(currNeighborhood,0);
 		char[] currSeq = seqS[s];
 
 		prefix = 0; 					 	// first < l-blockDegree > characters of l-mer
@@ -185,15 +183,15 @@ public class EMS_GT_32 {
 
 
 		// housekeeping: set blockOffsets, currBlockMasks
-		currBlockRow = (int) (suffix / 32);
+		currBlockRow = (int) (suffix / rowsInBlock);
 		currBlockCol = (int) (suffix % 32);
 		currBlockMasks = blockMasks[(int)suffix];
 		int blockStart = (int) (prefix << (2*blockDegree - 5));
-		for(int offset=0; offset < 32; offset++) {
+		for(int offset=0; offset < rowsInBlock; offset++) {
 			if(d >= blockDegree)
-				currNeighborhood[blockStart+offset] = 0b11111111111111111111111111111111;
+				currNeighborhood[blockStart+offset] = Integer.MAX_VALUE;
 			else
-				currNeighborhood[blockStart+offset] |= currBlockMasks[d][offset];
+				currNeighborhood[blockStart+offset] |= currBlockMasks[d - 1][offset];
 		}
 		addNeighbors(prefix, 0, d);
 		
@@ -216,15 +214,15 @@ public class EMS_GT_32 {
 			}
 			
 			// housekeeping: set blockOffsets, currBlockMasks
-			currBlockRow = (int) suffix / 32;
+			currBlockRow = (int) suffix / rowsInBlock;
 			currBlockCol = (int) suffix % 32;
 			currBlockMasks = blockMasks[(int)suffix];
 			blockStart = (int) prefix << (2*blockDegree - 5);
-			for(int offset=0; offset < 32; offset++) {
+			for(int offset=0; offset < rowsInBlock; offset++) {
 				if(d >= blockDegree)
-					currNeighborhood[blockStart+offset] = 0b11111111111111111111111111111111;
+					currNeighborhood[blockStart+offset] = Integer.MAX_VALUE;
 				else
-					currNeighborhood[blockStart+offset] |= currBlockMasks[d][offset];
+					currNeighborhood[blockStart+offset] |= currBlockMasks[d - 1][offset];
 			}
 			addNeighbors(prefix, 0, d);
 		}
@@ -238,7 +236,6 @@ public class EMS_GT_32 {
 			long alt2 = prefix ^ (((long) 2) << shift);
 			long alt3 = prefix ^ (((long) 3) << shift);
 
-			int multByRow = 2*blockDegree - 5;
 			int blockStart1 = (int) alt1 << multByRow;
 			int blockStart2 = (int) alt2 << multByRow;
 			int blockStart3 = (int) alt3 << multByRow;
@@ -247,22 +244,22 @@ public class EMS_GT_32 {
 			int allow_d = d - 1;
 			if( allow_d >= blockDegree ) {		// all 1's
 				for(int offset=0; offset < rowsInBlock; offset++) {
-					currNeighborhood[blockStart1 + offset] = 0b11111111111111111111111111111111;
-					currNeighborhood[blockStart2 + offset] = 0b11111111111111111111111111111111;
-					currNeighborhood[blockStart3 + offset] = 0b11111111111111111111111111111111;
+					currNeighborhood[blockStart1 + offset] = Integer.MAX_VALUE;
+					currNeighborhood[blockStart2 + offset] = Integer.MAX_VALUE;
+					currNeighborhood[blockStart3 + offset] = Integer.MAX_VALUE;
 				}
 			}
 			else if( allow_d > 0 ) {			// select a mapping from 1 to blockDegree-1
 				for(int offset=0; offset < rowsInBlock; offset++) {
-					currNeighborhood[blockStart1 + offset] |= currBlockMasks[allow_d][offset];
-					currNeighborhood[blockStart2 + offset] |= currBlockMasks[allow_d][offset];
-					currNeighborhood[blockStart3 + offset] |= currBlockMasks[allow_d][offset];
+					currNeighborhood[blockStart1 + offset] |= currBlockMasks[allow_d - 1][offset];
+					currNeighborhood[blockStart2 + offset] |= currBlockMasks[allow_d - 1][offset];
+					currNeighborhood[blockStart3 + offset] |= currBlockMasks[allow_d - 1][offset];
 				}
 			}
 			else {			// only [currBlockRow][currBlockCol] = 1
-				currNeighborhood[blockStart1 + currBlockRow] |= 1 << (31 - currBlockCol);
-				currNeighborhood[blockStart2 + currBlockRow] |= 1 << (31 - currBlockCol);
-				currNeighborhood[blockStart3 + currBlockRow] |= 1 << (31 - currBlockCol);
+				currNeighborhood[blockStart1 + currBlockRow] |= 1 << (currBlockCol);
+				currNeighborhood[blockStart2 + currBlockRow] |= 1 << (currBlockCol);
+				currNeighborhood[blockStart3 + currBlockRow] |= 1 << (currBlockCol);
 			}
 
 			// recursive call
@@ -324,15 +321,15 @@ public class EMS_GT_32 {
 			if( (value = candidateMotifs[i]) == 0)
 				continue;
 
-			// System.out.println("Nonzero: candidateMotifs[" + i + "]\t= "
-				// + Long.toBinaryString(candidateMotifs[i]));
+			/*System.out.println("Nonzero: candidateMotifs[" + i + "]\t= "
+				+ Long.toBinaryString(candidateMotifs[i]));*/
 			long base = ((long) i) << 5;
 			for(int j=0; j < 32; j++) {
 				if( (value & 1) != 0) {
-					long candidate = base + 31 - j;
+					long candidate = base + j;
 					if( isMotif(candidate, tPrime) ) {
 						foundMotifs += " " + decode(candidate, l);
-						//System.out.println("Motif found:\t" + decode(candidate, l) );
+						// System.out.println("Motif found:\t" + decode(candidate, l) );
 						numMotifs++;
 					}
 				}
