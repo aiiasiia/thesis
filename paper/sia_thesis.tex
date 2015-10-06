@@ -15,15 +15,15 @@
 \ThesisTitle{\textbf{Improving An Exact Solution to the ($l$, $d$)-Planted Motif Problem}}
 \ThesisArea{Computer Science}
 \ThesisDefenseYear{2015}
-% \DefenseDate{10 July 2013}
+% \DefenseDate{23 October 2015}
 % \ThesisGrade{}
 
 \DepartmentHead{MARLENE M. DE LEON, Ph.D.}
 \SchoolHead{EVANGELINE P. BAUTISTA, Ph.D.}
 \ThesisAdviser{PROCESO L. FERNANDEZ, JR., Ph.D.}
-\FirstPanelMember{XXX, Ph.D.}	% Doc Andrei Coronel
-\SecondPanelMember{XXX, Ph.D.}	% Ma'am Juliet
-\ThirdPanelMember{XXX, Ph.D.}	% Jal de Vera
+% \FirstPanelMember{Andrei D. Coronel, Ph.D.}
+% \SecondPanelMember{Julieta Q. Nabos}
+% \ThirdPanelMember{Jose Alfredo A. De Vera, Ph.D.}
 
 \ThesisStyle{MS}{Draft}{-10pt}{15pt}
 % Choices for the 1st argument: MS, PhD
@@ -78,11 +78,11 @@
 		\noindent \hspace*{35pt} Ex. $dH(\texttt{\ul{ga}tta\ul{c}a}, \texttt{\ul{cg}tta\ul{g}a}) = 3$. \newline
 		\noindent ``Distance'' refers to Hamming distance in this paper, unless otherwise stated.\newline
 
-		\noindent\textbf{\boldmath DEFINITION 3. $d$-neighborhood}
+		\noindent\textbf{\boldmath DEFINITION 3. $d$-neighbor and $d$-neighborhood}
 		
 		\noindent A {\boldmath\bf $d$-neighbor} $x'$ of an $l$-mer $x$ is an $l$-mer whose Hamming distance from $x$ is at most $d$, i.e., {\boldmath $dH (x, x') \leq d$}.
 
-		\noindent \hspace*{35pt} Ex. \texttt{\ul{cg}tta\ul{g}a} is a $d$-neighbor of \texttt{\ul{ga}tta\ul{c}a} for any $d \geq 3$.\newline
+		\noindent \hspace*{35pt} Ex. \texttt{\ul{cg}tta\ul{g}a} is considered a $d$-neighbor of \texttt{\ul{ga}tta\ul{c}a} for any $d \geq 3$.\newline
 
 		\noindent The \textbf{\boldmath $d$-neighborhood of an $l$-mer $x$} is the set {\boldmath $N(x, d)$} of all $d$-neighbors of $x$: $N(x,d) = \{ x'\ |\ dH(x, x') \leq d\}$. Note that $x$ is always included in $N(x,d)$ for any $d$.\newline
 		
@@ -91,11 +91,11 @@
 					% \hspace*{145pt}
 					\texttt{\ul{a}atta}, \texttt{\ul{c}atta}, \texttt{\ul{t}atta},				
 					
-					\hspace*{145pt}\texttt{g\ul{c}tta}, \texttt{g\ul{g}tta}, \texttt{g\ul{t}tta},
+					\hspace*{150pt}\texttt{g\ul{c}tta}, \texttt{g\ul{g}tta}, \texttt{g\ul{t}tta},
 					% \hspace*{145pt}
 					\texttt{ga\ul{a}ta}, \texttt{ga\ul{c}ta}, \texttt{ga\ul{g}ta},
 
-				 	\hspace*{145pt}\texttt{gat\ul{a}a}, \texttt{gat\ul{c}a}, \texttt{gat\ul{g}a},
+				 	\hspace*{150pt}\texttt{gat\ul{a}a}, \texttt{gat\ul{c}a}, \texttt{gat\ul{g}a},
 				 	% \hspace*{145pt}
 				 	\texttt{gatt\ul{c}}, \texttt{gatt\ul{g}}, \texttt{gatt\ul{t}} \}.
 
@@ -115,15 +115,11 @@
 		\noindent\hspace*{55pt}of $n$ DNA sequences of length $L > l$ over the alphabet $\Sigma$ = \{\texttt{a}, \texttt{g}, \texttt{c}, \texttt{t}\}.\newline
 		\noindent SOLUTION: The set $M = \{\ l\text{-mer}\ x\ |\ \forall i \in \{1,...,n\}\ \ \exists x_i \in \mathcal{L}(S_i,l),\ \ dH(x, x_i) \}$.
 
-
 		% \newline We formally define the ($l$,$d$) planted motif problem as follows:\bigskip
 		% \noindent\hspace*{50pt} Given a set $\mathcal{S} = \{S_{1},...S_{n}\}$ of $n$ DNA sequences of length $L$,
 		% % \newline \hspace*{52pt} the motif length $l$, and the number of allowable mismatches $d$,
 		% \newline \hspace*{50pt} find $M$, the set of sequences (or motifs) of length $l < L$
 		% \newline \hspace*{50pt} which have at least one $d$-neighbor in each sequence in $S$. %in $S$.
-
-		\newpage
-		/// sample image
 		
 	\newpage
 	\section{Objectives of the Study}
@@ -165,24 +161,28 @@
 		Gibbs sampling \cite{lawrence1993detecting} and Expectation Maximization (EM), used in the motif-finding tool MEME \cite{lawrence1990expectation,bailey1995unsupervised} both use probabilistic computations to improve an initial random alignment. (An alignment is simply a vector $(a_{1}, a_{2},...,a_{n})$ of $n$ positions, which predicts that the motif occurs at position $a_{i}$ in the given sequence $S_{i}$.) Gibbs sampling attempts to refine the alignment one position at a time; %in contrast,
 		EM may recompute the entire alignment in a single iteration. 
 
-		Projection \cite{blanchette2002discovery} combines a pattern-based approach with EM's probabilistic approach, trying to guess every successive character of a tentative motif and using EM to verify its guesses. GARPS \cite{huo2009combining} uses a random version of the projection strategy, in tandem with the iteratively self-correcting Genetic Algorithm (GA), for yet another iterative approach. These are just some of many successful heuristic algorithms for motif finding.	
-
-		////// list more algorithms! name, citation
+		Projection \cite{blanchette2002discovery} combines a pattern-based approach with EM's probabilistic approach, trying to guess every successive character of a tentative motif and using EM to verify its guesses. GARPS \cite{huo2009combining} uses a random version of the projection strategy, in tandem with the iteratively self-correcting Genetic Algorithm (GA), for yet another iterative approach. Other successful heuristic algorithms for motif finding include Pattern Branching \cite{price2003finding}, ProfileBranching \cite{price2003finding}, MULTIPROFILER \cite{keich2002finding}, NestedMICA \cite{down2005nestedmica}, and CONSENSUS \cite{hertz1999identifying}. There is also the ``ensemble'' motif discovery algorithm EMD \cite{hu2006emd}, which combines the best predictions from five component heuristic algorithms to achieve a 22.4\% improvement in prediction accuracy (over the best standalone component).
 
 	\section{Exact Algorithms}
-		While heuristics can be efficient, these approaches are non-exhaustive and thus do not always guarantee to find a solution. Exact motif search algorithms, on the other hand, perform an exhaustive search of possible motifs and so always find the planted motif.
+		While heuristics can be efficient, they are non-exhaustive approaches, and do not always guarantee finding a solution. Exact motif search algorithms, on the other hand, perform an exhaustive search of all possible motifs and thus always find the planted motif.
 
-		WINNOWER \cite{pevzner2000combinatorial} and its successor MITRA \cite{eskin2002finding} are exact algorithms that look at pairwise $l$-mer similarity to find motifs. In a set of DNA sequences, there are numerous pairs of ``similar'' $l$-mers, which come from different sequences and have Hamming distances of at most 2$d$ from each other (meaning that they could possibly be two $d$-neighbors of the same $l$-mer). WINNOWER represents these pairs in a graph, with $l$-mers as nodes and edges connecting $l$-mer pairs. It then prunes the graph to identify ``cliques'' of pairs that indicate a motif. MITRA refines this graph representation into a mismatch tree containing all possible $l$-mers, organized by prefix. The tree structure allows MITRA to eliminate entire branches at a time, making it significantly faster than WINNOWER at removing the many spurious edges that are not part of any motif clique.
+		WINNOWER \cite{pevzner2000combinatorial} and its successor MITRA \cite{eskin2002finding} are exact algorithms that look at pairwise $l$-mer similarity to find motifs. In a set of DNA sequences, there are numerous pairs of ``similar'' $l$-mers, which come from different sequences and have Hamming distances of at most 2$d$ from each other (meaning that they could possibly be two $d$-neighbors of the same $l$-mer). WINNOWER represents these pairs in a graph, with $l$-mers as nodes and edges connecting $l$-mer pairs. It then prunes the graph to identify ``cliques'' of $l$-mer pairs that could indicate a motif.
 
-		 ////// add photo for MITRA, with citation
+		\noindent MITRA refines this graph representation into a mismatch tree which contains all possible $l$-mers, organized by prefix. 
 
-		The BitBased algorithm \cite{dasari2010efficient} uses approaches that are similar to EMS-GT's (see subsection 2.3.1): it maps $l$-mers to binary strings of length $2l$, and represents the motif search space with an array of bits. The main difference is that BitBased is optimized for parallel computation on multiple cores, requiring specialized GPU hardware (Nvidia Tesla C1060 or S1070). BitBased is able to solve the challenge problem instance (21,8) in 1.1 hours.
+			\begin{figure}[h] \label{fig:mitra}
+				\includegraphics[width=6.0in]{img/mitra}
+				\caption{An (8,1) mismatch tree for \{\texttt{agtatcag}, \texttt{gtatcgat}, \texttt{tatcagtt}\}.\ \ \ {\em Left}: the tree, in its initial state. {\em Center}: the tree, after traversing prefix \texttt{--a}: the second and third $l$-mers now each have a single mismatch with the prefix. {\em Right}: the tree, after traversing prefix \texttt{--a--t}: the third $l$-mer now has two mismatches with the prefix, which is greater than the allowable 1. The third $l$-mer will thus be excluded further down the tree. Image from \cite{eskin2002finding}. }
+				\end{figure}
 
-	\newpage
+		\noindent The tree structure allows MITRA to eliminate entire branches at a time, making it significantly faster than WINNOWER at removing the many spurious edges that are not part of any motif clique.
+
+		The BitBased algorithm \cite{dasari2010efficient} is another exact algorithm which uses efficiency approaches similar to EMS-GT's (see subsection 2.2.2): it maps $l$-mers to binary strings of length $2l$, and represents the motif search space with an array of bits. The main difference is that BitBased is optimized for parallel computation on multiple cores, requiring specialized GPU hardware (Nvidia Tesla C1060 or S1070). BitBased can solve the challenge instance (21,8) in 1.1 hours.
+
 	\subsection{PMS8 and qPMS9}
 		The current state-of-the-art exact algorithms are PMS8 and qPMS9, from the Panoptic Motif Search (PMS) series
 		 developed by Rajasekaran et al
-		\cite{pms2007,pms2014,pms2015}. The idea in both PMS8 and qPMS9 is to first consider a subset of $\mathcal{S}$, $S_1,...S_{n'}$, and from these, form all possible $n'$-tuples of ``similar'' $l$-mers (similarity is defined in Step 1 below); then, determine whether the common neighbors of $l$-mers in these tuples are motifs. This approach proceeds in two main steps:
+		\cite{pms2007,pms2014,pms2015}. The idea in both PMS8 and qPMS9 is to first form all possible $n'$-tuples of ``similar'' $l$-mers, taking one $l$-mer from each of a subset $\{S_1,...,S_n'\} \subset \mathcal{S}$ of the given DNA sequences (see requirements for similarity in step 1); then, for each tuple, do a brute-force search to determine whether the common neighbors of the member $l$-mers are motifs. This approach proceeds in two main steps:
 
 		\begin{enumerate}
 			\item {\em Sample-driven step}\newline
@@ -195,18 +195,21 @@
 			\vspace{-5mm}
 			\item {\em Pattern-driven step}\newline
 			This step intersects the $d$-neighborhoods of $x_{1}, x_{2}, ..., x_{n'}$ to form the set $C$ of their common neighbors. It then checks each $l$-mer $c$ in $C$, to determine whether a $d$-neighbor of $c$ appears in all of the $n-n'$ remaining sequences (i.e., those sequences which did not initially contribute an $l$-mer to $T$). If this is the case, $c$ is accepted as a motif.
-			\begin{equation} C = N(x_{1}, d) \cap N(x_{2}, d) \cap...\cap N(x_{n'}, d). \end{equation}
-
-			\begin{equation} M =\{ c \in C\ |\ \forall i \in \{n'+1,...,n\}\ \exists\ x_i \in \mathcal{L}(S_i, l)\ \text{such that}\ dH(c, x_i) \leq d \}. \end{equation}
-
+			\begin{equation} C = N(x_{1}, d) \cap N(x_{2}, d) \cap...\cap N(x_{n'}, d). \end{equation} %\vspace{-5mm}
+			\begin{equation} M =\{ c \in C\ |\ \forall i \in \{n'+1,...,n\}\ \exists\ x_i \in \mathcal{L}(S_i, l),\ \ \ dH(c, x_i) \leq d \}. \end{equation}
 		\end{enumerate}
-		\vspace{-5mm}
 		\noindent Exhaustively building all ``similar'' $n'$-tuples requires significant runtime and many false starts (i.e., the algorithm has built a tuple to size $m < n'$, only to find that no further similar $l$-mers can be found).
 		PMS8 reduces this by improving the search for additional $l$-mers, using stricter pruning conditions for similarity % ---the presence of common neighbors---
 		between {\em three} $l$-mers (two from the tuple, and the one to be added). This method of testing similarity for $l$-mer triples, instead of pairs, quickly recognizes and discards false starts. For even greater efficiency, qPMS9 intelligently prioritizes adding $l$-mers that are highly distant from those already in the tuple, such that common neighborhood becomes smaller and faster to check through.
-		In practice, both PMS8 and qPMS9 have been implemented to run on multiple processors with the OpenMPI C library, allowing them to solve highly challenging problem instances with ($l, d$) as large as (50, 21) in a few hours.
 
-		/// add image
+			\begin{figure}[ht] \label{fig:qpms9}
+				\centering
+				\includegraphics[width=5.3in]{img/qpms9}
+				\caption{Runtime of qPMS9 on DNA datasets for various ($l$,$d$) values. Blue indicates the program used 48 cores; white indicates single-core execution. Gray cells represent instances with over 500 spurious motifs. Instances in orange could not be solved efficiently. Image from \cite{pms2015}.}
+				\end{figure}
+
+		\vspace*{2mm}
+		\noindent In practice, both PMS8 and qPMS9 have been implemented to run on multiple processors with the OpenMPI C library, allowing them to solve highly challenging problem instances with ($l, d$) as large as (50, 21) in a couple of hours. Note also that most non-challenging instances require trivial ($<$ 1 s) runtime to solve.
 
 	\newpage
 	\subsection{EMS-GT}
@@ -222,7 +225,7 @@
 			\item {\em Test candidates}\newline
 			This step simply checks each candidate motif $c$ in $C$, to determine whether a $d$-neighbor of $c$ appears in all of the remaining sequences $S_{n'+1},S_{n'+2},...,S_{n}$. If this is the case, $c$ is accepted as a motif in set $M$.
 				% \begin{equation} M = C \cap \mathcal{N}(S_{n'+1}, d) \cap...\cap \mathcal{N}(S_{n}, d). \end{equation}
-				\begin{equation} M =\{ c \in C\ |\ \forall i \in \{n'+1,...,n\}\ \exists\ x_i \in \mathcal{L}(S_i, l)\ \text{such that}\ dH(c, x_i) \leq d \}. \end{equation}
+				\begin{equation} M =\{ c \in C\ |\ \forall i \in \{n'+1,...,n\}\ \exists\ x_i \in \mathcal{L}(S_i, l),\ \ dH(c, x_i) \leq d \}. \end{equation}
 			\end{enumerate}
 
 		\newpage{\setstretch{1.0}
@@ -512,7 +515,7 @@
 
 		\noindent This entire procedure effectively performs $\mathcal{N}(S,d) \leftarrow \mathcal{N}(S,d) \cup N(x,d)$ for each $l$-mer $x$ in $S$, as specified in lines 2-5 and 9-12 of EMS-GT (Algorithm 2.1).
 
-	\section{Performance improvement with pattern-based speedup technique}
+	\section{Improvement with pattern-based speedup technique}
 		The pattern-based technique requires examining all $d$-neighbors of $x$'s prefix $y$.
 		We can use our recursive procedure (Algorithm 2.3) to traverse the neighborhood $N(y,d)$; as Table \ref{tbl:neighbors_blockmasking} shows, this will require generating much fewer neighbors than $N(x,d)$:\newline
 
@@ -642,7 +645,7 @@
 			\caption{\small Performance of PMS8, qPMS9 and EMS-GT on non-challenging ($l$,$d$).}
 			\end{table}
 
-		EMS-GT is highly competitive with PMS8 and qPMS9 on challenging problem instances, but as Table 4.\ref{tbl:runtimes_nonchallenge} shows, on non-challenging instances EMS-GT is not as efficient. This may be due to differing ways of narrowing down the search space of the search space: while EMS-GT manipulates a fixed-size bit-array to narrow down the search space of all $4^l$ $l$-mers, PMS8 and qPMS9 have a dynamically-sized search space which is easily pruned down for most ($l$,$d$) values, but may be more difficult to manage for challenging ($l$,$d$) values.
+		EMS-GT is highly competitive with PMS8 and qPMS9 on challenging problem instances, but as Table 4.\ref{tbl:runtimes_nonchallenge} shows, on non-challenging instances EMS-GT is not as efficient. This may be due to differing ways of narrowing down the search space: while EMS-GT manipulates a fixed-size bit-array to narrow down the search space of all $4^l$ $l$-mers, PMS8 and qPMS9 have a dynamically-sized search space which is easily pruned down for most ($l$,$d$) values, but more difficult to manage for challenging ($l$,$d$) values.
 
 \chapter{Conclusion}
 	This paper discusses a novel speedup technique for the EMS-GT algorithm, an exact solution to the planted motif problem for any arbitrary instance, $l$=17. A Java implementation, run on various challenge problem instances, shows the improved algorithm to be very competitive against state-of-the-art exact algorithms PMS8 and qPMS9. The speedup technique allows EMS-GT to outperform the current best algorithm, qPMS9, for the challenge problem instances (9,2), (11,3), (13,4) and (15,5) with a run-time reduction of at least 76\%, 81\%, 77\% and 37\% respectively for these instances, while ranking second to qPMS9 for test instance (17,6). Note that EMS-GT does not outperform PMS8 and qPMS9 on non-challenging ($l$,$d$) instances.
