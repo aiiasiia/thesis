@@ -21,9 +21,9 @@
 \DepartmentHead{MARLENE M. DE LEON, Ph.D.}
 \SchoolHead{EVANGELINE P. BAUTISTA, Ph.D.}
 \ThesisAdviser{PROCESO L. FERNANDEZ, JR., Ph.D.}
-\FirstPanelMember{XXX, Ph.D.}
-\SecondPanelMember{XXX, Ph.D.}
-\ThirdPanelMember{XXX, Ph.D.}
+\FirstPanelMember{XXX, Ph.D.}	% Doc Andrei Coronel
+\SecondPanelMember{XXX, Ph.D.}	% Ma'am Juliet
+\ThirdPanelMember{XXX, Ph.D.}	% Jal de Vera
 
 \ThesisStyle{MS}{Draft}{-10pt}{15pt}
 % Choices for the 1st argument: MS, PhD
@@ -37,7 +37,7 @@
 
 	This study implements a novel improvement to EMS-GT, a motif search algorithm which operates on a compact bit-based representation of the search space. The improvement takes advantage of distance-related patterns in the search space, in order to speed up the bulk bit-setting operations performed by the algorithm. A Java implementation
 	% ---run on synthetic datasets for various challenge instances of the ($l,d$) planted motif problem---
-	is shown to be highly competitive against PMS8 and qPMS9, two current state-of-the-art exact algorithms. EMS-GT works extremely well for problems involving short motifs, outperforming both competitors for challenge instances with ($l,d$) values (9,2), (11,3), (13,4) and (15,5), showing runtime reductions of 76\%, 81\%, 77\% and 37\% respectively for these instances, while ranking second to qPMS9 for challenge instance (17,6).
+	is shown to be highly competitive against PMS8 and qPMS9, two current state-of-the-art exact algorithms. EMS-GT works extremely well for problems involving short motifs, outperforming both competitors for challenge instances with ($l,d$) values (9,2), (11,3), (13,4) and (15,5), showing runtime reductions of at least 76\%, 81\%, 77\% and 37\% respectively for these instances, while ranking second to qPMS9 for challenge instance (17,6).
 	\end{abstract}
 
 \tableofcontents
@@ -58,39 +58,79 @@
 
 		The planted motif problem simply asks: ``\emph{Given a set of DNA sequences, can we find an unknown motif of length $l$ that appears at different positions in each of the sequences} \cite{pevzner2000combinatorial}?'' Initially it seems an exhaustive string search will suffice for this problem. However, due to biological mutation, motif occurrences in DNA are allowed to differ from the original motif by up to $d$ characters. This greatly impacts complexity: two distinct variants of a motif---both counting as valid occurrences of the motif---might differ in as many as 2$d$ characters! Brute-force solutions quickly become infeasible as values of $l$ and $d$ increase. All of this shows why ($l$, $d$)-motifs are sometimes called ``subtle'' signals in DNA  \cite{pevzner2000combinatorial}, and why finding them is difficult and computationally expensive. In fact, the motif finding problem has already been shown to be NP-complete \cite{pms2014}. 
 
-		This study is concerned with the EMS-GT (\emph{Exact Motif Search - Generate and Test}) algorithm \cite{nabos2015dissertation}, which solves the planted motif problem for any arbitrary instance up to $l$=17. This study investigates certain Hamming distance-related patterns appearing in EMS-GT's bit-based representation of the motif search space, and uses these to develop a novel speedup technique for EMS-GT.
+		This study is concerned with the EMS-GT (\emph{Exact Motif Search - Generate and Test}) algorithm \cite{nabos2015dissertation}, which solves the planted motif problem for any arbitrary instance up to $l$=17. The study investigates certain Hamming distance-related patterns appearing in EMS-GT's bit-based representation of the motif search space, and uses these to develop a novel speedup technique for EMS-GT.
 
+	\newpage
 	\section{Context of the Study}
-		This section formally defines the planted motif problem. It also defines key terms used throughout this paper in discussing exact motif-search algorithms.
+		This section formally defines the planted motif problem. It also defines key terms used throughout this paper in discussing exact motif-search algorithms.\vspace{5mm}
 
-		\noindent\textbf{\boldmath DEFINITION 1. $l$-mer, Hamming distance, $d$-neighborhood}
+		\noindent\textbf{\boldmath DEFINITION 1. $l$-mer}
 
-		\noindent An \textbf{\boldmath $l$-mer} is a sequence of length $l$. Given a sequence $S$ of length $L > l$, the $i^{th}$ $l$-mer in $S$ starts at the $i^{th}$ position. The \textbf{\boldmath Hamming distance $dH$} between two $l$-mers of equal length is the number of characters that differ between them. ``Distance'' refers to Hamming distance in this paper, unless otherwise stated.
-		\newline\hspace*{35pt} Ex. If $l$ = 5, the second $l$-mer in \texttt{gattaca} is \texttt{attac}.
-		\newline\hspace*{55pt} $dH(\texttt{gattaca}, \texttt{cgttaga}) = 3$.
+		\noindent An \textbf{\boldmath $l$-mer} is any sequence of length $l$. In the context of the study, we consider only $l$-mers over the DNA nucleic alphabet, $\Sigma$ = \{\texttt{a}, \texttt{g}, \texttt{c}, \texttt{t}\}. Formally, an $l$-mer $x$ is an element of $\Sigma^l$, whose size is denoted by $|x| = l$. Given a sequence $S$ of length $L > l$, we denote the set of all $l$-mers in $S$ as $\mathcal{L}(S_i, l)$. The $i^{th}$ $l$-mer in $S$ is the $l$-mer that starts at the $i^{th}$ position.
 
-		\noindent The \textbf{\boldmath $d$-neighborhood of an $l$-mer $x$} is the set {\boldmath $N(x, d)$} of all $d$-neighbors of $x$: all $l$-mers $x'$ whose Hamming distance from $x$ is at most $d$, i.e., {\boldmath $dH (x, x') \leq d$}. 
-		Meanwhile, the \textbf{\boldmath $d$-neighborhood of a sequence $S$} of length $L > l$ is the set {\boldmath $\mathcal{N}(S, d)$} of all $d$-neighbors of all the $l$-mers in $S$.
-		\newline\hspace*{35pt} Ex. \texttt{gatct}, \texttt{cctta}, and \texttt{aatta} are all in $N(\texttt{gatta}, 2)$.
-		\newline\hspace*{55pt} For $l$ = 5,
+		\noindent \hspace*{35pt} Ex. If $l$ = 5,\ \ $\mathcal{L}(\texttt{gattaca}, l)= \{\texttt{gatta},\texttt{attac},\texttt{ttaca}\}$;
+		\newline\hspace*{55pt}	\texttt{attac} is the second $l$-mer in \texttt{gattaca}.\newline
+
+		\noindent\textbf{\boldmath DEFINITION 2. Hamming distance}
+
+		\noindent The \textbf{\boldmath Hamming distance $dH$} between two $l$-mers of equal length is the number of corresponding characters that differ between them. Formally, the Hamming distance between $x_1$ and $x_2$ is given by $ dH(x_1, x_2) = | \{i\ |\ x_1[i] \neq x_2[i], 1 \leq i \leq l\} |$, where $x[i]$ is the $i^{th}$ character in a given $l$-mer $x$.
+
+		\noindent \hspace*{35pt} Ex. $dH(\texttt{\ul{ga}tta\ul{c}a}, \texttt{\ul{cg}tta\ul{g}a}) = 3$. \newline
+		\noindent ``Distance'' refers to Hamming distance in this paper, unless otherwise stated.\newline
+
+		\noindent\textbf{\boldmath DEFINITION 3. $d$-neighborhood}
+		
+		\noindent A {\boldmath\bf $d$-neighbor} $x'$ of an $l$-mer $x$ is an $l$-mer whose Hamming distance from $x$ is at most $d$, i.e., {\boldmath $dH (x, x') \leq d$}.
+
+		\noindent \hspace*{35pt} Ex. \texttt{\ul{cg}tta\ul{g}a} is a $d$-neighbor of \texttt{\ul{ga}tta\ul{c}a} for any $d \geq 3$.\newline
+
+		\noindent The \textbf{\boldmath $d$-neighborhood of an $l$-mer $x$} is the set {\boldmath $N(x, d)$} of all $d$-neighbors of $x$: $N(x,d) = \{ x'\ |\ dH(x, x') \leq d\}$. Note that $x$ is always included in $N(x,d)$ for any $d$.\newline
+		
+		\noindent\begin{minipage}{\textwidth} {\setstretch{1.0}
+				\noindent\hspace*{35pt} Ex. $N(\texttt{gatta}, 1) =$\{ \texttt{gatta},
+					% \hspace*{145pt}
+					\texttt{\ul{a}atta}, \texttt{\ul{c}atta}, \texttt{\ul{t}atta},				
+					
+					\hspace*{145pt}\texttt{g\ul{c}tta}, \texttt{g\ul{g}tta}, \texttt{g\ul{t}tta},
+					% \hspace*{145pt}
+					\texttt{ga\ul{a}ta}, \texttt{ga\ul{c}ta}, \texttt{ga\ul{g}ta},
+
+				 	\hspace*{145pt}\texttt{gat\ul{a}a}, \texttt{gat\ul{c}a}, \texttt{gat\ul{g}a},
+				 	% \hspace*{145pt}
+				 	\texttt{gatt\ul{c}}, \texttt{gatt\ul{g}}, \texttt{gatt\ul{t}} \}.
+
+		}\end{minipage}\newline
+		% \newline\hspace*{35pt} ///// add full enumeration of neighbors for (\texttt{gatta}, 1)?
+
+		\noindent Meanwhile, for a given $l$, the \textbf{\boldmath $d$-neighborhood of a sequence $S$} of length $L > l$ is the set {\boldmath $\mathcal{N}(S, d)$} of all $d$-neighbors of all the $l$-mers in $S$.
+		\newline\hspace*{35pt} Ex. For $l$ = 5,
 			$\mathcal{N}(\texttt{gattaca}, 2) 
 					= N(\texttt{gatta}, 2) \cup 
 						N(\texttt{attac}, 2) \cup
 						N(\texttt{ttaca}, 2)$.\newline
 		
-		\noindent\textbf{\boldmath DEFINITION 2. ($l,d$) Planted Motif Problem}
-		\newline We formally define the ($l$,$d$) planted motif problem as follows:\bigskip
+		\noindent\textbf{\boldmath DEFINITION 4.}
+		\noindent {\bf \boldmath ($l$,$d$) \textsc{Planted Motif Problem}}\newline
+		\noindent INSTANCE: A motif length $l$, an allowable distance $d$, and a set $\mathcal{S} = \{S_{1},..., S_{n}\}$\newline
+		\noindent\hspace*{55pt}of $n$ DNA sequences of length $L > l$ over the alphabet $\Sigma$ = \{\texttt{a}, \texttt{g}, \texttt{c}, \texttt{t}\}.\newline
+		\noindent SOLUTION: The set $M = \{\ l\text{-mer}\ x\ |\ \forall i \in \{1,...,n\}\ \ \exists x_i \in \mathcal{L}(S_i,l),\ \ dH(x, x_i) \}$.
 
-		\noindent\hspace*{50pt} Given a set $\mathcal{S} = \{S_{1},...S_{t}\}$ of $n$ DNA sequences of length $L$,
-		% \newline \hspace*{52pt} the motif length $l$, and the number of allowable mismatches $d$,
-		\newline \hspace*{50pt} find $M$, the set of sequences (or motifs) of length $l < L$
-		\newline \hspace*{50pt} which have at least one $d$-neighbor in each sequence in $S$. %in $S$.
+
+		% \newline We formally define the ($l$,$d$) planted motif problem as follows:\bigskip
+		% \noindent\hspace*{50pt} Given a set $\mathcal{S} = \{S_{1},...S_{n}\}$ of $n$ DNA sequences of length $L$,
+		% % \newline \hspace*{52pt} the motif length $l$, and the number of allowable mismatches $d$,
+		% \newline \hspace*{50pt} find $M$, the set of sequences (or motifs) of length $l < L$
+		% \newline \hspace*{50pt} which have at least one $d$-neighbor in each sequence in $S$. %in $S$.
+
+		\newpage
+		/// sample image
 		
+	\newpage
 	\section{Objectives of the Study}
 		The main objective of this study is to improve the performance of the EMS-GT algorithm. Specifically, it aims:
 		\begin{enumerate}
 		\item To develop a speedup technique for EMS-GT that takes advantage of distance-related patterns in the motif search space.
-		\item To evaluate the resulting technique with regard to improvement in runtime and solvable problem instances.
+		\item To evaluate the resulting technique with regard to improvement in runtime. %and solvable problem instances.
 		\item To evaluate the improved version of EMS-GT against state-of-the-art motif search algorithms.
 		\end{enumerate}
 
@@ -100,17 +140,17 @@
 
 		\begin{enumerate}
 		\item How can distance-related patterns observed within the motif search space be exploited in a speedup technique for EMS-GT?
-		\item What performance improvement does a pattern-based speedup technique, with regard to runtime and solvable problem instances?
+		\item What performance improvement does a pattern-based speedup technique produce, with regard to runtime? % and solvable problem instances?
 		\item How does the improved version of EMS-GT compare with state-of-the-art motif search algorithms?
 		\end{enumerate}
 
 	\section{Significance of the Study}
 		Motif finding in DNA and other types of nucleotide sequences is an important task in bioinformatics. Genome analysis requires fast, efficient algorithms to identify biological motifs which may be linked to protein synthesis, gene function, or even disease and targets for medical treatment. 
 
-		Improvinging the EMS-GT algorithm, which was shown to be competitive with the state-of-the-art, results in an even faster option for real-world motif finding applications. Furthermore, this study's investigation and insights regarding distance-related patterns within an organized search space may prove applicable to other types of search tasks, pattern-matching tasks, and problems involving Hamming distances.
+		Improving the EMS-GT algorithm, which was shown to be competitive with the state-of-the-art, results in an even faster option for real-world motif finding applications. Furthermore, this study's investigation and insights regarding distance-related patterns within an organized search space may prove applicable to other types of search tasks, pattern-matching tasks, and problems involving Hamming distances.
 
 	\section{Scope and Limitations of the Study}
-		This study is concerned with integrating a novel bit-masking speedup technique into the existing Java implementation of EMS-GT. The improved version is benchmarked by its runtime on synthetic datasets for challenging instances of the problem. (EMS-GT had been previously tested for correctness using real biological data with known motifs; re-testing would be redundant since the speedup technique does not change the logic of the algorithm.)	
+		This study is concerned with developing and integrating a novel bit-masking speedup technique into the existing Java implementation of EMS-GT. The improved version is benchmarked by its runtime on synthetic datasets for challenging instances of the problem. (EMS-GT had been previously tested for correctness using real biological data with known motifs; re-testing would be redundant since the speedup technique does not change the logic of the algorithm.)	
 		Furthermore, the performance of EMS-GT is compared to that of PMS8 and qPMS9 running on a single core. Although both competitor algorithms are also capable of using multiple procesors, parallelization is beyond the current scope of the speedup techniques explored for EMS-GT.
 
 \chapter{Review of Related Literature}
@@ -125,30 +165,40 @@
 		Gibbs sampling \cite{lawrence1993detecting} and Expectation Maximization (EM), used in the motif-finding tool MEME \cite{lawrence1990expectation,bailey1995unsupervised} both use probabilistic computations to improve an initial random alignment. (An alignment is simply a vector $(a_{1}, a_{2},...,a_{n})$ of $n$ positions, which predicts that the motif occurs at position $a_{i}$ in the given sequence $S_{i}$.) Gibbs sampling attempts to refine the alignment one position at a time; %in contrast,
 		EM may recompute the entire alignment in a single iteration. 
 
-		Projection \cite{blanchette2002discovery} combines a pattern-based approach with EM's probabilistic approach, trying to guess every successive character of a tentative motif and using EM to verify its guesses. GARPS \cite{huo2009combining} uses a random version of the projection strategy, in tandem with the iteratively self-correcting Genetic Algorithm (GA), for yet another iterative approach. These are just some of many successful heuristic algorithms for motif finding.
+		Projection \cite{blanchette2002discovery} combines a pattern-based approach with EM's probabilistic approach, trying to guess every successive character of a tentative motif and using EM to verify its guesses. GARPS \cite{huo2009combining} uses a random version of the projection strategy, in tandem with the iteratively self-correcting Genetic Algorithm (GA), for yet another iterative approach. These are just some of many successful heuristic algorithms for motif finding.	
+
+		////// list more algorithms! name, citation
 
 	\section{Exact Algorithms}
-		While they can be efficient, heuristic approaches are non-exhaustive and thus not always guaranteed to find a solution. Exact motif search algorithms, on the other hand, perform an exhaustive search of possible motifs and so always find the planted motif.
+		While heuristics can be efficient, these approaches are non-exhaustive and thus do not always guarantee to find a solution. Exact motif search algorithms, on the other hand, perform an exhaustive search of possible motifs and so always find the planted motif.
 
 		WINNOWER \cite{pevzner2000combinatorial} and its successor MITRA \cite{eskin2002finding} are exact algorithms that look at pairwise $l$-mer similarity to find motifs. In a set of DNA sequences, there are numerous pairs of ``similar'' $l$-mers, which come from different sequences and have Hamming distances of at most 2$d$ from each other (meaning that they could possibly be two $d$-neighbors of the same $l$-mer). WINNOWER represents these pairs in a graph, with $l$-mers as nodes and edges connecting $l$-mer pairs. It then prunes the graph to identify ``cliques'' of pairs that indicate a motif. MITRA refines this graph representation into a mismatch tree containing all possible $l$-mers, organized by prefix. The tree structure allows MITRA to eliminate entire branches at a time, making it significantly faster than WINNOWER at removing the many spurious edges that are not part of any motif clique.
 
+		 ////// add photo for MITRA, with citation
+
 		The BitBased algorithm \cite{dasari2010efficient} uses approaches that are similar to EMS-GT's (see subsection 2.3.1): it maps $l$-mers to binary strings of length $2l$, and represents the motif search space with an array of bits. The main difference is that BitBased is optimized for parallel computation on multiple cores, requiring specialized GPU hardware (Nvidia Tesla C1060 or S1070). BitBased is able to solve the challenge problem instance (21,8) in 1.1 hours.
 
+	\newpage
 	\subsection{PMS8 and qPMS9}
 		The current state-of-the-art exact algorithms are PMS8 and qPMS9, from the Panoptic Motif Search (PMS) series
 		 developed by Rajasekaran et al
-		\cite{pms2007,pms2014,pms2015}. The idea in both PMS8 and qPMS9 is to form all possible tuples of $n'$ ``similar'' $l$-mers, for some $n' < n$, and then determine whether the common neighbors of $l$-mers in these tuples are motifs. This approach proceeds in two main steps:
+		\cite{pms2007,pms2014,pms2015}. The idea in both PMS8 and qPMS9 is to first consider a subset of $\mathcal{S}$, $S_1,...S_{n'}$, and from these, form all possible $n'$-tuples of ``similar'' $l$-mers (similarity is defined in Step 1 below); then, determine whether the common neighbors of $l$-mers in these tuples are motifs. This approach proceeds in two main steps:
 
 		\begin{enumerate}
 			\item {\em Sample-driven step}\newline
-			This step chooses a tuple $T$ of $n'$ ``similar'' $l$-mers from $n'$ distinct DNA sequences in the set $\mathcal{S}$. Similarity means that the $l$-mers in the tuple have a common neighbor; this implies that the distance between any two $l$-mers in $T$ must be less than $2d$.
+			This step chooses an $n'$-tuple $T$ of ``similar'' $l$-mers, in which the $i^{th}$ element is an $l$-mer in $S_i$.
+			 % ``similar'' $l$-mers from $n'$ distinct DNA sequences in the set $\mathcal{S}$. 
+			 Similarity means that the $l$-mers in the tuple have a common neighbor; this implies that the distance between any two $l$-mers in $T$ must not be more than $2d$.
 			%To build $T$, the algorithm repeatedly chooses an $l$-mer from a different sequence each time, avoiding $l$-mers with distances over $2d$ from any of the $l$-mers already in $T$. This ensures that new $l$-mers have neighbors in common with the others.
-			\begin{equation} T = \{l_{1}, l_{2}, ..., l_{n'}\},\ \ \ \ \ \ 
-			dH(l_{i}, l_{j}) \leq 2d\ \ \forall\ l_{i}, l_{j} \in T \end{equation}
-
+			\begin{equation} T = (x_{1}, x_{2}, ..., x_{n'}),\ x_i \in \mathcal{L}(S_i, l) \ \ \ \ \ 
+			dH(x_{i}, x_{j}) \leq 2d\ \ \forall\ i,j \end{equation}
+			\vspace{-5mm}
 			\item {\em Pattern-driven step}\newline
-			This step intersects the $d$-neighborhoods of $l_{1}, l_{2}, ..., l_{n'}$ to form the set $C$ of their common neighbors. It then checks each $l$-mer $c$ in $C$, to determine whether a $d$-neighbor of $c$ appears in all of the $n-n'$ remaining sequences (i.e., those sequences which did not initially contribute an $l$-mer to $T$). If this is the case, $c$ is accepted as a motif.
-			\begin{equation} C = N(l_{1}, d) \cap N(l_{2}, d) \cap...\cap N(l_{n'}, d). \end{equation}
+			This step intersects the $d$-neighborhoods of $x_{1}, x_{2}, ..., x_{n'}$ to form the set $C$ of their common neighbors. It then checks each $l$-mer $c$ in $C$, to determine whether a $d$-neighbor of $c$ appears in all of the $n-n'$ remaining sequences (i.e., those sequences which did not initially contribute an $l$-mer to $T$). If this is the case, $c$ is accepted as a motif.
+			\begin{equation} C = N(x_{1}, d) \cap N(x_{2}, d) \cap...\cap N(x_{n'}, d). \end{equation}
+
+			\begin{equation} M =\{ c \in C\ |\ \forall i \in \{n'+1,...,n\}\ \exists\ x_i \in \mathcal{L}(S_i, l)\ \text{such that}\ dH(c, x_i) \leq d \}. \end{equation}
+
 		\end{enumerate}
 		\vspace{-5mm}
 		\noindent Exhaustively building all ``similar'' $n'$-tuples requires significant runtime and many false starts (i.e., the algorithm has built a tuple to size $m < n'$, only to find that no further similar $l$-mers can be found).
@@ -156,8 +206,10 @@
 		between {\em three} $l$-mers (two from the tuple, and the one to be added). This method of testing similarity for $l$-mer triples, instead of pairs, quickly recognizes and discards false starts. For even greater efficiency, qPMS9 intelligently prioritizes adding $l$-mers that are highly distant from those already in the tuple, such that common neighborhood becomes smaller and faster to check through.
 		In practice, both PMS8 and qPMS9 have been implemented to run on multiple processors with the OpenMPI C library, allowing them to solve highly challenging problem instances with ($l, d$) as large as (50, 21) in a few hours.
 
+		/// add image
+
 	\newpage
-	\section{EMS-GT}
+	\subsection{EMS-GT}
 		EMS-GT, first developed by Nabos \cite{nabos2015dissertation}, is an exact motif search algorithm based on the candidate generate-and-test principle.
 		It operates on a compact bit-based representation of the search space.
 		% , identifying the common $d$-neighbors of the $n$ given DNA sequences as motifs. 
@@ -169,19 +221,20 @@
 				\begin{equation} C = \mathcal{N}(S_{1}, d) \cap \mathcal{N}(S_{2}, d) \cap...\cap \mathcal{N}(S_{n'}, d). \end{equation}
 			\item {\em Test candidates}\newline
 			This step simply checks each candidate motif $c$ in $C$, to determine whether a $d$-neighbor of $c$ appears in all of the remaining sequences $S_{n'+1},S_{n'+2},...,S_{n}$. If this is the case, $c$ is accepted as a motif in set $M$.
-				\begin{equation} M = C \cap \mathcal{N}(S_{n'+1}, d) \cap...\cap \mathcal{N}(S_{n}, d). \end{equation}
+				% \begin{equation} M = C \cap \mathcal{N}(S_{n'+1}, d) \cap...\cap \mathcal{N}(S_{n}, d). \end{equation}
+				\begin{equation} M =\{ c \in C\ |\ \forall i \in \{n'+1,...,n\}\ \exists\ x_i \in \mathcal{L}(S_i, l)\ \text{such that}\ dH(c, x_i) \leq d \}. \end{equation}
 			\end{enumerate}
 
 		\newpage{\setstretch{1.0}
 		\noindent\hspace*{6pt}{\bf Algorithm 2.1} \textsc{Exact Motif Search - Generate and Test}\small
 		\begin{algorithmic}[1] \label{alg:EMS-GT}
-			\Require set $S = \{S_{1},S_{2},...,S_{n}\}$ of $L$-length sequences, \newline \hspace*{25pt}motif length $l$, allowable mismatches $d$
-			\Ensure set $M$ of candidate motifs %\vspace*{6pt}
+			\Require set $S = \{S_{1},S_{2},...,S_{n}\}$ of $L$-length sequences, \newline \hspace*{25pt}motif length $l$, allowable distance $d$
+			\Ensure set $M$ of motifs %\vspace*{6pt}
 			% \State 
-			\State $C \leftarrow \{\}$										\hspace*{200pt}\Comment{generate candidates}
+			% \State $C \leftarrow \{\}$										
 			\State $\mathcal{N}(S_{1},d) \leftarrow \{\}$
-			\For{$j \leftarrow 1$ to $L-l+1$}
-				\State $x \leftarrow j^{th} l$-mer in $S_{1}$
+			\For{$j \leftarrow 1$ to $L-l+1$}							\hspace*{200pt}\Comment{generate candidates}
+				\State $x \leftarrow j^{th} l$-mer in $S_{1}$			
 				\State $\mathcal{N}(S_{1},d) \leftarrow \mathcal{N}(S_{1},d) \cup N(x,d)$
 			\EndFor
 			\State $C \leftarrow \mathcal{N}(S_{1},d)$
@@ -193,14 +246,14 @@
 				\EndFor
 				\State $C \leftarrow C \cap \mathcal{N}(S_{i},d)$
 			\EndFor
-			\State $M \leftarrow \{\}$										\hspace*{200pt}\Comment{test candidates}
-			\For{each $l$-mer $u$ in $C$}
+			\State $M \leftarrow \{\}$										
+			\For{each $l$-mer $c$ in $C$}								\hspace*{180pt}\Comment{test candidates}
 				\State $isMotif \leftarrow$ true
 				\For{$i \leftarrow (n'+1)$ to $n$}
 					\State $found \leftarrow$ false
 					\For{$j \leftarrow 1$ to $L-l+1$}
 						\State $x \leftarrow j^{th} l-$mer in $S_{i}$
-						\If{$dH(x,u) \leq d$}
+						\If{$dH(x,c) \leq d$}
 							\State $found \leftarrow$ true
 							\State break
 						\EndIf
@@ -211,7 +264,7 @@
 					\EndIf
 				\EndFor
 				\If{$isMotif$}
-					\State $M \leftarrow M \cup u$
+					\State $M \leftarrow M \cup c$
 				\EndIf
 			\EndFor
 			\State\Return $M$
@@ -219,32 +272,33 @@
 		}
 
 
-		\noindent In practice, EMS-GT must perform speedy operations on an array of bits representing the entire motif search space. Subsections 2.3.1 to 2.3.4 discuss the efficiency strategies EMS-GT uses for important tasks such as representing sets in the search space, determining whether $l$-mers are neighbors, and generating all possible $d$-neighbors of a given $l$-mer.
+		\noindent In practice, EMS-GT must perform speedy operations on an array of bits representing the entire motif search space. The succeeding sections discuss the efficiency strategies EMS-GT uses for important tasks such as representing sets in the search space, determining whether $l$-mers are neighbors, and generating all possible $d$-neighbors of a given $l$-mer.
 
-		\subsection{Bit-based set representation and $l$-mer enumeration}
-			The motif search space consists of the $4^{l}$ possible $l$-mers that can be formed from the nucleic alphabet \{\texttt{a}, \texttt{g}, \texttt{c}, \texttt{t}\}. To efficiently represent sets---such as a $d$-neighborhood, or a set of candidate motifs---within this space, EMS-GT assigns each of the $4^{l}$ $l$-mers a bit flag in an array, set to 1 if the $l$-mer is a member of the set and 0 otherwise. Bit flags correspond to $l$-mers via a simple mapping: EMS-GT maps an $l$-mer $s$ to a bit flag index $x$ by replacing each character with 2 bits (\texttt{a=00}, \texttt{c=01}, \texttt{g=10}, \texttt{t=11}). Note that this mapping scheme enumerates $l$-mers in strict alphabetical order.
+		\subsubsection{Bit-based set representation and $l$-mer enumeration}
+			The motif search space consists of the $4^{l}$ possible $l$-mers that can be formed from the nucleic alphabet $\Sigma=$ \{\texttt{a}, \texttt{g}, \texttt{c}, \texttt{t}\}. To efficiently represent sets---such as a $d$-neighborhood, or a set of candidate motifs---within this space, EMS-GT assigns each of the $4^{l}$ $l$-mers a bit flag in an array, set to 1 if the $l$-mer is a member of the set and 0 otherwise. Bit flags correspond to $l$-mers via a simple mapping: EMS-GT maps an $l$-mer $s$ to a bit flag index $x$ by replacing each character with 2 bits (\texttt{a=00}, \texttt{c=01}, \texttt{g=10}, \texttt{t=11}). Note that this mapping scheme enumerates $l$-mers in strict alphabetical order.
 
-			\noindent \hspace*{40pt}{\small Ex. \texttt{tacgt} maps to \texttt{1100011011} = 795; thus, its flag is the $795^{th}$ bit in the array.
+			\noindent \hspace*{40pt}{\small Ex. \texttt{tacgt} maps to \texttt{1100011011} = 795; 
+			thus, its flag is the bit at index 795.
 				% \hspace*{58pt} Thus, the flag for \texttt{tagct} is bit 795 in the array.}
 
-		\subsection{Bit-array compression}
-			EMS-GT's implementation compresses the required set-representation array of $4^{l}$ bits into an equivalent array of $\frac{4^{l}}{32}$ 32-bit integers. The $x^{th}$ bit is now found at position ($x$ mod 32) of the integer at array index $\frac{x}{3}$.\newline
+		\subsubsection{Bit-array compression}
+			EMS-GT's implementation compresses the required set-representation array of $4^{l}$ bits into an equivalent array of $\frac{4^{l}}{32}$ 32-bit integers. The bit for $l$-mer $x$ is now found at position ($x$ mod 32) of the integer at array index $\left\lfloor\frac{x}{32}\right\rfloor$.\newline
 			\hspace*{40pt}{\small Ex. \texttt{tacgt} maps to \texttt{1100011011} = 795 in decimal.\newline
-				\hspace*{58pt} \emph{array index}  = $\frac{795}{32}$ = 24 , \hspace*{5pt} \emph{bit position} = 795 mod 32 = 27;\newline %\newline\hspace*{58pt} 
-				\hspace*{58pt}Thus, the flag for \texttt{tacgt} is the 27$^{th}$ bit of the integer at array index 24.}
+				\hspace*{58pt} \emph{array index}  = $\left\lfloor\frac{795}{32}\right\rfloor$ = 24 , \hspace*{5pt} \emph{bit position} = 795 mod 32 = 27;\newline %\newline\hspace*{58pt} 
+				\hspace*{58pt}Thus, the flag for \texttt{tacgt} is the bit at index 27 of the integer at index 24.}
 			% \begin{figure}[h] \label{fig:bitarray_demo}
 			% 	\end{figure}
 
-		\subsection{XOR-based Hamming distance computation}
-			The mapping of $l$-mers to binary numbers  is also useful for computing Hamming distances. An exclusive OR (XOR) bitwise operation between the mappings of two $l$-mers will produce a nonzero pair of bits at every mismatch position; counting these nonzero pairs of bits in the XOR result gives us the Hamming distance. See Algorithm 2.2 for the implementation.\newline
+		\subsubsection{XOR-based Hamming Distance Computation}
+			The mapping of $l$-mers to binary numbers  is also useful for computing Hamming distances. An Exclusive OR (XOR) bitwise operation between the mappings of two $l$-mers will produce a nonzero pair of bits at every mismatch position; counting these nonzero pairs of bits in the XOR result gives us the Hamming distance. See Algorithm 2.2 for the implementation.\newline
 			\noindent\hspace*{40pt} {\small Ex.	\texttt{tacgt} maps to \texttt{1100011011} \newline
 				\vspace*{2pt}\hspace*{62pt} \texttt{ttcgg} maps to \texttt{1111011010} \newline				
 				\hspace*{62pt}	XOR produces \hspace*{3pt}\texttt{00\hl{11}0000\hl{01}} = 2 mismatches.}
 
-		\subsection{Recursive neighborhood generation}
+		\subsubsection{Recursive Neighborhood Generation}
 			To generate a $d$-neighbor of an $l$-mer $x$, we choose $d' \leq d$ positions from 1, 2,..., $l$-1, $l$ and change the character at each of the $d'$ positions in $x$. EMS-GT uses a recursive procedure (Algorithm 2.3) to do this, effectively (1) traversing the tree of all $d$-neighbors and (2) setting the bit flag in the neighborhood array $N$ for each neighbor it encounters. Since we choose up to $d$ positions in the $l$-mer, and have 3 possible substitute characters at each position, the size of the neighborhood $N(x,d)$ is given by: %\bigskip \hspace*{20pt}
 			\begin{equation}
-				|N(x,d)| = \sum_{i=0}^d \binom{l}{i} 3^{i}
+				\left|N(x,d)\right| = \sum_{i=0}^d \binom{l}{i} 3^{i}
 			\end{equation}
 
 		\newpage
@@ -255,12 +309,12 @@
 				\Ensure $dH(u,v)$\vspace*{6pt}
 
 				\State $dH(u,v) = 0$
-				\State $z \leftarrow u ^ v$
+				\State $z \leftarrow u$ \texttt{XOR} $v$
 				\For {$i \leftarrow 1$ to $l$}
-				\If{$z$ \& 3 != 0}
+				\If{ ($z$ \texttt{AND} $3) \neq 0$}
 				\State $dH(u,v) \leftarrow dH(u,v) + 1$
 				\EndIf
-				\State $z \leftarrow z >>$ 2
+				\State $z \leftarrow z \gg$ 2 			\hspace{150pt}\Comment{shift two bits to the right}
 				\EndFor
 				\State\Return $dH(u,v)$
 				\end{algorithmic}
@@ -284,10 +338,10 @@
 				\State \Comment{make $d$ changes in $l$-mer $x$, from position $s$ onward}
 				\Procedure{AddNeighbors}{$x$, $s$, $d$}
 					\For{$i \leftarrow s$ to $l$}
-						\State $\Sigma' \leftarrow$ \{\texttt{a}, \texttt{g}, \texttt{c}, \texttt{t}\} $- x_{i}$ \hspace*{79pt}\Comment{\small remove $i^{th}$ character of $x$}
+						\State $\Sigma' \leftarrow$ \{\texttt{a}, \texttt{g}, \texttt{c}, \texttt{t}\} - $\{x[i]\}$ \hspace*{79pt}\Comment{\small remove $i^{th}$ character of $x$}
 						\For{$j \leftarrow 1$ to $|\Sigma'|$}
-							\State $neighbor \leftarrow concatenate(x_{1...i-1},\Sigma_{j},x_{i+1...l})$
-							\State $\mathcal{N}[neighbor] \leftarrow 1$
+							\State $neighbor \leftarrow concatenate(x[1...(i-1)],\Sigma_{j},x[(i+1)...l])$
+							\State $\mathcal{N}[neighbor] \leftarrow 1$				\hspace*{100pt}\Comment{set $neighbor$'s bit flag to 1}
 							\If{$d > 1$ and $i < l$}
 								\State \textsc{AddNeighbors}($neighbor$, $i+1$, $d-1$)
 							\EndIf
@@ -353,7 +407,7 @@
 
 				{\small\hspace*{40pt}Ex. $D(\texttt{tacgt})_{100}$\ \ \ \ \ = $dH(\texttt{tacgt}, \texttt{0b0001100100})$
 				\newline\hspace*{137pt} = $dH(\texttt{tacgt}, \texttt{acgca})$
-				\newline\hspace*{137pt} = 5 ,\ \ \ \ at row $\frac{100}{32} = 3$, column $(100\ \emph{mod}\ 32) = 4$
+				\newline\hspace*{137pt} = 5 ,\ \ \ \ at row $\frac{100}{32} = 3$, column $(100\mod 32) = 4$
 				}\newline
 
 			\item Due to the alphabetical enumeration, the $4^k\ l-$mers grouped together in a block will all begin with the same ($l - k$) characters, which we will call the {\bf\boldmath block prefix $y'$}. We can compute a single prefix distance $d_{y'}$ for an entire block: this is simply the distance $dH(y, y')$ between $x$'s prefix and the block prefix.
@@ -363,8 +417,8 @@
 				\newline\hspace*{70pt} $d_{y'} = dH(\texttt{acgtacg}, \texttt{acgttgc}) = 3.$
 				}
 
-			\item We can infer that the distance between any two $l$-mers is equal to the sum of the distance between their prefixes and the distance between their $k$-suffixes %(in other words, Hamming distances are additive);
-			; thus, knowing $d_{y'}$ and $\mathcal{D}(z)$ for some $l$-mer $x' = y'z'$ in the search space, we can compute its distance from $x$ as:
+			\item We can infer that the distance between any two $l$-mers is equal to the sum of the distance between their prefixes and the distance between their $k$-suffixes; %(in other words, Hamming distances are additive);
+			thus, knowing $d_{y'}$ and $\mathcal{D}(z)$ for some $l$-mer $x' = y'z'$ in the search space, we can compute its distance from $x$ as:
 				\begin{equation}
 					dH(x,x') = d_{y'} + \mathcal{D}(z)_{z'}
 					\end{equation}
@@ -421,7 +475,7 @@
 				\Require block degree $k$
 				\Ensure 3D bit-array $\mathcal{P}$ containing all possible non-trivial block patterns \vspace*{6pt}
 
-				\State $\mathcal{P}[][][] \leftarrow \{\}$ \hspace*{90pt}
+				\State $\mathcal{P}[\ ][\ ][\ ] \leftarrow \{\}$ \hspace*{90pt}
 				\Comment{retrieve a pattern $P$ as $\mathcal{P}[z][d - d_{y'}]$ }
 
 				\For {$z \leftarrow 0$ to $4^k$}
@@ -456,7 +510,7 @@
 			% This traverses and masks all non-empty blocks---those which fulfill the condition $d - d_{y'} \geq 0$; in other words, those for which the block prefix $y'$ is a neighbor of $y$.
 		\end{enumerate}
 
-		\noindent This entire procedure effectively performs $\mathcal{N}(S,d) \leftarrow \mathcal{N}(S,d) \cup N(x,d)$ for each $l$-mer $x$ in $S$, as specified in lines 3-6 and 10-13 of EMS-GT (Algorithm 2.1).
+		\noindent This entire procedure effectively performs $\mathcal{N}(S,d) \leftarrow \mathcal{N}(S,d) \cup N(x,d)$ for each $l$-mer $x$ in $S$, as specified in lines 2-5 and 9-12 of EMS-GT (Algorithm 2.1).
 
 	\section{Performance improvement with pattern-based speedup technique}
 		The pattern-based technique requires examining all $d$-neighbors of $x$'s prefix $y$.
@@ -496,13 +550,13 @@
 			\bfseries\boldmath $(l,d)$ & \bfseries Without pattern-based & \bfseries With pattern-based & \bfseries speedup\\
 			\bfseries & \bfseries procedure & \bfseries\boldmath procedure, $k=5$ & \bfseries\\
 			\hline
-			 9,2 &   0.06 s &    0.11 s &     --  \\
-			11,3 &   0.22 s &    0.20 s &    6.7\%\\
-			13,4 &   1.98 s &    1.04 s &   47.5\%\\
+			 (9,2) &   0.06 s &    0.11 s &     --  \\
+			(11,3) &   0.22 s &    0.20 s &    6.7\%\\
+			(13,4) &   1.98 s &    1.04 s &   47.5\%\\
 			% 14,4 &   3.53 s &    2.55 s &   27.8\%\\
-			15,5 &  25.06 s &   15.51 s &   38.1\%\\
+			(15,5) &  25.06 s &   15.51 s &   38.1\%\\
 			% 16,5 &  41.63 s &   29.03 s &   30.3\%\\
-			17,6 & 308.61 s &  175.85 s &   43.0\%\\
+			(17,6) & 308.61 s &  175.85 s &   43.0\%\\
 			\hline\end{tabular}
 
 			\caption{\small Performance of EMS-GT with vs. without pattern-based speedup
@@ -533,10 +587,10 @@
 				\bfseries\boldmath $32 \times 128$ blk &
 				\bfseries\boldmath $32 \times 512$ blk \\
 				\hline
-				 9,2 	&    -   &    -     & {\bf  0.11 s} &  0.57 s &  9.02 s \\
-				11,3 	&    -   &    -     & {\bf  0.20 s} &  0.70 s &  9.77 s \\
-				13,4 	&  1.74 s &  1.31 s & {\bf  1.04 s} &  2.19 s & 12.40 s \\
-				15,5 	& 23.43 s & 21.43 s & {\bf 15.51 s} & 24.28 s & 46.30 s \\
+				 (9,2) 	&    -   &    -     & {\bf  0.11 s} &  0.57 s &  9.02 s \\
+				(11,3) 	&    -   &    -     & {\bf  0.20 s} &  0.70 s &  9.77 s \\
+				(13,4) 	&  1.74 s &  1.31 s & {\bf  1.04 s} &  2.19 s & 12.40 s \\
+				(15,5) 	& 23.43 s & 21.43 s & {\bf 15.51 s} & 24.28 s & 46.30 s \\
 				% 17,6 	&	&	&	&	&\\
 				\hline
 				\end{tabular}
@@ -559,13 +613,13 @@
 			\begin{tabular}{|c|c|c|c|c|}
 			\hline \bfseries\boldmath $(l,d)$ & \bfseries PMS8 & \bfseries qPMS9 & \bfseries EMS-GT & \bfseries \% speedup\\
 			\hline
-			 9,2 &  0.74 s  &  0.47 s & {\bf 0.11 s} & 76.6\%\\
-			11,3 &  1.58 s  &  1.06 s & {\bf 0.20 s} & 81.1\%\\
-			13,4 &  5.39 s  &  4.52 s & {\bf 1.04 s} & 77.0\%\\
+			 (9,2) &  0.74 s  &  0.47 s & {\bf 0.11 s} & 76.6\%\\
+			(11,3) &  1.58 s  &  1.06 s & {\bf 0.20 s} & 81.1\%\\
+			(13,4) &  5.39 s  &  4.52 s & {\bf 1.04 s} & 77.0\%\\
 			% 14,4 &  1.29 s  &  1.02 s &      2.55 s\\
-			15,5 & 36.45 s  & 24.63 s & {\bf15.51 s} & 37.0\%\\
+			(15,5) & 36.45 s  & 24.63 s & {\bf15.51 s} & 37.0\%\\
 			% 16,5 &  4.79 s  &  2.96 s &     29.03 s\\
-			17,6 &  3.91 min & \textbf{1.96 min} & {\emph{2.93 min}} & --\\
+			(17,6) &  3.91 min & \textbf{1.96 min} & {\emph{2.93 min}} & --\\
 			\hline\end{tabular}
 
 			\caption{\small Runtimes of PMS8, qPMS9 and EMS-GT. Shortest times are in bold text.}
@@ -588,7 +642,7 @@
 			\caption{\small Performance of PMS8, qPMS9 and EMS-GT on non-challenging ($l$,$d$).}
 			\end{table}
 
-		EMS-GT is highly competitive with PMS8 and qPMS9 on challenging problem instances, but as Table 4.\ref{tbl:runtimes_nonchallenge} shows, on non-challenging instances EMS-GT is not as efficient. This may be due to differing representations of the search space: while EMS-GT uses a fixed-size bit-array to represent the search space of all $4^l$ $l$-mers, PMS8 and qPMS9 have a dynamically-sized search space which is efficient for most ($l$,$d$) values, but may be more costly to narrow down for challenging ($l$,$d$) values.
+		EMS-GT is highly competitive with PMS8 and qPMS9 on challenging problem instances, but as Table 4.\ref{tbl:runtimes_nonchallenge} shows, on non-challenging instances EMS-GT is not as efficient. This may be due to differing ways of narrowing down the search space of the search space: while EMS-GT manipulates a fixed-size bit-array to narrow down the search space of all $4^l$ $l$-mers, PMS8 and qPMS9 have a dynamically-sized search space which is easily pruned down for most ($l$,$d$) values, but may be more difficult to manage for challenging ($l$,$d$) values.
 
 \chapter{Conclusion}
 	This paper discusses a novel speedup technique for the EMS-GT algorithm, an exact solution to the planted motif problem for any arbitrary instance, $l$=17. A Java implementation, run on various challenge problem instances, shows the improved algorithm to be very competitive against state-of-the-art exact algorithms PMS8 and qPMS9. The speedup technique allows EMS-GT to outperform the current best algorithm, qPMS9, for the challenge problem instances (9,2), (11,3), (13,4) and (15,5) with a run-time reduction of at least 76\%, 81\%, 77\% and 37\% respectively for these instances, while ranking second to qPMS9 for test instance (17,6). Note that EMS-GT does not outperform PMS8 and qPMS9 on non-challenging ($l$,$d$) instances.
@@ -600,5 +654,8 @@
 \bibliography{sources}
 %\addappheadtotoc
 %\input{APPENDIX}
+
+% source code
+
 
 \end{document}
