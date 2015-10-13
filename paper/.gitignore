@@ -11,3 +11,6 @@ sources/
 *.lof
 *.lot
 *.toc
+*.nav
+*.out
+*.snm
