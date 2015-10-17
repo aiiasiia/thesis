@@ -32,6 +32,7 @@
 		% \newline \hspace*{12pt} find $M$, the set of sub-sequences (motifs) of length $l < L$
 		% \newline \hspace*{12pt} which occur with at most $d$ mismatches in each sequence in $\mathcal{S}$.
 		% \newline
+		{
 		\centering
 		\emph{Find a motif of length $l$=8 across 5 DNA sequences,}\\
 		\emph{each containing the motif with at most $d$=2 mismatches.}\\
@@ -46,91 +47,92 @@
 		$S_5$\ \ \  \texttt{tgaaaagaatttacggtaaaggatccacatc{\color{blue}c{a}atcgt{g}}tgaaag}\\ 
 		\ \\
 		\emph{Planted motif: }\texttt{\color{blue}ccatcgtt}\\
+		\ \\
+		}
+		\hspace*{0.1\textwidth} Given: set of DNA sequences $\mathcal{S} = \{S_{1},...S_{n}\}$,\\
+		\hspace*{0.1\textwidth} \ \ \ \ \ \ \ \ \  motif length $l$, allowable mismatches $d$\\
+		\hspace*{0.1\textwidth} Find:\ \ \ motif $M$ occurring with at most $d$ mismatches\\
+		\hspace*{0.1\textwidth} \ \ \ \ \ \ \ \ \ in each of the sequences in $\mathcal{S}$.
 
-		Given: set of DNA sequences $\mathcal{S} = \{S_{1},...S_{n}\}$, motif length $l$, allowable mismatches $d$
-		
+		\end{frame}
+
+	\begin{frame}{Introduction}{Solutions to the ($l$,$d$) planted motif problem)}
+		There are two main types of motif search algorithms:\\ \ \\
+		\begin{itemize}
+		\item {\usebeamercolor[fg]{frametitle} heuristic algorithms} 
+		perform an iterative local search, ex. repeatedly refining an input sampling or projection until a motif is found
+		\\ \ \\
+		\item {\usebeamercolor[fg]{frametitle} exact algorithms}
+		perform an exhaustive search of possible motifs, i.e. 
+		\end{itemize}
 		\end{frame}
 
 	\subsection{$l$-mers, Hamming distances, and $d$-neighborhoods}
 	\begin{frame}{Introduction}{$l$-mers, Hamming distances, and $d$-neighborhoods}
 		\begin{itemize}
 		\setbeamercovered{transparent=25}
-		\item<1,2>
-			\alt<2>{{\usebeamercolor[fg]{frametitle} $l$-mer}}
-													{$l$-mer}
-			\only<2>{ \newline- sequence of length $l$\newline
-				\newline
-				{\footnotesize
-				\hspace*{0.05\textwidth}$l$ = 8,\newline
-				\hspace*{0.05\textwidth}$S$ = \texttt{acgccgattacatc{\color{red}cgatcctt}gtatagctcctaacgggcatcac}\newline
-				{\color{blue}\hspace*{0.35\textwidth} $\hookrightarrow$ $15^{th}$ $l$-mer in $S$\newline}
-				% \newline\includegraphics[width=11.0cm]{img/concepts_lmer}
+		\item<1,2>{\alt<2>{\usebeamercolor[fg]{frametitle}}{} $l$-mer}
+			\only<2>{ \newline- sequence of length $l$\\
+				\begin{center}
+				{\small
+				$S_1$\ =\ \texttt{at{\color{blue}c{ac}tcgtt}ctcctctaatgtgtaaagacgtactaccgacctta}\\ \ \\
 				}
+				\end{center}
+				% {\color{blue}\hspace*{0.15\textwidth} $\hookrightarrow$ $3^{rd}$ $l$-mer in $S$, for $l$=8\\}
 			}
-		\item<1,3>
-			\alt<3>{{\usebeamercolor[fg]{frametitle} Hamming distance $dH(x_1, x_2)$}}
-													{Hamming distance $dH(x_1, x_2)$}
-			\only<3>{ \newline- number of mismatches between $l$-mers $x_1$ and $x_2$\newline
-				\newline
-				{\footnotesize
-				\hspace*{0.15\textwidth} $x_1$ = \texttt{c{\color{red}g}atc{\color{red}c}tt}\newline
-				\hspace*{0.15\textwidth} $x_2$ = \texttt{c{\color{red} c}atc{\color{red} g}tt}\newline
-				{\color{blue} \hspace*{0.25\textwidth}
-					$\hookrightarrow$ $2^{nd}$ and $6^{th}$ characters differ\newline
-					\hspace*{0.27\textwidth} thus, $dH(x_1, x_2)$ = 2.\newline
-					}
-				}
-				% \newline\includegraphics[width=11.0cm]{img/concepts_dH}		
+		\item<1,3> {\alt<3>{\usebeamercolor[fg]{frametitle}}{} Hamming distance $dH(x_1, x_2)$}
+			\only<3>{ \\- number of mismatches between $l$-mers $x_1$ and $x_2$\\
+				\begin{center} {
+					$x_1$ = \texttt{c{\color{blue}g}atc{\color{blue}c}tt}\ \ \\
+					$x_2$ = \texttt{c{\color{blue}c}atc{\color{blue} g}tt}\ \ \\
+				}\end{center}\ \\
 			}
-		\item<1,4>
-			\alt<4>{{\usebeamercolor[fg]{frametitle} $d$-neighborhood $N(x,d)$ of $l$-mer $x$}} 
-													{$d$-neighborhood $N(x,d)$ of $l$-mer $x$}
+		\item<1,4>{\alt<4>{\usebeamercolor[fg]{frametitle}}{} $d$-neighborhood $N(x,d)$ of $l$-mer $x$}
 			\only<4>{ \newline- set of all $l$-mers having at most $d$ mismatches with $x$\newline
 				\newline
 				{\footnotesize 
-					$N$(\texttt{ccatcgtt}, 2) = \{ \texttt{ccatcgtt}, \newline
+					$N$(\texttt{ccatcgtt}, 2)\\
+					\hspace*{0.055\textwidth}=  \{ \texttt{ccatcgtt}, \newline
 					\texttt{
 						\hspace*{0.1\textwidth}
-						{\color{red}a}catcgtt,{\color{green}g}catcgtt,{\color{blue}t}catcgtt,%
-						c{\color{red}a}atcgtt,c{\color{green}g}atcgtt,c{\color{blue}t}atcgtt,
+						{\color{blue}a}catcgtt,{\color{blue}g}catcgtt,{\color{blue}t}catcgtt,%
+						c{\color{blue}a}atcgtt,c{\color{blue}g}atcgtt,c{\color{blue}t}atcgtt,
 					}	
-					\hspace*{0.12\textwidth}...
-					\hspace*{0.35\textwidth}{\color{blue} $\hookrightarrow$ 1 mismatch}\newline
+					\hspace*{0.12\textwidth}...{\color{Gray}  1 mismatch}\newline
 					\texttt{
 						\hspace*{0.1\textwidth}
-						{\color{red}a}{\color{red}a}atcgtt,%
-						{\color{red}a}{\color{green}g}atcgtt,%
-						{\color{red}a}{\color{blue}t}atcgtt,%
-						{\color{green}g}{\color{red}a}atcgtt,%
-						{\color{green}g}{\color{green}g}atcgtt,%
-						{\color{green}g}{\color{blue}t}atcgtt,
+						{\color{blue}a}{\color{red}a}atcgtt,%
+						{\color{blue}a}{\color{red}g}atcgtt,%
+						{\color{blue}a}{\color{red}t}atcgtt,%
+						{\color{blue}g}{\color{red}a}atcgtt,%
+						{\color{blue}g}{\color{red}g}atcgtt,%
+						{\color{blue}g}{\color{red}t}atcgtt,
 						\hspace*{0.1\textwidth}
 						{\color{blue}t}{\color{red}a}atcgtt,%
-						{\color{blue}t}{\color{green}g}atcgtt,%
-						{\color{blue}t}{\color{blue}t}atcgtt,%
-						{\color{red}a}c{\color{red}c}tcgtt,%
-						{\color{red}a}c{\color{green}g}tcgtt,%
-						{\color{red}a}c{\color{blue}t}tcgtt,					
+						{\color{blue}t}{\color{red}g}atcgtt,%
+						{\color{blue}t}{\color{red}t}atcgtt,%
+						{\color{blue}a}c{\color{red}c}tcgtt,%
+						{\color{blue}a}c{\color{red}g}tcgtt,%
+						{\color{blue}a}c{\color{red}t}tcgtt,					
 				 	}
-				 	\hspace*{0.12\textwidth}...
-				 	\hspace*{0.35\textwidth}{\color{blue} $\hookrightarrow$ 2 mismatches}\newline
-				 	\hspace*{0.12\textwidth}{\footnotesize\}}
+				 	\hspace*{0.12\textwidth}...{\color{Gray} 2 mismatches}\newline
+				 	\hspace*{0.095\textwidth}{\footnotesize\}}
 			 	}
 				% \newline\includegraphics[width=10.5cm]{img/concepts_N(x,d)}	
 				}
-		\item<1,5>
-			\alt<5>{{\usebeamercolor[fg]{frametitle} $d$-neighborhood $\mathcal{N}(S,d)$ of sequence $S$}}
-													{$d$-neighborhood $\mathcal{N}(S,d)$ of sequence $S$}
-			\only<5>{ \newline- set of all $d$-neighbors of all $l$-mers in $S$\newline\newline
-			{\footnotesize
-			\hspace*{0.08\textwidth}$S$ = \texttt{{\color{green}acgccgat}tacatc{\color{red}cgatcctt}gtatagctcctaacg{\color{blue}ggcatcac}}\newline
-			% \hspace*{0.05\textwidth}
-				$\mathcal{N}(S, 2)$ = 
-					$N$(\texttt{\color{green}  acgccgat}, 2) $\cup ...\cup$
-					$N$(\texttt{\color{red}cgatcctt}, 2) $\cup ...\cup$
-					$N$(\texttt{\color{blue} ggcatcac}, 2)\newline
-				\hspace*{0.05\textwidth} {\color{blue} $\hookrightarrow$ union of $d$-neighborhoods of $l$-mers in $S$}
+		\item<1,5>{\alt<5>{\usebeamercolor[fg]{frametitle}}{} $d$-neighborhood $\mathcal{N}(S,d)$ of sequence $S$}
+			\only<5>{ \newline- set of all $d$-neighbors of all $l$-mers in $S$\\
+			{\small\ \\
+			$S$ = \texttt{{\color{blue}a}{\color{red}c}gccgattacatccgatccttgtatagctcctaacg{\color{blue}g}gcatcac}\\
+			\footnotesize
+			\ \\
+			\hspace*{-0.05\textwidth}
+			$\mathcal{N}(S, 2)$ = 
+				$N$(\texttt{\color{blue} a}cgccgat, 2) $\cup$ 
+				$N$(\texttt{\color{red} c}gccgatt, 2) $\cup\ ...\ \cup$
+				$N$(\texttt{\color{blue} g}gcatcac, 2)\\
 			}
+			% \hspace*{0.05\textwidth} {\color{blue} $\hookrightarrow$ union of $d$-neighborhoods of $l$-mers in $S$}
 			% \newline\newline\includegraphics[width=11.0cm]{img/concepts_N(S,d)}		
 		}
 		\end{itemize}
@@ -189,11 +191,11 @@
 			% This scheme enumerates $l$-mers in alphabetical order.
 				{
 				\scriptsize
-				{\LARGE\texttt{aaaaa}}\ \ {\LARGE\texttt{aaaa{\color{red}c}}}\ \ {\LARGE\texttt{aaaa{\color{green}g}}} ...,\ %
-				{\LARGE\texttt{{\color{blue}t}a{\color{red}c}{\color{green}g}{\color{blue}t}}}\ \ {\LARGE\texttt{{\color{blue}t}a{\color{red}c}{\color{blue}t}a}} ...
+				{\LARGE\texttt{aaaaa}}\ \ {\LARGE\texttt{aaaa{\color{blue}c}}}\ \ {\LARGE\texttt{aaaa{\color{blue}g}}} ...,\ %
+				{\LARGE\texttt{{\color{blue}t}a{\color{blue}c}{g}{\color{blue}t}}}\ \ {\LARGE\texttt{{\color{blue}t}a{\color{blue}c}t{\color{blue}a}}} ...
 				\newline
-				\texttt{0000000000},\ \ \texttt{00000000{\color{red}01}},\ \ \texttt{00000000{\color{green}10}}, ...,
-				\texttt{{\color{blue}11}00{\color{red}01}{\color{green}10}{\color{blue}11}},\ \ \texttt{{\color{blue}11}00{\color{red}01}{\color{blue}11}00}, ...	\newline
+				\texttt{0000000000},\ \ \texttt{00000000{\color{blue}01}},\ \ \texttt{00000000{\color{blue}10}}, ...,
+				\texttt{{\color{blue}11}00{\color{blue}01}{10}{\color{blue}11}},\ \ \texttt{{\color{blue}11}00{\color{blue}01}11{\color{blue}00}}, ...	\newline
 					{
 					\normalsize
 					\color{blue} \hspace*{0.05\textwidth}
@@ -209,7 +211,7 @@
 		\item<1,3> \alt<3>{{\usebeamercolor[fg]{frametitle}Bit-based representation of sets}}{Bit-based representation of sets}
 			\only<3>{
 			\newline 
-			The motif search space includes all $4^l$ $l$-mers that can be formed with $\Sigma$ = \{\texttt{a}, \texttt{c}, \texttt{g}, \texttt{t}\}. To represent sets in this space, EMS-GT assigns each $l$-mer $x$ a bit flag, indexed by mapping: % $set to 1 if the $l$-mer is a member of the set, 0 otherwise.
+			The motif search space includes all $4^l$ $l$-mers that can be formed with $\Sigma$ = \{\texttt{a}, \texttt{c}, \texttt{g}, \texttt{t}\}. To represent sets in this space, EMS-GT assigns each $l$-mer a bit flag, indexed by mapping: % $set to 1 if the $l$-mer is a member of the set, 0 otherwise.
 			\begin{equation*}
 				Flags[\ {\color{blue}795}\ ] = \left\{
 				\begin{array}{rl}
@@ -219,69 +221,61 @@
 				\end{equation*}			
 			}
 		\item<1,4> \alt<4>{{\usebeamercolor[fg]{frametitle}Bit-array compression}}{Bit-array compression}
-			\only<4>{\newline EMS-GT stores $4^l$ bit flags as an array of $\frac{4^l}{32}$ 32-bit integers.\newline
-			
-			\begin{columns}[t]
-				\begin{column}{0.07\textwidth}\end{column}
-
-				\begin{column}{0.33\textwidth}
-				\footnotesize
-				The flag for \texttt{\color{blue}tacgt} is at \newline
-				bit ${\footnotesize({\color{blue}795\ mod\ 32})} = {27}$\\
-				of int index ${\color{blue}\frac{795}{32}} = {24}$.
-				\newline 
-				\end{column}
-
-				\begin{column}{0.6\textwidth}
-				\footnotesize
-				\hspace*{0.17\textwidth} {\tiny\color{blue}27}\newline
-				{\tiny[23]}\ \ 00000011100001000100100000110011\newline
-				{\tiny\color{blue}[24]}\ \ 0011{\color{blue}0}111100000000011100000011100\newline
-				{\tiny[25]}\ \ 11110001011001000011111100000011\newline
-				\end{column}
-
-				\end{columns}
+			\only<4>{\newline EMS-GT stores $4^l$ bit flags as an array of $\frac{4^l}{32}$ 32-bit integers.\\
+			\footnotesize\ \\
+			The flag for \texttt{\color{blue}tacgt} is in int index ${\color{blue}\frac{795}{32}} = {24}$, at bit ${\footnotesize({\color{blue}795\ mod\ 32})} = {27}$.\\
+			\ \\
+			\hspace*{0.3\textwidth} {\tiny\color{blue}27}\\
+			{\centering
+				{\tiny23}\ \ 			  {\color{Gray}0000{\color{black}0}011100001000100100000110011}\\
+				{\tiny\color{blue}24}\ \  {\color{Gray}001{\color{black}1{\color{blue}0}1}11100000000011100000011100}\\
+				{\tiny25}\ \ 			  {\color{Gray}1111{\color{black}1}001011001000011111100000011}\\
+			\ \\
+			}
 			}
 		\item<1,5> \alt<5>{{\usebeamercolor[fg]{frametitle}Recursive neighborhood generation}}
 			{Recursive neighborhood generation}
-			\only<5>{\newline To generate a $d$-neighbor, we change up to $d$ characters in $x$.\newline
-			With 3 options per change (ex. \texttt{c} $\rightarrow$ \texttt{a}, \texttt{g} or \texttt{t}),\newline 
-			\begin{equation*}\text{the $l$-mer $x$ will have}\ \ \ \ \sum_{i=0}^d \binom{l}{i} 3^{i}\ \ \ \ \text{possible $d$-neighbors.\ \ } \end{equation*} 
-			\newline
-			To generate a $d$-neighborhood, EMS-GT recursively generates each neighbor, finds and sets its bit flag.
+			\only<5>{\newline To generate a $d$-neighborhood, EMS-GT recursively generates each neighbor, then finds and sets its bit flag.\\ \ \\
+			Generating a $d$-neighbor changes up to $d$ characters in $x$, with 3 alternatives per change (ex. \texttt{c} $\rightarrow$ \texttt{a}, \texttt{g} or \texttt{t}); thus,
+			\begin{equation*}\text{$l$-mer $x$ will have}\ \ \ \ 
+			{\color{blue}
+			\sum_{i=0}^d \binom{l}{i} 3^{i}}\ \ \ \ \text{possible $d$-neighbors.\ \  }\end{equation*} 
+			\ \\
+			
 			}
 		\end{itemize}
 		\end{frame}
 
 	\begin{frame}{EMS-GT}{Key observations}
+
+		{\centering include graph here\\ \ \\ \ \\}
+
 		\begin{itemize}
-		\item $l$-mer neighborhoods, and the search space, will grow very quickly as ($l$,$d$) values increase;\newline
-		\item thus, EMS-GT must spend considerable time locating and setting bits in its main bit-array.\newline
-		\item However, we know that EMS-GT's main bit-array enumerates $l$-mers in strict alphabetical order.
+		\item $l$-mer neighborhoods grow very quickly with ($l$,$d$), meaning that EMS-GT must spend more time locating and setting bits in its main bit-array.\\ \ \\
+		\item we know that EMS-GT's main bit-array enumerates $l$-mers in strict alphabetical order; {\color{blue} can we use this for greater efficiency}?
 		\end{itemize}
-		\uncover<2->{\bigskip\bigskip\centering\usebeamercolor[fg]{frametitle} ORDER = PATTERNS = EFFICIENCY \\}
+		% \uncover<2->{\bigskip\bigskip\centering\usebeamercolor[fg]{frametitle} ORDER = PATTERNS = EFFICIENCY \\}
 		\end{frame}
 
 \section{Methods}
 	\subsection{Research objectives}
 	\begin{frame}{Methods}{Research objectives}
-		The main objectives of this research are:\newline
+		The main objectives of this research are:\\ \ \\
 		\begin{enumerate}
-		\item To develop a speedup technique for EMS-GT that takes advantage of distance-related patterns in the search space;
-		\newline
-		\item To evaluate the speedup technique with regard to improvement in runtime; and\newline
+		\item To develop a speedup technique for EMS-GT that takes advantage of distance-related patterns in the search space;\\ \ \\
+		\item To evaluate the speedup technique with regard to improvement in runtime; and\\ \ \\
 		\item To evaluate the improved version of EMS-GT against state-of-the-art motif search algorithms.
 		\end{enumerate}
 		\end{frame}
 	
 	\subsection{Work summary}
 	\begin{frame}{Methods}{Work summary}
-		To fulfill these objectives, we:\newline
+		To fulfill these objectives, we:\\ \ \\
 		\begin{itemize}
 		\item %\emph{Developing an EMS-GT speedup technique}\newline
-		investigated repeating block patterns in EMS-GT's bit-based representation of an $l$-mer neighborhood;\newline
+		investigated repeating block patterns in EMS-GT's bit-based representation of an $l$-mer neighborhood;\\ \ \\
 
-		\item designed a more efficient bit-setting procedure that sets bits according to these block patterns; and\newline
+		\item designed a more efficient bit-setting procedure that sets bits according to these block patterns; and\\ \ \\
 		
 		\item measured EMS-GT's performance on synthetic data for ``challenging'' ($l$,$d$): (9,2), (11,3), (13,4), (15,5) and (17,6).
 		% \begin{itemize}
@@ -291,27 +285,108 @@
 		\end{frame}
 
 \section{Results}
-	
-	\subsection{Block patterns in an $l$-mer neighborhood}
-	\begin{frame}{Results}{Block patterns in an $l$-mer neighborhood}
-		\begin{itemize}
-		\item 
-		\item
-		\item
-		\item
-		\item 
-		\end{itemize}
+	\begin{frame}{Results}{Key observation}
+	\centering
+	A bit-array $N_x$ representing an $l$-mer neighborhood\\
+	can be divided into consecutive blocks of $4^k$ bits each.\\ \ \\
+	Each block will conform to one of at most ($k + 2$) patterns.\\ \ \\ \ \\\
+	\\
+	Let $k = 5$.
 
+	\end{frame}
+
+	\subsection{Deriving block patterns in an $l$-mer neighborhood}
+	\begin{frame}{Results}{Deriving block patterns in an $l$-mer neighborhood}
+		\begin{itemize}
+		\setbeamercovered{transparent=25}
+		\item<1,2> {\alt<2->{\usebeamercolor[fg]{frametitle} }{}Let bit-array $N_x$ represent the neighborhood of $l$-mer $x$}
+			\only<2>{\\ A bit $x'$ is set in $N_x$ if and only if $x'$ is a $d$-neighbor of $x$.
+				\begin{equation*}
+				N_x[\ x'\ ] = \left\{
+				\begin{array}{rl}
+					1 & \text{if } {\color{blue}d_H(x,x') \leq d},\\
+					0 & \text{otherwise.}%\text{if } dH(x,x') > d.
+				\end{array} \right.
+				\text{ for any $l$-mer }x'.
+				\end{equation*}
+			}
+		\item<1,3> {\alt<3->{\usebeamercolor[fg]{frametitle}}{} We show Hamming distances $d_H$ are additive}\\
+			\only<3>{
+				We can divide an $l$-mer $x$ into a {\color{blue} prefix $y$} and a {\color{red}suffix $z$},\\ 
+				where $|z|$ = {$k$}:
+				% For $x=yz$ and $x'=y'z'$,
+				\begin{equation*}
+				{d_H(x,x')} = {\color{blue}d_H(y,y')} + {\color{red}d_H(z,z')}.
+				\end{equation*}\large\centering
+				\ \ $x^{\ }$ =\ \ \texttt{ac{\color{blue}g}ta{\color{blue}c}g\ \ ta{\color{red}c}gt}\ \ \\
+				\ \ $x'$ 	 =\ \ \texttt{ac{\color{blue}c}ta{\color{blue}t}g\ \ ta{\color{red} g}gt}\ \ \\
+				\ \\
+				}
+		\item<1,4> {\alt<4>{\usebeamercolor[fg]{frametitle}}{} We redefine $N_x$ with the additive property}
+			\only<4>{
+			\begin{equation*}
+			N_x[ x' ] = \left\{
+			\begin{array}{rl}
+				1 & \text{if } {\color{blue}d_H(y,y')} + {\color{red}d_H(z,z')} \leq d,\\
+				0 & \text{otherwise.}%\text{if } d_{y'} + \mathcal{D}(z)_{z'} > d.
+			\end{array} \right.
+			\text{ for }x' = y'z'.
+			\end{equation*}\ \\
+			The condition for setting a bit in $N_x$ is now
+				\begin{center}{
+				\ \ \ ${\color{blue}d_H(y,y')} + {\color{red}d_H(z,z')} \leq d$\\
+				or, ${\color{red}d_H(z,z')} \leq {\color{blue}d - d_H(y,y')}$\\
+				}\end{center}\ \\
+			}
+		\item<1,5> {\alt<5>{\usebeamercolor[fg]{frametitle}}{} We examine ($k + 2$) cases for $d-d_H(y,y')$}
+			\only<5> {\\We set bit $x' = y'z'$ in $N_x$ iff ${\color{red}d_H(z,z')} \leq {\color{blue}d - d_H(y,y')}$.
+				\\The value of {\color{red} $dH(z,z')$} ranges from 0 to $|z|=k$, therefore\\\ \\
+				
+				\begin{columns}
+
+					\begin{column}{0.1\textwidth}
+					\
+					if\\
+					if\\
+					if\\
+					\end{column}
+					\begin{column}{0.33\textwidth}
+					\centering
+					$\ \ \ \ d-d_H(y,y') < 0$\\
+					$0 \leq d-d_H(y,y') < k$ \\
+					$k \leq d-d_H(y,y')\ \ \ \ $\\
+					\end{column}
+					\begin{column}{0.25\textwidth}
+					no bits are set\\
+					some bits are set\\
+					all bits are set\\
+					\end{column}
+					\begin{column}{0.23\textwidth}
+					Case -1\\
+					Cases 0-($k$-1)\\
+					Case $k$\\
+					\end{column}
+				\end{columns}
+			}
+		\end{itemize}
 		\end{frame}
 
-	\subsection{Designing a pattern-based speedup technique}
-	\begin{frame}{Results}{Designing a pattern-based speedup technique}
+	\subsection{Applying block patterns in an $l$-mer neighborhood}
+	\begin{frame}{Results}{Applying block patterns in an $l$-mer neighborhood}
 		\begin{itemize}
-		\item 
-		\item
-		\item
-		\item
-		\item 
+		\setbeamercovered{transparent=25}
+		\item<1,2> {\alt<2>{\usebeamercolor[fg]{frametitle}}{} $l$-mers in $N_{(x,d)}$ are organized into blocks}\\
+			\only<2>{The strict alphabetical enumeration scheme 
+			}
+			\ \\
+		\item<1,3> {\alt<3>{\usebeamercolor[fg]{frametitle}}{} Do: pre-generate distribution of suffix distances $dH(z,z')$}
+			\only<3>{
+
+			}
+		\item<1,4> {\alt<4>{\usebeamercolor[fg]{frametitle}}{} Do: compute all prefixes of distance $dH(y,y') \leq d$ }
+			\only<4>{
+
+			}
 		\end{itemize}
 		\end{frame}
 
