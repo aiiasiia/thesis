@@ -64,10 +64,9 @@
 			\only<2>{ \newline- sequence of length $l$\\
 				\begin{center}
 				{\small
-				$S_1$\ =\ \texttt{at{\color{blue}c{ac}tcgtt}ctcctctaatgtgtaaagacgtactaccgacctta}\\ \ \\
+				$S_1$\ =\ \texttt{at{\color{red}c{ac}tcgtt}ctcctctaatgtgtaaagacgtactaccgacctta}\\ \ \\
 				}
 				\end{center}
-				% {\color{blue}\hspace*{0.15\textwidth} $\hookrightarrow$ $3^{rd}$ $l$-mer in $S$, for $l$=8\\}
 			}
 		\item<1,3> {\alt<3>{\usebeamercolor[fg]{frametitle}}{} Hamming distance $d_H$}
 			\only<3>{ \\- number of mismatches between $l$-mers $x_1$ and $x_2$\\
@@ -75,8 +74,8 @@
 					\begin{column}{0.1\textwidth}\end{column}
 					\begin{column}{0.4\textwidth}
 					\begin{center} {
-						$x_1$ = \texttt{c{\color{blue}g}atc{\color{blue}c}tt}\ \ \\
-						$x_2$ = \texttt{c{\color{blue}c}atc{\color{blue} g}tt}\ \ \\
+						$x_1$ = \texttt{c{\color{red}g}atc{\color{red}c}tt}\ \ \\
+						$x_2$ = \texttt{c{\color{red}c}atc{\color{red} g}tt}\ \ \\
 					}\end{center}
 					\end{column}
 					\begin{column}{0.5\textwidth}
@@ -94,25 +93,25 @@
 					\hspace*{0.055\textwidth}=  \{ \texttt{ccatcgtt}, \newline
 					\texttt{
 						\hspace*{0.1\textwidth}
-						{\color{blue}a}catcgtt,{\color{blue}g}catcgtt,{\color{blue}t}catcgtt,%
-						c{\color{blue}a}atcgtt,c{\color{blue}g}atcgtt,c{\color{blue}t}atcgtt,
+						{\color{red}a}catcgtt,{\color{red}g}catcgtt,{\color{red}t}catcgtt,%
+						c{\color{red}a}atcgtt,c{\color{red}g}atcgtt,c{\color{red}t}atcgtt,
 					}	
 					\hspace*{0.12\textwidth}...{\color{Gray} all $l$-mers with 1 mismatch}\newline
 					\texttt{
 						\hspace*{0.1\textwidth}
-						{\color{blue}a}{\color{red}a}atcgtt,%
-						{\color{blue}a}{\color{red}g}atcgtt,%
-						{\color{blue}a}{\color{red}t}atcgtt,%
-						{\color{blue}g}{\color{red}a}atcgtt,%
-						{\color{blue}g}{\color{red}g}atcgtt,%
-						{\color{blue}g}{\color{red}t}atcgtt,
+						{\color{red}a}{\color{red}a}atcgtt,%
+						{\color{red}a}{\color{red}g}atcgtt,%
+						{\color{red}a}{\color{red}t}atcgtt,%
+						{\color{red}g}{\color{red}a}atcgtt,%
+						{\color{red}g}{\color{red}g}atcgtt,%
+						{\color{red}g}{\color{red}t}atcgtt,
 						\hspace*{0.1\textwidth}
-						{\color{blue}t}{\color{red}a}atcgtt,%
-						{\color{blue}t}{\color{red}g}atcgtt,%
-						{\color{blue}t}{\color{red}t}atcgtt,%
-						{\color{blue}a}c{\color{red}c}tcgtt,%
-						{\color{blue}a}c{\color{red}g}tcgtt,%
-						{\color{blue}a}c{\color{red}t}tcgtt,					
+						{\color{red}t}{\color{red}a}atcgtt,%
+						{\color{red}t}{\color{red}g}atcgtt,%
+						{\color{red}t}{\color{red}t}atcgtt,%
+						{\color{red}a}c{\color{red}c}tcgtt,%
+						{\color{red}a}c{\color{red}g}tcgtt,%
+						{\color{red}a}c{\color{red}t}tcgtt,					
 				 	}
 				 	\hspace*{0.12\textwidth}...{\color{Gray} all $l$-mers with 2 mismatches}\newline
 				 	\hspace*{0.095\textwidth}{\footnotesize\}}
@@ -185,7 +184,7 @@
 		{
 			\item The search space contains all $4^l$ possible $l$-mers that can be formed with
 			$\Sigma$ = \{\texttt{a}, \texttt{c}, \texttt{g}, \texttt{t}\}. \\\ \\
-			\item To represent sets in this space, EMS-GT assign each of the $4^l$ $l$-mers a bit flag,
+			\item To represent sets in this space, EMS-GT assigns each of the $4^l$ $l$-mers a bit flag,
 			which is 1 if the $l$-mer is a member of the set, 0 otherwise.\\\ \\
 			\item For efficiency, EMS-GT stores the $4^l$ bits as $\frac{4^l}{32}$ 32-bit integers.
 		}
@@ -195,12 +194,13 @@
 	\subsection{Bit-based representation of the search space}
 	\begin{frame}{EMS-GT}{Bit-based representation of the search space}
 		\begin{itemize}
-		{
 			\item $N$(\ \texttt{acgt}, 1\ ): $4^l$ = 256, $\frac{4^l}{32}$ = 8
-			
-			\ \\ {\color{red}emphasize alphabetical order, maybe show how l-mer corresponds to binary num}  \\
+		\end{itemize}\ \\\ \\
+		
+		{ \centering\includegraphics[width=\textwidth]{img/acgt_labeled.png}\\ }
+		\ \\
+		\begin{itemize}
 			\item EMS-GT generates a neighborhood bit-array by generating each individual neighbor, then finding and setting its bit flag.
-		}
 		\end{itemize}
 		\end{frame}
 
@@ -304,19 +304,21 @@
 \section{Speedup technique}
 	\begin{frame}{Speedup technique}{Key observation}
 		\begin{itemize}
-		\item The bit-array $N_x$ representing the neighborhood of $l$-mer $x$
-		\\ can be partitioned into blocks of $4^k$ bits each.\\\ \\
-		\item $l$-mers in a block all begin with the same ($l-k$) characters;
-		all the blocks conform to one of ($k + 2$) patterns.\\\ \\
+		\item<1-> If a bit-array $N_x$ representing the neighborhood of $l$-mer $x$
+		\\ is partitioned into blocks of $4^k$ bits each,\\\ \\
+		\end{itemize}
+		\uncover<2->{\centering
+			Ex.\ \ \large $N$(\ \texttt{acgtacgtacgt}, 5\ ), $k$ = 5\\
+			\normalsize block size = $4^5 = 1024 = 32 \times 32$\\\ \\
+		}
+		\begin{itemize}
+		\item<3-> the $4^k$ $l$-mers represented in a block will all begin with the same {\usebeamercolor[fg]{frametitle}prefix} (first $l-k$ characters), and will differ only in the {\usebeamercolor[fg]{frametitle}$k$-suffix} (last $k$ characters);\\\ \\
+		\item<4-> {\usebeamercolor[fg]{frametitle}each block conforms to one of ($k + 2$) patterns.}\\\ \\
 		\end{itemize}
 		\ \\
-		\uncover<2>{\centering
-			\large Ex. $N$(\ \texttt{acgtacgtacgt}, 5\ ), k = 5\\
-			\normalsize\ \\ block size = $4^5 = 32 \times 32$\\
-		}
 	\end{frame}
 
-	\begin{frame}{Speedup technique}{Block patterns in the neighborhood of \texttt{acgtacgtacgt}}
+	\begin{frame}{Speedup technique}{Block patterns in the $d$-neighborhood of \texttt{acgtacgtacgt}, $d$=5, $k$=5}
 		\begin{columns}
 			\begin{column}{0.33\textwidth}
 				\includegraphics[width=0.9\textwidth]{img/0.png}\\\ \\
@@ -334,8 +336,15 @@
 	\end{frame}
 
 	\begin{frame}{Speedup technique}{Key observation}
-		\centering
-		Crucial frame here!\\``Think of splitting the allowable mismatches d between prefix and suffix''
+		\begin{itemize}
+			\item In a $d$-neighbor of $x$, the $d$ allowable mismatches from $x$ are distributed between the prefix and the $k$-suffix.\\\ \\
+			\texttt{\large\centering
+				acgtacg tacgt\\
+				acg{\color{red}a}a{\color{red}aa} t{\color{red}c}cg{\color{red}a}\\\ \\
+			}
+			\item If a {\usebeamercolor[fg]{frametitle}block's prefix already has $p$ mismatches} from $x$'s prefix, then within that block, {\usebeamercolor[fg]{frametitle}any neighbor must have a suffix with at most $d-p$ mismatches} from $x$'s suffix.
+		\end{itemize}
+
 	\end{frame}
 
 	\begin{frame} %% THE COLORING-IN SEQUENCE
@@ -484,36 +493,31 @@
 		% \end{frame}
 
 	\begin{frame}{Speedup technique}{Generate and apply patterns}
-		To generate $N_x$ for $x={\color{black}y}{\color{black}z}$ in blocks, we perform two steps:\\\ \\
+		To generate $N_x$ for $x={\color{black}y}{\color{black}z}$, we perform two steps:\\\ \\
 		\begin{enumerate}
-		\item From {\color{black} $z$}, generate $P$, the set of non-empty block patterns.\\\ \\
-		\includegraphics[width=0.12\textwidth]{img/0.png}\ \ 
-		\includegraphics[width=0.12\textwidth]{img/1.png}\ \ 
-		\includegraphics[width=0.12\textwidth]{img/2.png}\ \ 
-		\includegraphics[width=0.12\textwidth]{img/3.png}\ \ 
-		\includegraphics[width=0.12\textwidth]{img/4.png}\ \ 
-		\includegraphics[width=0.12\textwidth]{img/5.png}\ \ 
-		\\
-		\ \ \ $P[0]$\ \ \ 
-		\ \ \ $P[1]$\ \ \ \
-		\ \ \ $P[2]$\ \ \
-		\ \ \ $P[3]$\ \ \ \  
-		\ \ \ $P[4]$\ \ \ 
-		\ \ \ $P[5]$
-		\\\ \\
+		\item From {\color{black} $x$}'s suffix $z$, generate $P$, the set of block patterns.\\\ \\
+		\begin{columns}
+			\begin{column}{0.12\textwidth}\end{column}
+			\begin{column}{0.12\textwidth}\includegraphics[width=\textwidth]{img/0}\\ \centering $P_0$ \end{column}
+			\begin{column}{0.12\textwidth}\includegraphics[width=\textwidth]{img/1}\\ \centering $P_1$ \end{column}
+			\begin{column}{0.12\textwidth}\includegraphics[width=\textwidth]{img/2}\\ \centering $P_2$ \end{column}
+			\begin{column}{0.12\textwidth}\includegraphics[width=\textwidth]{img/3}\\ \centering $P_3$ \end{column}
+			\begin{column}{0.12\textwidth}\includegraphics[width=\textwidth]{img/4}\\ \centering $P_4$ \end{column}
+			\begin{column}{0.12\textwidth}\includegraphics[width=\textwidth]{img/5}\\ \centering $P_5$ \end{column}
+			\begin{column}{0.12\textwidth}\end{column}
+		\end{columns}\ \\\ \\
 		% {\usebeamercolor[fg]{frametitle}Generate the set $\mathcal{P}$} of ($k+2$) block patterns, based on the distribution of Hamming distances from $x$'s {\color{red} suffix $z$} to all possible suffixes $z'$.\\\ \\
-		\item From {\color{black} $y$}, recursively generate each $d$-neighbor $y'$ of y,
-		\\\ \ \ \ \ \ \ \ \ \ \ find the block in $N_x$ that has $y'$ as its prefix,
-		\\\ \ \ \ \ \ \ \ \ \ \ and apply $P[\ {\color{black}d - d_H(y,y')}\ ] $ to that block.
+		\item From $x$'s prefix $y$, recursively generate each $d$-neighbor $y'$, and apply $P_{(d - d_H(y,y'))}$ to the block whose prefix is $y'$.
+
 		\end{enumerate}
 	\end{frame}
 
 \section{Results}
 	\subsection{Performance improvement}
-	\begin{frame}{Results}{Performance improvement with speedup technique}
+	\begin{frame}{Results}{Reduction in recursive neighbor generation} %{Performance improvement with speedup technique}
 		{\centering\includegraphics[width=0.8\textwidth]{img/nbrhd_growth_compare.png}\\}
 		\begin{itemize}
-		\item We still generate $d$-neighbors recursively, but for a shorter sequence $y'$, of length $l-k$;
+		\item We still generate $d$-neighbors recursively, but for a shorter sequence $y$, of length $l-k$;
 		this graph shows that, for $k$=5, neighborhood size is reduced by a factor of 10.
 		\end{itemize}
 		% \begin{table}[h] %neighbors_blockmasking
@@ -538,52 +542,56 @@
 		% {\centering \footnotesize Reduction in neighborhood size without vs. with speedup \\}
 		\end{frame}
 
-	\begin{frame}{Results}{Performance improvement with speedup technique}
-		\begin{table}[h] %speedup_blockmasking
-			\small
-			\renewcommand{\arraystretch}{1.3}
-			\label{tbl:speedup_blockmasking}
-			\centering
-			\begin{tabular}{|c|c|c|c|}
-			\hline 
-			\bfseries\boldmath $(l,d)$ & \bfseries Without speedup & \bfseries With speedup, $k$=5 & \bfseries \% reduction\\
-			% \bfseries & \bfseries procedure & \bfseries\boldmath procedure, $k=5$ & \bfseries\\
-			\hline
-			 (9,2) &   0.06 s &    0.11 s &     --  \\
-			(11,3) &   0.22 s &    0.20 s &    6.7\%\\
-			(13,4) &   1.98 s &    1.04 s &   47.5\%\\
-			% 14,4 &   3.53 s &    2.55 s &   27.8\%\\
-			(15,5) &  25.06 s &   15.51 s &   38.1\%\\
-			% 16,5 &  41.63 s &   29.03 s &   30.3\%\\
-			(17,6) & 308.61 s &  175.85 s &   43.0\%\\
-			\hline\end{tabular}
-			\end{table}
+	\begin{frame}{Results}{{\bf EMS-GT \color{blue}without} vs. {\bf\color{red}with} the speedup technique\\} %{Performance improvement with speedup technique}
+		% \begin{table}[h] %speedup_blockmasking
+		% 	\small
+		% 	\renewcommand{\arraystretch}{1.3}
+		% 	\label{tbl:speedup_blockmasking}
+		% 	\centering
+		% 	\begin{tabular}{|c|c|c|c|}
+		% 	\hline 
+		% 	\bfseries\boldmath $(l,d)$ & \bfseries Without speedup & \bfseries With speedup, $k$=5 & \bfseries \% reduction\\
+		% 	% \bfseries & \bfseries procedure & \bfseries\boldmath procedure, $k=5$ & \bfseries\\
+		% 	\hline
+		% 	 (9,2) &   0.06 s &    0.11 s &     --  \\
+		% 	(11,3) &   0.22 s &    0.20 s &    6.7\%\\
+		% 	(13,4) &   1.98 s &    1.04 s &   47.5\%\\
+		% 	% 14,4 &   3.53 s &    2.55 s &   27.8\%\\
+		% 	(15,5) &  25.06 s &   15.51 s &   38.1\%\\
+		% 	% 16,5 &  41.63 s &   29.03 s &   30.3\%\\
+		% 	(17,6) & 308.61 s &  175.85 s &   43.0\%\\
+		% 	\hline\end{tabular}
+		% 	\end{table}
 
-		{\centering \footnotesize Average performance for 20 synthetic datasets per ($l$,$d$) instance \\}
+		{\centering
+		\includegraphics[width=0.8\textwidth]{img/results1.png}\\
+		% EMS-GT {\bf\color{blue}without} vs. {\bf\color{red}with} the speedup technique\\
+		\footnotesize Runtime in seconds, averaged over 20 synthetic datasets per ($l$,$d$) \\}
 		\end{frame}
 
 	\subsection{Performance against PMS8 and qPMS9}
-	\begin{frame}{Results}{Performance against PMS8 and qPMS9}
+	\begin{frame}{Results}{ {\bf\color{blue}PMS8} vs. {\bf\color{blue}qPMS9} vs. {\bf\color{red}EMS-GT with speedup technique} }%{Performance against PMS8 and qPMS9}
+		% \begin{table}[ht] %runtimes
+		% 	\small
+		% 	\renewcommand{\arraystretch}{1.3}
+		% 	\label{tbl:runtimes_v_pms}
+		% 	\centering
+		% 	\begin{tabular}{|c|c|c|c|c|}
+		% 	\hline \bfseries{\boldmath $(l,d)$} & \bfseries PMS8 & \bfseries qPMS9 & \bfseries EMS-GT & \bfseries \% reduction\\
+		% 	\hline
+		% 	 (9,2) &  0.74 s  &  0.47 s & {\color{blue} 0.11 s} & 76.6\%\\
+		% 	(11,3) &  1.58 s  &  1.06 s & {\color{blue} 0.20 s} & 81.1\%\\
+		% 	(13,4) &  5.39 s  &  4.52 s & {\color{blue} 1.04 s} & 77.0\%\\
+		% 	% 14,4 &  1.29 s  &  1.02 s &      2.55 s\\
+		% 	(15,5) & 36.45 s  & 24.63 s & {\color{blue}15.51 s} & 37.0\%\\
+		% 	% 16,5 &  4.79 s  &  2.96 s &     29.03 s\\
+		% 	(17,6) &  3.91 min & {\color{blue}1.96 min} & {2.93 min} & --\\
+		% 	\hline\end{tabular}
+		% 	\end{table}
 
-		\begin{table}[ht] %runtimes
-			\small
-			\renewcommand{\arraystretch}{1.3}
-			\label{tbl:runtimes_v_pms}
-			\centering
-			\begin{tabular}{|c|c|c|c|c|}
-			\hline \bfseries{\boldmath $(l,d)$} & \bfseries PMS8 & \bfseries qPMS9 & \bfseries EMS-GT & \bfseries \% reduction\\
-			\hline
-			 (9,2) &  0.74 s  &  0.47 s & {\color{blue} 0.11 s} & 76.6\%\\
-			(11,3) &  1.58 s  &  1.06 s & {\color{blue} 0.20 s} & 81.1\%\\
-			(13,4) &  5.39 s  &  4.52 s & {\color{blue} 1.04 s} & 77.0\%\\
-			% 14,4 &  1.29 s  &  1.02 s &      2.55 s\\
-			(15,5) & 36.45 s  & 24.63 s & {\color{blue}15.51 s} & 37.0\%\\
-			% 16,5 &  4.79 s  &  2.96 s &     29.03 s\\
-			(17,6) &  3.91 min & {\color{blue}1.96 min} & {2.93 min} & --\\
-			\hline\end{tabular}
-			\end{table}
-
-		{\centering \footnotesize Average performance for 20 synthetic datasets per ($l$,$d$) instance \\}
+		{\centering \includegraphics[width=0.8\textwidth]{img/results2.png}\\
+		% {\bf\color{blue}PMS8} vs. {\bf\color{blue}qPMS9} vs. {\bf\color{red}EMS-GT with speedup technique}\\
+		\footnotesize Runtime in seconds, averaged over 20 synthetic datasets per ($l$,$d$) \\}
 
 		\end{frame}
 
