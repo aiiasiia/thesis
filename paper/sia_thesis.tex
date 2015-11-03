@@ -558,8 +558,8 @@
 			\centering
 			\begin{tabular}{|c|c|c|c|}
 			\hline 
-			\bfseries\boldmath $(l,d)$ & \bfseries Without pattern-based & \bfseries With pattern-based & \bfseries speedup\\
-			\bfseries & \bfseries procedure & \bfseries\boldmath procedure, $k=5$ & \bfseries\\
+			\bfseries\boldmath $(l,d)$ & \bfseries Without pattern-based & \bfseries With pattern-based & \bfseries Runtime\\
+			\bfseries & \bfseries procedure & \bfseries\boldmath procedure, $k=5$ & \bfseries reduction\\
 			\hline
 			 (9,2) &   0.06 s &    0.11 s &     --  \\
 			(11,3) &   0.22 s &    0.20 s &    6.7\%\\
@@ -614,7 +614,7 @@
 			When $k$ is lower, there are fewer and smaller block patterns to manage, but building $N$ requires many highly scattered array accesses to small blocks. When $k$ is higher, there are larger contiguous blocks and thus fewer accesses in $N$, but also a much larger set of block patterns to manage. It seems that $k=5$ allows for the most efficient balance between recursive neighbor generation (which identifies and accesses blocks according to their prefixes) and bit-masking operations (which selects and applies the correct pattern to each block), with a feasible number of block patterns. 
 
 	\section{Performance of improved EMS-GT}
-		Finally, the improved EMS-GT and two competitor algorithms were run on an Intel Xeon, 2.10 GHz processor (single core only). Their performance, averaged over 20 synthetic datasets for each $(l,d)$ challenge instance, is outlined in Table 4.\ref{tbl:runtimes_v_pms}:\newline
+		Finally, the improved EMS-GT and two competitor algorithms were run on an Intel Xeon, 2.10 GHz processor (single core only). Their performance, averaged over 20 synthetic datasets for each $(l,d)$ challenge instance, is outlined in Table 4.\ref{tbl:runtimes_v_pms}:
 
 		\begin{table}[ht] %runtimes
 			\small
@@ -622,7 +622,8 @@
 			\label{tbl:runtimes_v_pms}
 			\centering
 			\begin{tabular}{|c|c|c|c|c|}
-			\hline \bfseries\boldmath $(l,d)$ & \bfseries PMS8 & \bfseries qPMS9 & \bfseries EMS-GT & \bfseries \% speedup\\
+			\hline \bfseries\boldmath $(l,d)$ & \bfseries PMS8 & \bfseries qPMS9 & \bfseries EMS-GT & \bfseries Runtime\\
+			& & & & \bfseries reduction \\
 			\hline
 			 (9,2) &  0.74 s  &  0.47 s & {\bf 0.11 s} & 76.6\%\\
 			(11,3) &  1.58 s  &  1.06 s & {\bf 0.20 s} & 81.1\%\\
@@ -655,17 +656,21 @@
 
 		EMS-GT is highly competitive with PMS8 and qPMS9 on challenging problem instances, but as Table 4.\ref{tbl:runtimes_nonchallenge} shows, on non-challenging instances EMS-GT is not as efficient. This may be due to differing ways of narrowing down the search space: while EMS-GT manipulates a fixed-size bit-array to narrow down the search space of all $4^l$ $l$-mers, PMS8 and qPMS9 have a dynamically-sized search space which is easily pruned down for most ($l$,$d$) values, but more difficult to manage for challenging ($l$,$d$) values.
 
-\chapter{Conclusion}
-	This paper discusses a novel speedup technique for the EMS-GT algorithm, an exact solution to the planted motif problem for any arbitrary instance, $l$=17. A Java implementation, run on various challenge problem instances, shows the improved algorithm to be very competitive against state-of-the-art exact algorithms PMS8 and qPMS9. The speedup technique allows EMS-GT to outperform the current best algorithm, qPMS9, for the challenge problem instances (9,2), (11,3), (13,4) and (15,5) with a run-time reduction of at least 76\%, 81\%, 77\% and 37\% respectively for these instances, while ranking second to qPMS9 for test instance (17,6). Note that EMS-GT does not outperform PMS8 and qPMS9 on non-challenging ($l$,$d$) instances.
+\chapter{Conclusions}
+	This paper discusses a novel speedup technique for the EMS-GT algorithm, an exact solution to the planted motif problem for any arbitrary instance, $l$=17. In line with our research objectives, our conclusions are as follows:
+	\begin{enumerate}
+	\item Our novel speedup technique takes advantage of 
+	\item The speedup technique reduces runtime 
+	\item The speedup technique allows EMS-GT to outperform the current best algorithm, qPMS9, for the challenge problem instances (9,2), (11,3), (13,4) and (15,5) with a run-time reduction of at least 76\%, 81\%, 77\% and 37\% respectively for these instances, while ranking second to qPMS9 for test instance (17,6).
+	\end{enumerate}
 
-	Directions for further research include: refining the bit-based storage mechanism to be able to represent the entire motif search space for $l > 17$; creating a multiprocessor version of EMS-GT to solve in parallel for larger values of ($l$,$d$); and delegating the bit-masking optimization and other bulk bit operations to the graphics card, as explored in \cite{dasari2010efficient}, for faster performance.
+	\noindent Directions for further research include: refining the bit-based storage mechanism to be able to represent the entire motif search space for $l > 17$; creating a multiprocessor version of EMS-GT to solve in parallel for larger values of ($l$,$d$); and delegating the bit-masking optimization and other bulk bit operations to the graphics card, as explored in \cite{dasari2010efficient}, for faster performance.
 
 \BackMatter
 \bibliographystyle{plain}
 \bibliography{sources}
 
-
-% \addappheadtotoc
+%\addappheadtotoc
 %\input{APPENDIX}
 
 \appendix{Source Code for Improved EMS-GT}
