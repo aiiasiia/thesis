@@ -12,6 +12,8 @@ import java.io.*;
 import java.util.*;
 
 public class EMS_GT_32 {
+	static int TABLE_WIDTH_LOG_2 = 5;
+	static int TABLE_WIDTH = (1 << TABLE_WIDTH_LOG_2);
 
 	static String inputFileHeader = "../datasets/";
 	static String inputFileName = "";
@@ -35,9 +37,9 @@ public class EMS_GT_32 {
 
 	// for masking
 	static int blockDegree = 5;
-	static int multByRow;
 	static int lmersInBlock;
 	static int rowsInBlock;
+	static int prefixShift;
 	static int[][][] blockMasks;
 	static int[][] currBlockMasks;
 	static long prefix;
@@ -52,9 +54,9 @@ public class EMS_GT_32 {
 	public static void main(String args[]) throws Exception {
 		if( args.length > 0 ) {
 			inputFileName = args[0];
-			if( args.length > 1 ) {
-				blockDegree = Integer.parseInt(args[1]);
-			}
+		}
+		if( args.length > 1 ) {
+			blockDegree = Integer.parseInt(args[1]);
 		}
 
 		readInput( inputFileHeader + inputFileName );
@@ -64,7 +66,8 @@ public class EMS_GT_32 {
 		prefixMask = (((long) 1) << 2*(l-blockDegree-1) ) - 1;
 		suffixMask = (((long) 1) << 2*(blockDegree-1) ) - 1;
 		nl1 = n - l + 1;
-		pmt = (int) (( (long)1 << (2*l) ) >>> 5); // (4^l)/32
+		pmt = (int) ( (long)1 << (2*l - TABLE_WIDTH_LOG_2)); // (4^l)/TABLE_WIDTH
+		prefixShift = (2*blockDegree - TABLE_WIDTH_LOG_2);
 		
 		System.out.print("\n" + inputFileName);
 		
@@ -86,14 +89,12 @@ public class EMS_GT_32 {
 		System.out.print(", " + (eTime - sTime) / 1000000000.0 / 60.0);
 		System.out.print(", " + memUse / 1024.0 / 1024.0);
 		System.out.print(", " + memUseGC / 1024.0 / 1024.0);
-
 		System.out.print(", " + plantedMotif + "," + foundMotifs);
 	}
 
 	public static void generateBlockMasks() throws Exception {
-		multByRow = 2*blockDegree - 5;
-		lmersInBlock = 1 << (2 * blockDegree);		// 4 ^ blockDegree
-		rowsInBlock = lmersInBlock >> 5;			// 4 ^ blockDegree / 32
+		lmersInBlock = 1 << (2 * blockDegree);						// 4 ^ blockDegree
+		rowsInBlock  = 1 << (2 * blockDegree - TABLE_WIDTH_LOG_2);	// 4 ^ blockDegree / TABLE_WIDTH
 		blockMasks = new int[lmersInBlock][blockDegree - 1][rowsInBlock];
 		for(int i=0; i < lmersInBlock; i++) {
 			for(int k=0; k < blockDegree - 1; k++) {
@@ -101,7 +102,7 @@ public class EMS_GT_32 {
 			}
 			for(int row=0; row < rowsInBlock; row++) {
 				for(int col=31; col > -1; col--) {
-					int distance = computeHD(i, row*32+col);
+					int distance = computeHD(i, row*TABLE_WIDTH+col);
 					for(int k=0; k < blockDegree - 1; k++) {
 						if(distance <= k+1) {
 							blockMasks[i][k][row]++;
@@ -114,12 +115,6 @@ public class EMS_GT_32 {
 
 			}
 		}
-
-		/*System.out.println("Done.\n\nSample block mask: centered at row 14, col 12, distance <= 4: ");
-		currBlockMasks = blockMasks[14*32+12];
-		for(int row=0; row < rows; row++) {
-			System.out.printf("%32s\n", Long.toBinaryString(currBlockMasks[row][4]));
-		}*/
 	}
 
 	public static void readInput(String filename) throws Exception {
@@ -160,9 +155,7 @@ public class EMS_GT_32 {
 	}
 
 	public static void generateNeighborhood(int s) throws Exception {
-		// System.out.println("genNeigbhorhood(" + s + ")");
 		currNeighborhood = new int[pmt];
-		// Arrays.fill(currNeighborhood,0);
 		char[] currSeq = seqS[s];
 
 		prefix = 0; 					 	// first < l-blockDegree > characters of l-mer
@@ -181,12 +174,11 @@ public class EMS_GT_32 {
 				suffix = (suffix << 2) + base;
 		}
 
-
 		// housekeeping: set blockOffsets, currBlockMasks
-		currBlockRow = (int) (suffix / rowsInBlock);
-		currBlockCol = (int) (suffix % 32);
+		currBlockRow = (int) (suffix / TABLE_WIDTH);
+		currBlockCol = (int) (suffix % TABLE_WIDTH);
 		currBlockMasks = blockMasks[(int)suffix];
-		int blockStart = (int) (prefix << (2*blockDegree - 5));
+		int blockStart = (int) (prefix * rowsInBlock);
 		for(int offset=0; offset < rowsInBlock; offset++) {
 			if(d >= blockDegree)
 				currNeighborhood[blockStart+offset] = Integer.MAX_VALUE;
@@ -214,10 +206,10 @@ public class EMS_GT_32 {
 			}
 			
 			// housekeeping: set blockOffsets, currBlockMasks
-			currBlockRow = (int) suffix / rowsInBlock;
-			currBlockCol = (int) suffix % 32;
+			currBlockRow = (int) suffix / TABLE_WIDTH;
+			currBlockCol = (int) suffix % TABLE_WIDTH;
 			currBlockMasks = blockMasks[(int)suffix];
-			blockStart = (int) prefix << (2*blockDegree - 5);
+			blockStart = (int) prefix << (2*blockDegree - TABLE_WIDTH_LOG_2);
 			for(int offset=0; offset < rowsInBlock; offset++) {
 				if(d >= blockDegree)
 					currNeighborhood[blockStart+offset] = Integer.MAX_VALUE;
@@ -228,7 +220,7 @@ public class EMS_GT_32 {
 		}
 	}
 
-	public static void addNeighbors(long prefix, int start, int d) throws Exception {
+	public static void addNeighbors(long prefix, int start, int d) {
 		int shift = (l-blockDegree-start)*2;
 		for(int i=start; i < l-blockDegree; ++i) {
 			shift -= 2;
@@ -236,27 +228,27 @@ public class EMS_GT_32 {
 			long alt2 = prefix ^ (((long) 2) << shift);
 			long alt3 = prefix ^ (((long) 3) << shift);
 
-			int blockStart1 = (int) alt1 << multByRow;
-			int blockStart2 = (int) alt2 << multByRow;
-			int blockStart3 = (int) alt3 << multByRow;
+			int blockStart1 = (int) alt1 << prefixShift;
+			int blockStart2 = (int) alt2 << prefixShift;
+			int blockStart3 = (int) alt3 << prefixShift;
 
 			// masking part
 			int allow_d = d - 1;
-			if( allow_d >= blockDegree ) {		// all 1's
+			if( allow_d >= blockDegree ) {	// all 1's
 				for(int offset=0; offset < rowsInBlock; offset++) {
 					currNeighborhood[blockStart1 + offset] = Integer.MAX_VALUE;
 					currNeighborhood[blockStart2 + offset] = Integer.MAX_VALUE;
 					currNeighborhood[blockStart3 + offset] = Integer.MAX_VALUE;
 				}
 			}
-			else if( allow_d > 0 ) {			// select a mapping from 1 to blockDegree-1
+			else if( allow_d > 0 ) {		// select a mapping from 1 to blockDegree-1
 				for(int offset=0; offset < rowsInBlock; offset++) {
 					currNeighborhood[blockStart1 + offset] |= currBlockMasks[allow_d - 1][offset];
 					currNeighborhood[blockStart2 + offset] |= currBlockMasks[allow_d - 1][offset];
 					currNeighborhood[blockStart3 + offset] |= currBlockMasks[allow_d - 1][offset];
 				}
 			}
-			else {			// only [currBlockRow][currBlockCol] = 1
+			else {							// only [currBlockRow][currBlockCol] = 1
 				currNeighborhood[blockStart1 + currBlockRow] |= 1 << (currBlockCol);
 				currNeighborhood[blockStart2 + currBlockRow] |= 1 << (currBlockCol);
 				currNeighborhood[blockStart3 + currBlockRow] |= 1 << (currBlockCol);
@@ -323,8 +315,8 @@ public class EMS_GT_32 {
 
 			/*System.out.println("Nonzero: candidateMotifs[" + i + "]\t= "
 				+ Long.toBinaryString(candidateMotifs[i]));*/
-			long base = ((long) i) << 5;
-			for(int j=0; j < 32; j++) {
+			long base = ((long) i) << TABLE_WIDTH_LOG_2;
+			for(int j=0; j < TABLE_WIDTH; j++) {
 				if( (value & 1) != 0) {
 					long candidate = base + j;
 					if( isMotif(candidate, tPrime) ) {
