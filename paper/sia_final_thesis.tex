@@ -37,7 +37,6 @@
 	\tableofcontents
 	\listoffigures
 	\listoftables
-% magis: make list of figures take only the first sentence of a caption.
 
 \MainMatter  % =======================================================
 
@@ -56,7 +55,7 @@
 		This study is concerned with the EMS-GT (\emph{Exact Motif Search - Generate and Test}) algorithm \cite{nabos2015dissertation}, which solves the planted motif problem for any arbitrary instance up to $l$=17. The study investigates certain Hamming distance-related patterns appearing in EMS-GT's bit-based representation of the motif search space, and uses these to develop a novel speedup technique for EMS-GT.
 		\newpage
 
-	\section{Context of the Study}
+	\section{Context of the study}
 		This section formally defines the planted motif problem. It also defines key terms used throughout this paper in discussing exact motif-search algorithms.\vspace{5mm}
 
 		\noindent{\bf\boldmath DEFINITION 1. $l$-mer}
@@ -105,14 +104,14 @@
 						N(\texttt{ttaca}, 2)$.\newline
 		
 		\noindent{\bf\boldmath DEFINITION 4.}
-		\noindent {\bf \boldmath ($l$,$d$) {Planted Motif Problem}}\newline
+		\noindent {\bf \boldmath ($l,d$) {Planted Motif Problem}}\newline
 		\noindent \textsc{Instance:} A motif length $l$, an allowable distance $d$, and a set $\mathcal{S} = \{S_{1},..., S_{n}\}$\\
 		\noindent\hspace*{55pt}of $n$ DNA sequences of length $L > l$ over the alphabet $\Sigma$ = \{\texttt{a}, \texttt{c}, \texttt{g}, \texttt{t}\}.\newline
 		\noindent \textsc{Solution:} The set $M = \{\ l\text{-mer}\ x\ |\ \forall i \in \{1,...,n\}\ \ \exists x_i \in \mathcal{L}(S_i,l),\ \ dH(x, x_i) \leq d \}$\\
 		\noindent\hspace*{55pt}of motifs occurring with at most $d$ mismatches in all sequences in $\mathcal{S}$.
 		\newpage
 
-	\section{Objectives of the Study}
+	\section{Objectives of the study}
 		The main objective of this study is to improve the performance of the EMS-GT algorithm. Specifically, it aims:
 		\begin{enumerate}
 		\item To develop a speedup technique for EMS-GT that takes advantage of distance-related patterns in the motif search space.
@@ -120,7 +119,7 @@
 		\item To evaluate the improved version of EMS-GT against state-of-the-art motif search algorithms.
 		\end{enumerate}
 
-	\section{Research Questions}
+	\section{Research questions}
 		This study aims to answer the question: How can the performance of the EMS-GT algorithm be improved?
 		Specifically, it aims to answer the following:
 
@@ -130,12 +129,12 @@
 		\item How does the improved version of EMS-GT compare with state-of-the-art motif search algorithms?
 		\end{enumerate}
 
-	\section{Significance of the Study}
+	\section{Significance of the study}
 		Motif finding in DNA and other types of nucleotide sequences is an important task in bioinformatics. Genome analysis requires fast, efficient algorithms to identify biological motifs which may be linked to protein synthesis, gene function, or even disease and targets for medical treatment. 
 
 		Improving the EMS-GT algorithm, which was shown to be competitive with the state-of-the-art, results in an even faster option for real-world motif finding applications. Furthermore, this study's investigation and insights regarding distance-related patterns within an organized search space may prove applicable to other types of search tasks, pattern-matching tasks, and problems involving Hamming distances.
 
-	\section{Scope and Limitations of the Study}
+	\section{Scope and limitations}
 		This study is concerned with developing and integrating a novel bit-masking speedup technique into the existing Java implementation of EMS-GT. The improved version is benchmarked by its runtime on synthetic datasets for challenging instances of the problem. (EMS-GT had been previously tested for correctness using real biological data with known motifs; re-testing would be redundant since the speedup technique does not change the logic of EMS-GT's algorithm.)	
 		Furthermore, the performance of EMS-GT is compared to that of PMS8 and qPMS9 running on a single core. Although both competitor algorithms are also capable of using multiple procesors, parallelization is beyond the current scope of the speedup techniques explored for EMS-GT.
 
@@ -145,12 +144,12 @@
 	of both types, and provides an in-depth description of the exact algorithm EMS-GT.
 	
 	\section{Heuristic Algorithms}
-		Heuristic algorithms perform an iterative local search, for instance by repeatedly refining an input sampling or projection until a motif is found. 
+		Heuristic algorithms perform an iterative local search, for instance by repeatedly refining an input sampling or projection until a motif is found.
 
 		Gibbs sampling \cite{lawrence1993detecting} and Expectation Maximization (EM), used in the motif-finding tool MEME \cite{lawrence1990expectation,bailey1995unsupervised} both use probabilistic computations to improve an initial random alignment. (An alignment is simply a vector $(a_{1}, a_{2},...,a_{n})$ of $n$ positions, which predicts that the motif occurs at position $a_{i}$ in the given sequence $S_{i}$.) Gibbs sampling attempts to refine the alignment one position at a time; %in contrast,
 		EM may recompute the entire alignment in a single iteration. 
 
-		Projection \cite{blanchette2002discovery} combines a pattern-based approach with EM's probabilistic approach, trying to guess every successive character of a tentative motif and using EM to verify its guesses. GARPS \cite{huo2009combining} uses a random version of the projection strategy, in tandem with the iteratively self-correcting Genetic Algorithm (GA), for yet another iterative approach. Other successful heuristic algorithms for motif finding include Pattern Branching \cite{price2003finding}, ProfileBranching \cite{price2003finding}, MULTIPROFILER \cite{keich2002finding}, NestedMICA \cite{down2005nestedmica}, and CONSENSUS \cite{hertz1999identifying}. There is also the ``ensemble'' motif discovery algorithm EMD \cite{hu2006emd}, which combines the best predictions from five component heuristic algorithms to achieve a 22.4\% improvement in prediction accuracy (over the best standalone component).
+		Projection \cite{blanchette2002discovery} combines a pattern-based approach with EM's probabilistic approach, trying to guess every successive character of a tentative motif and using EM to verify its guesses. GARPS \cite{huo2009combining} uses a random version of the projection strategy, in tandem with the iteratively self-correcting Genetic Algorithm (GA), for yet another iterative approach. Other successful heuristic algorithms for motif finding include Pattern Branching \cite{price2003finding}, ProfileBranching \cite{price2003finding}, MULTIPROFILER \cite{keich2002finding}, NestedMICA \cite{down2005nestedmica}, and CONSENSUS \cite{hertz1999identifying}. There is also the ``ensemble'' motif discovery algorithm EMD \cite{hu2006emd}, which combines the best predictions from five component heuristic algorithms to achieve a 22.4\% improvement in prediction accuracy (versus the best standalone component).
 
 	\section{Exact Algorithms}
 		While heuristics can be efficient, they are non-exhaustive approaches, and do not always guarantee finding a solution. Exact motif search algorithms, on the other hand, perform an exhaustive search of all possible motifs and thus always find the planted motif.
@@ -161,8 +160,7 @@
 
 		\begin{figure}[h] \label{fig:mitra}
 			\includegraphics[width=6.0in]{img/mitra}
-			\caption{The (8,1) mismatch tree for \{\texttt{agtatcag}, \texttt{gtatcgat}, and \texttt{tatcagtt}\}.\ }
-			{\em Left}: the tree, in its initial state. {\em Center}: the tree, after traversing prefix \texttt{--a}: the second and third $l$-mers now each have a single mismatch with the prefix. {\em Right}: the tree, after traversing prefix \texttt{--a--t}: the third $l$-mer now has two mismatches with the prefix, which is greater than the allowable 1. The third $l$-mer will thus be excluded further down the tree. Image from \cite{eskin2002finding}.
+			\caption[Example mismatch tree for MITRA.]{The (8,1) mismatch tree for \{\texttt{agtatcag}, \texttt{gtatcgat}, and \texttt{tatcagtt}\}. {\em Left}: the tree, in its initial state. {\em Center}: the tree, after traversing prefix \texttt{--a}: the second and third $l$-mers now each have a single mismatch with the prefix. {\em Right}: the tree, after traversing prefix \texttt{--a--t}: the third $l$-mer now has two mismatches with the prefix, which is greater than the allowable 1. The third $l$-mer will thus be excluded further down the tree. Image from \cite{eskin2002finding}}.
 			\end{figure}
 
 		\noindent The tree structure allows MITRA to eliminate entire branches at a time, making it significantly faster than WINNOWER at removing the many spurious edges that are not part of any motif clique.
@@ -191,14 +189,14 @@
 					M =\{ c \in C\ |\ \forall i \in \{n'+1,...,n\}\ \exists\ x_i \in \mathcal{L}(S_i, l),\ \ \ 
 					dH(c, x_i) \leq d \}.
 					\end{equation}
-		\end{enumerate}
+			\end{enumerate}
+
 		\noindent Exhaustively building all ``similar'' $n'$-tuples requires significant runtime and many false starts (i.e., the algorithm has built a tuple to size $m < n'$, only to find that no further similar $l$-mers can be found). PMS8 reduces this by improving the search for additional $l$-mers, using stricter pruning conditions for similarity between {\em three} $l$-mers (two from the tuple, and the one to be added). This method of testing similarity for $l$-mer triples, instead of pairs, quickly recognizes and discards false starts. For even greater efficiency, qPMS9 intelligently prioritizes adding $l$-mers that are highly distant from those already in the tuple, such that common neighborhood becomes smaller and faster to check through.
 
-			\begin{figure}[ht] \label{fig:qpms9}
-				\centering
-				\includegraphics[width=5.3in]{img/qpms9}
-				\caption{Runtime of qPMS9 on DNA datasets for various ($l$,$d$) values. Blue indicates the program used 48 cores; white indicates single-core execution. Gray cells represent instances with over 500 spurious motifs. Instances in orange could not be solved efficiently. Image from \cite{pms2015}.}
-				\end{figure}\vspace*{2mm}
+		\begin{figure}[ht] \label{fig:qpms9}
+			{\centering \includegraphics[width=5.3in]{img/qpms9}\\}
+			\caption[Runtime of qPMS9 for various ($l,d$)]{Runtime of qPMS9 on DNA datasets for various ($l,d$) up to (50, 21). Blue indicates the program used 48 cores; white indicates single-core execution. Gray cells represent instances with over 500 spurious motifs. Instances in orange could not be solved efficiently. Image from \cite{pms2015}.}
+			\end{figure}\vspace*{3mm}
 
 		\noindent In practice, both PMS8 and qPMS9 have been implemented to run on multiple processors with the OpenMPI C library, allowing them to solve highly challenging problem instances with ($l, d$) as large as (50, 21) in a couple of hours. Note also that most non-challenging instances require trivial ($<$ 1 s) runtime to solve.
 		\newpage
@@ -264,16 +262,23 @@
 			\EndFor
 			\State\Return $M$
 			\end{algorithmic}
-			}\newpage
+			}\normalsize\setstretch{2.0}\newpage
 
-		In practice, EMS-GT must perform speedy operations on an array of bits representing the entire motif search space. The succeeding sections discuss the efficiency strategies EMS-GT uses for important tasks such as representing sets in the search space, determining whether $l$-mers are neighbors, and generating all possible $d$-neighbors of a given $l$-mer.
+		EMS-GT has already proven competitive against other motif search algorithms. Figure 2.\ref{fig:emsgt_vs_pmsprune_qpms7_pms8} shows that EMS-GT beats PMSPrune \cite{pms2007} and qPMS7 \cite{pms2007} for all tested ($l,d$), while also beating PMS8 \cite{pms2014}---which, at the time EMS-GT was developed, was the state-of-the-art---for ($l,d$) values (13,4) and (14,5).
+
+		\begin{figure}[h]\label{fig:emsgt_vs_pmsprune_qpms7_pms8}
+			\centering
+			\includegraphics{img/emsgt-vs-pmsprune,qpms7,pms8}
+			\caption{EMS-GT's performance vs PMSPrune, qPMS7 and PMS8.}
+			\end{figure}
+
+		EMS-GT achieves this competitive speed by efficiently performing operations on an array of bits representing the entire motif search space. The succeeding sections discuss EMS-GT's efficiency strategies for representing sets in the search space, determining whether $l$-mers are neighbors, and generating all possible $d$-neighbors of a given $l$-mer.
 
 		\subsubsection{Bit-based set representation}
 			The motif search space consists of the $4^{l}$ possible $l$-mers that can be formed from the nucleic alphabet $\Sigma=$ \{\texttt{a}, \texttt{c}, \texttt{g}, \texttt{t}\}. To efficiently represent sets---such as a $d$-neighborhood, or a set of candidate motifs---within this space, EMS-GT assigns each of the $4^{l}$ $l$-mers a bit flag in an array, set to 1 if the $l$-mer is a member of the set and 0 otherwise. Bit flags correspond to $l$-mers via a simple mapping: EMS-GT maps an $l$-mer $x$ to a bit flag index by replacing each character in $x$ with 2 bits (\texttt{a=00}, \texttt{c=01}, \texttt{g=10}, \texttt{t=11}). This results in an alphabetical enumeration of $l$-mers: i.e. for $l$=4, $l$-mer 0 is \texttt{aaaa}, 1 is \texttt{aaac}, 2 is \texttt{aaag}, and so on.\vspace*{3mm}
 
 			\noindent \hspace*{40pt}{\small Ex. \texttt{cgca} maps to \texttt{01100100} = 100; 
 			thus, its flag is the bit at index 100.
-				% \hspace*{58pt} Thus, the flag for \texttt{tagct} is bit 795 in the array.}
 
 		\subsubsection{Bit-array compression}
 			EMS-GT's implementation compresses the required set-representation array of $4^{l}$ bits into an equivalent array of $\frac{4^{l}}{32}$ 32-bit integers. The bit for $l$-mer $x$ is now found at position ($x$ mod 32) of the integer at array index $\left\lfloor\frac{x}{32}\right\rfloor$.\newline
@@ -281,32 +286,20 @@
 				\hspace*{58pt} \emph{array index}  = $\left\lfloor\frac{100}{32}\right\rfloor$ = 3 , \hspace*{5pt} \emph{bit position} = 100 mod 32 = 4;\\ 
 				\hspace*{58pt}Thus, the flag for \texttt{tacgt} is the bit at index 4 of the integer at array index 3.}
 
-			\begin{figure}[h]\label{fig:acgt}
-				\centering
+			\noindent Note that EMS-GT can only solve problem instances with $l \leq 17$; when we reach $l$=18, the size of the integer array needed to represent the entire search space ($\frac{4^{18}}{32} = \frac{2^{36}}{2^{5}} = 2^{31}$ integers) begins to exceed the maximum size for Java arrays, which is ($2^{31} - 1$) elements.
+
+			\begin{figure}[ht]\label{fig:acgt}
+				\centering\ \\
 				\includegraphics[width=6.0in]{img/acgt3}
-				\caption{Bit-array $N_\texttt{acgt}$ representing $N(\texttt{acgt},2)$. All possible $l$-mers are represented by $4^4 = 256$ bit flags, compressed into eight 32-bit integers.}
-				\end{figure}
+				\caption[Bit-array representing an $l$-mer neighborhood]{Bit-array $N_\texttt{acgt}$ representing $N(\texttt{acgt},2)$. If $l$=4, all possible $l$-mers are represented by $4^4 = 256$ bit flags, compressed here into eight 32-bit integers. A bit is set to 1 if its corresponding $l$-mer has 2 or fewer mismatches with \texttt{acgt}.}
+				\end{figure} \vspace*{3mm}
 
 		\subsubsection{XOR-based Hamming Distance Computation}
 			The mapping of $l$-mers to binary numbers  is also useful for computing Hamming distances. An Exclusive OR (XOR) bitwise operation between the mappings of two $l$-mers will produce a nonzero pair of bits at every mismatch position; counting these nonzero pairs of bits in the XOR result gives us the Hamming distance. See Algorithm 2.2 for the implementation of this procedure.\newline
 			\noindent\hspace*{40pt} {\small Ex.	\texttt{tacgt} maps to \texttt{1100011011} \newline
 				\vspace*{2pt}\hspace*{62pt} \texttt{ttcgg} maps to \texttt{1111011010} \newline				
 				\hspace*{62pt}	XOR produces \hspace*{3pt}\texttt{00\hl{11}0000\hl{01}} = 2 mismatches.}
-
-		\subsubsection{Recursive Neighborhood Generation}
-			To generate a $d$-neighbor of an $l$-mer $x$, we choose $d' \leq d$ positions from 1, 2,..., $l$-1, $l$ and change the character at each of the $d'$ positions in $x$. EMS-GT uses a recursive procedure (Algorithm 2.3) to do this, effectively (1) traversing the tree of all $d$-neighbors and (2) setting the bit flag in the neighborhood array $N$ for each neighbor it encounters. Since we choose up to $d$ positions in the $l$-mer, and have 3 possible substitute characters at each position, the size of the neighborhood $N(x,d)$ is given by:
-			 \begin{equation}
-				\left|N(x,d)\right| = \sum_{i=0}^d \binom{l}{i} 3^{i}
-				\end{equation}
-
-% to-do: explain neighborhood size etc.
-		\begin{figure}[h]\label{fig:nxd}
-			\centering
-			\includegraphics{img/nbrhd_growth.png}
-			\caption{Number of neighbors in $N(x,d)$ for challenging ($l,d$) values.}
-			\end{figure}
-
-		\newpage
+			\newpage
 
 		{\setstretch{1.0} % Algorithm 2.2
 			\noindent \hspace*{6pt}{\bf Algorithm 2.2} \textsc{Hamming distance computation}\small
@@ -324,9 +317,7 @@
 				\EndFor
 				\State\Return $dH(u,v)$
 				\end{algorithmic}
-			}
-
-			\bigskip\bigskip\bigskip
+			}\bigskip\bigskip\bigskip
 
 		{\setstretch{1.0} % Algorithm 2.3
 			\noindent \hspace*{6pt}{\bf Algorithm 2.3} \textsc{Recursive neighborhood generation}\small
@@ -356,11 +347,23 @@
 				\EndProcedure
 				\State\Return $\mathcal{N}$
 				\end{algorithmic}
-			}
+			}\normalsize\setstretch{2.0}\newpage
 
-% to-do: note EMS-GT's current performance
-	% \includegraphics{img/emsgt.png}
-	\normalsize\setstretch{2.0}
+		\subsubsection{Recursive Neighborhood Generation}
+			To generate a $d$-neighbor of an $l$-mer $x$, choose $d' \leq d$ positions from 1, 2,..., $l$ and change the character in $x$ at each of the $d'$ chosen positions. EMS-GT uses a recursive procedure (Algorithm 2.3) to do this, effectively (1) traversing the tree of all $d$-neighbors and (2) setting the bit flag in the bit-array $N_x$ for each neighbor encountered. Since we change up to $d$ positions in $x$, and have 3 alternative characters at each position, the size of the neighborhood $N(x,d)$ is given by:
+			 \begin{equation}
+				\left|N(x,d)\right| = \sum_{i=0}^d \binom{l}{i} 3^{i}
+				\end{equation}
+% to-do: add here a tree showing how the neighborhood is traversed (like with acgt at its root)
+			\noindent As Figure 2.\ref{fig:nxd} shows, $|N(x,d)|$ grows very quickly---exponentially---with ($l,d$).\vspace*{5mm}
+
+			\begin{figure}[h]\label{fig:nxd}
+				\centering
+				\includegraphics{img/nbrhd_growth.png}
+				\caption{Number of neighbors in $N(x,d)$ for challenging ($l,d$) values.}
+				\end{figure}
+			
+			The exponential growth of $N(x,d)$ means that as $l$ and $d$ increase, the EMS-GT algorithm must spend more time locating and setting bit flags for individual neighbors. This makes the neighborhood-generating portion of EMS-GT---currently characterized by scattered array accesses and numerous bitwise operations---a prime target for further efficiency strategies or speedup techniques. 
 
 \chapter{METHODOLOGY}
 	This section briefly describes how a novel speedup technique for EMS-GT was explored and implemented.
@@ -371,13 +374,13 @@
 
 		Snapshots of EMS-GT's main data structure (an array of $4^l$ bit flags representing the entire search space) were taken at various times during program execution, and examined for features that might allow for a more efficient algorithm. It became clear that $l$-mer neighborhoods, when represented in this data structure, were made up of repeating block patterns; we examined the underlying distribution of Hamming distances in these blocks to explain the patterns.
 
-		By finding connections to (1) EMS-GT's alphabetical $l$-mer enumeration scheme and (2) the additive property of Hamming distances, we were able to justify the original observation, which was: ``A bit-array $N$ representing the neighborhood $N(x,d)$ can be partitioned into consecutive blocks of $4^k$ bits each, where each block will conform to one of at most ($k+2$) patterns.'' The full explanation of block patterns in $N$ is written out in Section 4.1.
+		By finding connections to (1) EMS-GT's alphabetical $l$-mer enumeration scheme and (2) the additive property of Hamming distances, we were able to justify the original observation, which was: ``A bit-array $N_x$ representing the neighborhood $N(x,d)$ can be partitioned into consecutive blocks of $4^k$ bits each, where each block will conform to one of at most ($k+2$) patterns.'' The full explanation of block patterns in $N$ is written out in Section 4.1.
 		
-		Working forwards, we then developed a procedure which can quickly build any neighborhood $N$ in blocks, referring to a pre-generated lookup table of the possible block patterns. This technique was integrated into the Java implementation of EMS-GT.
+		Working forwards, we then developed a procedure which can quickly build any neighborhood bit-array $N_x$ in blocks, referring to a pre-generated lookup table of the possible block patterns. This technique was integrated into the Java implementation of EMS-GT.
 
 	\section{Evaluation}
 		The improved version of EMS-GT was compared to the original EMS-GT algorithm, as well as to the state-of-the-art algorithms PMS8 and qPMS9, by benchmarking their performance on challenging instances of the ($l, d$) planted motif problem.
-		An ($l$, $d$) problem instance is defined to be a challenging instance if $d$ is the largest value for which the expected number of $l$-length motifs that would occur in the input by random chance does not exceed some limit---typically 500 random motifs \cite{pms2015}. The specific challenge instances used were (9,2), (11,3), (13,4), (15,5), and (17,6), as identified in \cite{pms2015,pms2007}. 
+		An ($l$, $d$) problem instance is defined to be a challenging instance if $d$ is the largest value for which the expected number of $l$-length motifs that would occur in the input by random chance does not exceed some limit---typically 500 random motifs \cite{pms2015}. The specific challenge instances used were (9,2), (11,3), (13,4), (15,5), and (17,6), as identified in \cite{pms2015,pms2007}. The runtimes shown for EMS-GT and competitor algorithms are average runtimes over 20 synthetic datasets per ($l,d$) instance.
 
 	\subsection{Synthetic Datasets}
 		Synthetic datasets were created using a DNA sequence generator written in Java. Each nucleotide character in a sequence is randomly generated; \{\texttt{a}, \texttt{c}, \texttt{g}, \texttt{t}\} each have a 25\% chance of being selected, independent from other characters in the sequence.
@@ -424,7 +427,7 @@
 			\begin{minipage}{.135\textwidth}\centering\includegraphics[width=0.95\textwidth]{img/4}\\ Pattern 4 \end{minipage}
 			\begin{minipage}{.135\textwidth}\centering\includegraphics[width=0.95\textwidth]{img/5}\\ Pattern 5 \end{minipage}
 			\newline\newline
-			\caption{Bit patterns followed by blocks in the bit-array representation of $N(\texttt{acgtacgtacgt}, 5)$. 
+			\caption[Block bit patterns in an $l$-mer neighborhood]{Bit patterns followed by blocks in the bit-array representation of $N(\texttt{acgtacgtacgt}, 5)$. 
 			Black signifies a bit set to 1.}
 			\end{figure}
 
@@ -446,17 +449,17 @@
 		Intuitively, if $x$ and $x'$ are neighbors, and there are {\bf\boldmath $d_H(y,y')$  prefix mismatches} between them, we can  allow {\bf\boldmath $d_H(z,z') \leq d - d_H(y,y')$ $k$-suffix mismatches} for $x$ and $x'$ to have $d$ or fewer total mismatches. Table 4.\ref{tbl:cases_prefix_suffix} shows the ($k+2$) cases for distributing $d$ allowable mismatches between prefix and $k$-suffix.\vspace*{3mm}
 		\begin{table}[h] \label{tbl:cases_prefix_suffix}
 			\centering\renewcommand{\arraystretch}{1.25}
-			\begin{tabular}{|l|r|l|}
+			\begin{tabular}{|c|c|c|}
 			\hline
-			\bfseries & \bfseries prefix mismatches & \bfseries\boldmath suffix mismatches allowed \\
+			\bfseries Case & \bfseries prefix mismatches & \bfseries\boldmath suffix mismatches allowed \\
 			\hline
-			Case -1 &		more than $d$ 	& --\\
-			Case  0 & 		$d$ 			& 0 \\
-			Case  1 & 		$d$ - 1 		& 0, 1 \\
-			Case  2 & 		$d$ - 2 		& 0, 1, 2 \\
-			... & ...& ...\\
-			Case  $k$-1 & 	$d$ - ($k$-1) 	& 0, 1, 2, ..., ($k$-1) \\
-			Case  $k$ & 	$d-k$ or less 	& 0, 1, 2, ..., ($k$-1), $k$ \\
+			-1 	  &	more than $d$ 	& --		\\
+			0 	  & $d$ 			& 0 		\\
+			1 	  & $d$ - 1 		& 0, 1 		\\
+			2 	  & $d$ - 2 		& 0, 1, 2 	\\
+			...   & ...				& ...		\\
+			$k$-1 & $d$ - ($k$-1) 	& 0, 1, 2, ..., ($k$-1) \\
+			$k$   & $d-k$ or less 	& 0, 1, 2, ..., ($k$-1), $k$ \\
 			\hline
 			\end{tabular}
 			\caption{Number of suffix mismatches allowed, given a fixed number of prefix mismatches, between two $d$-neighbors.}
@@ -475,7 +478,7 @@
 			\begin{minipage}{.33\textwidth}\centering\includegraphics[width=0.95\textwidth]{img/4}\\ Pattern 4 \\$d_H(y,y') = d-4$ \end{minipage}
 			\begin{minipage}{.33\textwidth}\centering\includegraphics[width=0.95\textwidth]{img/5}\\ Pattern 5 \\$d_H(y,y')\leq d-5$ \end{minipage}
 			\newline\newline
-			\caption{Correspondence between the value of $d_H(y,y')$ and bit patterns for $N(\texttt{acgtacgtacgt}, 5)$. Black signifies a bit set to 1.}
+			\caption[Block bit patterns vs prefix mismatches]{Correspondence between the number of prefix mismatches $d_H(y,y')$ and block bit patterns for $N(\texttt{acgtacgtacgt}, 5)$. Black signifies a bit set to 1.}
 			\end{figure}
 
 		\noindent Pattern -1 (the ``empty'' block pattern, in which no bits are set) corresponds to the case wherein $d_H(y,y') > d$---i.e., the mismatches in the prefix alone already exceed the allowable mismatches for a neighbor of $x$.
@@ -489,15 +492,15 @@
 			\end{array} \right.
 			\text{ for any $k$-suffix }z'.
 			\end{equation}
-% To-do: clean up ugly lines
+
 		\noindent In other words, the polarity (0 or 1) of a bit in a pattern is determined by its corresponding suffix's mismatches with $z$. To visualize this, compare Figure 4.\ref{fig:D_tacgt}---the color map of $d_H(\texttt{tacgt},z')$ values for all possible $k$-suffixes $z'$---with the bit patterns shown in Figure 4.\ref{fig:cases_block_patterns}.
 		\begin{figure}[h] \label{fig:D_tacgt}
 			\centering
-			\includegraphics[width=5.5in]{img/D(tacgt)_marked_2}
+			\includegraphics[width=5.4in]{img/D(tacgt)-marked}
 			\caption{Distance distribution from \texttt{tacgt} to all $4^{5} = 32 \times 32$ $k$-suffixes, $k$=5.}
 			\end{figure}
 
-% magis: add here a table of other distributions and their patterns
+% to-do: add here a table of other distributions and their patterns
 		% \begin{figure}\label{fig:patterns_other_suffixes}
 		% 	\end{figure}
 
@@ -513,66 +516,153 @@
 				\item otherwise, mask {\em Pattern}( $z$, $d_z$ ) onto the block.
 				\end{enumerate}
 			\end{enumerate}
-		\noindent This entire procedure effectively performs $\mathcal{N}(S,d) \leftarrow \mathcal{N}(S,d) \cup N(x,d)$ for each $l$-mer $x$ in $S$, as specified in {\bf lines 2-5 and 9-12 of EMS-GT (Algorithm 2.1).}
+		\noindent This entire procedure effectively performs $\mathcal{N}(S,d) \leftarrow \mathcal{N}(S,d) \cup N(x,d)$ for each $l$-mer $x$ in $S$, as specified in lines 2-5 and 9-12 of (Algorithm 2.1) EMS-GT .
+		\newpage
+		\noindent The speedup technique requires us to pre-generate all possible block patterns for a given $k$, for which we can use Algorithm 4.1. The set of patterns generated  excludes those patterns where none, all, or only one of the bits in the block are set---these are considered trivial to apply to blocks, even without pre-generated bit masks. \\
+
+			{\setstretch{1.0} % Algorithm 4.1. Block Pattern Generation
+				\noindent \hspace*{6pt}{\bf Algorithm 4.1}
+				\textsc{Block Pattern Generation}\small
+				\begin{algorithmic}[1]\label{alg:block-pattern-gen}
+					\Require block degree $k$
+					\Ensure 3D bit-array $\mathcal{P}$ containing all possible non-trivial block patterns \vspace*{6pt}
+
+					\State $\mathcal{P}[\ ][\ ][\ ] \leftarrow \{\}$ \hspace*{90pt}
+					\Comment{retrieve a pattern $P$ as $\mathcal{P}[z][d - d_{y'}]$ }
+
+					\For {$z \leftarrow 0$ to $4^k$}
+					\For {$j \leftarrow 1$ to $k-1$}
+					\For {$z' \leftarrow 0$ to $4^k$}
+					\If{$dH(z,z') \leq j$} 
+						\State $\mathcal{P}[z][j][z'] \leftarrow 1$
+					\Else
+						\State $\mathcal{P}[z][j][z'] \leftarrow 0$
+					\EndIf\EndFor\EndFor\EndFor
+					\State\Return $\mathcal{P}$
+					\end{algorithmic}
+				}\normalsize\setstretch{2.0}\
+			
+		After generating $\mathcal{P}$, we can retrieve {\em Pattern}( $z$, $d_z$ ) as $\mathcal{P}[\ z\ ][\ d_z\ ]$, which is an array of $4^k$ bits. In the actual implementation, the bit-arrays representing the patterns are also ``compressed'' to use 32-bit integers, following EMS-GT's convention. Note also that pre-generating and storing all $4^k \times (d_z - 2)$ entails non-negligible time and space overhead depending on the value of $k$ (i.e. storing all patterns requires $4^k \times (k-2) \times 4^k$ bits).
 		\newpage
 
-	\section{EMS-GT performance improvement}
-		Initially, EMS-GT's procedure for building $\mathcal{N}_S$ recursively generated all $d$-neighbors of a given $l$-mer $x$.
-		However, with our speedup technique, EMS-GT need now only generate the $d$-neighbors of $x$'s its prefix $y$---its first $l-k$ characters. This makes for a much smaller neighborhood, as evidenced in Figure 4.\ref{fig:nxd_vs_nyd}.\\
+	\section{Performance improvement}
+		Figure 4.\ref{fig:results1} compares the performance of EMS-GT with and without the speedup technique. For challenge instance (9,2), the computational overhead of generating and retrieving block patterns increases the runtime from 0.06 s to 0.11 s, but for all other instances tested, the speedup technique significantly reduces runtime.
 
-% to-do: add legend to this figure, blue = Nxd, red = Nyd
+		\begin{figure}[ht]\label{fig:results1}
+			\centering
+			\includegraphics[width=5.0in]{img/emsgt-without-vs-with-speedup}
+			\caption{EMS-GT runtimes without (baseline) vs. with speedup technique.}
+			\end{figure}
+
+		\noindent Specifically, for challenge instances (11,3), (13,4), (15,5) and (17,6), the speedup technique allows runtime reductions of at least 6.7\%, 47.5\%, 38.1\% and 43.0\% respectively.
+
+		\newpage The pattern-based speedup technique requires examining all $d$-neighbors of $x$'s prefix $y$. We can use Algorithm 2.3 to recursively traverse $N(y,d)$; as Figure 4.\ref{fig:nxd_vs_nyd} shows, this will encounter much fewer neighbors than $N(x,d)$.
+
 		\begin{figure}[h]\label{fig:nxd_vs_nyd}
 			\centering
 			\includegraphics{img/nbrhd_growth_compare.png}
 			\caption{Number of neighbors in $N(y,d)$ vs. $N(x,d)$ for challenging ($l,d$), $k$=5.}
 			\end{figure}
 
-		\noindent This large reduction in generated neighbors partly explains why, for most $(l,d)$ values, building $\mathcal{N}_S$ in blocks proves significantly faster (see Figure 4.\ref{fig:results1}) than generating each individual neighbor, then locating and setting its bit flag. 
+		This large difference in neighborhood size partly explains why, as $(l,d)$ values increase, building a neighborhood $\mathcal{N}_S$ in blocks proves significantly faster than generating each individual neighbor, then locating and setting its bit flag. 	The tradeoff is that, for each neighbor of $x$'s prefix $y$, we set an entire block of bits; this will entail $\frac{4^k}{32}$ OR operations (between the $\frac{4^k}{32}$ consecutive integers of a block in $N_x$ and the bit-mask of the same size).
 
-		\newpage
-% to-do: add legend to this figure, blue = w/o, red - w/ speedup
-		\begin{figure}[ht]\label{fig:results1}
+		Again, we see the suffix length $k$ determines the complexity for the speedup technique. For the preceding runtime measurements, we use $k$=5, which empirical tests confirm to be the optimum value of $k$ for all ($l,d$) tested.
+		\vspace*{5mm}
+
+		\begin{table}[h] \label{tbl:k_values}
+			\small
+			\renewcommand{\arraystretch}{1.3}
 			\centering
-			\includegraphics[width=5.0in]{img/results1.png}
-			\caption{EMS-GT's performance without (baseline) vs. with speedup technique.}
-			\end{figure}
+			\begin{tabular}{|c|c|c|c|c|c|}
+			\hline
+			\bfseries\boldmath $(l,d)$ &
+			\bfseries\boldmath $k=3$ &
+			\bfseries\boldmath $k=4$ &
+			\bfseries\boldmath $k=5$ &
+			\bfseries\boldmath $k=6$ &
+			\bfseries\boldmath $k=7$ \\
 
-% to-do: explain results1 in detail
-		% also talk about caveats of the new method
-		% add reasoning for optimum value of k
-		\newpage
+			\bfseries &
+			\bfseries\boldmath $32 \times   2$ blk &
+			\bfseries\boldmath $32 \times   8$ blk &
+			\bfseries\boldmath $32 \times  32$ blk &
+			\bfseries\boldmath $32 \times 128$ blk &
+			\bfseries\boldmath $32 \times 512$ blk \\
+			\hline
+			 (9,2) 	&    -   &    -     & {\bf  0.11 s} &  0.57 s &  9.02 s \\
+			(11,3) 	&    -   &    -     & {\bf  0.20 s} &  0.70 s &  9.77 s \\
+			(13,4) 	&  1.74 s &  1.31 s & {\bf  1.04 s} &  2.19 s & 12.40 s \\
+			(15,5) 	& 23.43 s & 21.43 s & {\bf 15.51 s} & 24.28 s & 46.30 s \\
+			% 17,6 	&	&	&	&	&\\
+			\hline
+			\end{tabular}
+			\centering
+			\caption{\small EMS-GT runtimes with speedup technique, using different values of $k$. Shortest runtimes are in bold text.}
+			\end{table}
+
+		When $k$ is lower, there are fewer and smaller $4^k$-bit block patterns to manage, but building $N_x$ requires more highly scattered array accesses to small blocks. When $k$ is higher, there are larger contiguous blocks and thus fewer scattered accesses to $N_x$, but also a much larger set of $4^k$-bit block patterns to manage. It seems that $k=5$ allows for the most efficient balance between recursive neighbor generation (which identifies and accesses blocks according to their prefixes) and bit-masking operations (which selects and applies the correct pattern to each block), with a feasible number of block patterns.
 
 	\section{EMS-GT performance comparison vs. PMS8 and qPMS9}
+		Finally, the improved EMS-GT and two competitor algorithms were run on an Intel Xeon, 2.10 GHz processor (single core). Their runtimes, averaged over 20 synthetic datasets per $(l,d)$ instance, are compared in Figure 4.\ref{fig:results2}.
 
-% to-do: fix labels and add legend to this figure, blue = PMS8, lightblue = qPMS9, red - EMS-GT w/ speedup
 		\begin{figure}[ht]\label{fig:results2}
 			\centering
-			\includegraphics[width=5.0in]{img/results2.png}
+			\includegraphics[width=5.0in]{img/emsgt-with-speedup-vs-PMS,qPMS9}
 			\caption{Improved EMS-GT's performance vs. PMS8 (baseline) and qPMS9.}
 			\end{figure}
 
-% to-do: explain results2 and talk about caveats of performance against PMS8 and qPMS9
-	% include the table with all runtime values
+		On every challenging ($l,d$) instance except (17,6) the improved EMS-GT outperforms qPMS9; it outperforms PMS8 on all the challenge instances. Note that without the speedup technique, EMS-GT could not outperform PMS8 for (17,6) (see Figure 2.\ref{fig:emsgt_vs_pmsprune_qpms7_pms8}), nor qPMS9 on (15,5);
+		see Table 4.\ref{tbl:all_runtimes} for the full summary of runtimes.
+
+		\begin{table}[ht] \label{tbl:all_runtimes}
+			\renewcommand{\arraystretch}{1.3}
+			\centering
+			\begin{tabular}{|c|c|c|c|c|}
+			\hline \bfseries\boldmath $(l,d)$ & \bfseries PMS8 & \bfseries qPMS9 & \bfseries EMS-GT & \bfseries EMS-GT with speedup\\
+			\hline
+			 9,2 &  0.74 s  &  0.47 s & {\bf 0.06 }s & {    0.11 s}\\
+			11,3 &  1.58 s  &  1.06 s &  0.22 s & {\bf 0.20 s}\\
+			13,4 &  5.39 s  &  4.52 s &  1.98 s & {\bf 1.04 s}\\
+			15,5 & 36.45 s  & 24.63 s & 25.06 s & {\bf15.51 s}\\
+			17,6 &  3.91 min & \textbf{1.96 min} & 5.14 min & {2.93 min}\\
+			\hline\end{tabular}
+			\caption{Runtimes of PMS8, qPMS9, EMS-GT without and with speedup technique. Shortest times are in bold text.}
+			\end{table}
+
+		EMS-GT is highly competitive with PMS8 and qPMS9 on challenging problem instances, but as Table 4.\ref{tbl:runtimes_nonchallenge} shows, EMS-GT is less efficient on non-challenging instances. This may be due to differing efficiency considerations when narrowing down the search space: while EMS-GT manipulates a fixed-size bit-array to narrow down the search space of all $4^l$ $l$-mers, PMS8 and qPMS9 have a dynamically-sized search space which is easily pruned down for most ($l,d$) values, but more difficult to manage for challenging ($l,d$) instances.\\
+
+		\begin{table}[ht] \label{tbl:runtimes_nonchallenge}
+			\renewcommand{\arraystretch}{1.3}
+			\centering
+			\begin{tabular}{|c|c|c|c|c|}
+			\hline \bfseries\boldmath $(l,d)$ & \bfseries PMS8 & \bfseries qPMS9 & \bfseries EMS-GT & \bfseries EMS-GT with speedup\\
+			\hline
+			14,4 &  1.29 s  &  1.02 s &  3.53 s &   2.55 s\\
+			16,5 &  4.79 s  &  2.96 s & 41.63 s &  29.03 s\\
+			\hline\end{tabular}
+
+			\caption{\small Runtimes of PMS8, qPMS9, EMS-GT without and with speedup technique on non-challenging ($l,d$).}
+			\end{table}
 
 \chapter{CONCLUSIONS}
 	In line with our research objectives, we make the following conclusions:
-
 	\begin{enumerate}
-		\item Our novel speedup technique takes advantage of the distance-related block patterns observed in the search space. Initially EMS-GT generates, and sets the bit for, each individual neighbor of an $l$-mer $x$. However, our speedup technique allows EMS-GT to set these bits in blocks of $4^k$ bits each, using pre-generated bit patterns; we find the ideal value of $k$ to be 5.
-		\item The speedup technique improves EMS-GT's performance on challenging ($l$,$d$) instances (11,3), (13,4), (15,5) and (17,6), with runtime reductions of at least 6.7\%, 47.5\%, 38.1\% and 43.0\% respectively; however, on challenge instance (9,2), overhead increases EMS-GT's runtime from 0.06 s initially to 0.11 s with the speedup technique.
-		\item The speedup technique allows EMS-GT to outperform the current best algorithm, qPMS9, on challenging ($l$,$d$) instances (9,2), (11,3), (13,4) and (15,5) with runtime reductions of at least 76\%, 81\%, 77\% and 37\% respectively for these instances, while ranking second to qPMS9's runtime on challenge instance (17,6).
+		\item Our novel speedup technique takes advantage of the distance-related block patterns observed in the search space. Initially EMS-GT generates each neighbor of an $l$-mer $x$ and sets a corresponding bit in an array. However, our speedup technique allows EMS-GT to set these bits in blocks of $4^k$ bits each, using pre-generated bit patterns as bit-masks; we find the ideal value of $k$ to be 5.
+		\item The speedup technique improves EMS-GT's performance on challenging ($l,d$) instances (11,3), (13,4), (15,5) and (17,6), with runtime reductions of at least 6.7\%, 47.5\%, 38.1\% and 43.0\% respectively; however, on challenge instance (9,2), overhead increases EMS-GT's runtime from 0.06 s initially to 0.11 s with the speedup technique.
+		\item The speedup technique allows EMS-GT to outperform the current best algorithm, qPMS9, on challenging ($l,d$) instances (9,2), (11,3), (13,4) and (15,5) with runtime reductions of at least 76\%, 81\%, 77\% and 37\% respectively for these instances, while ranking second to qPMS9's runtime on challenge instance (17,6).
 		\end{enumerate}
 
 	\noindent Directions for further research on improving EMS-GT include:
-
-	\begin{enumerate}
+	\begin{itemize}
 		\item Refining the bit-based search space representation (i.e. with compression techniques) to be able to represent the motif search space for $l > 17$;
+		\begin{itemize}
+			\item In 
+		\end{itemize}
 		\item Creating a multiprocessor version of EMS-GT to solve the planted motif problem faster, in parallel, for larger values of ($l$, $d$); and
 		\item Delegating the bit-masking speedup technique and other bulk bit operations to the graphics card, as explored in \cite{dasari2010efficient}, for faster performance.
-		\end{enumerate}
+		\end{itemize}
 
-% to-do: include caveats, generalization of usefulness of this technique
-
+	\noindent Finally, the EMS-GT speedup technique described by this paper can conceivably be translated to other string-matching and pattern-finding tasks beyond DNA motif search; however, its implementation will involve non-negligible computational and storage overhead which varies with the suffix length $k$. Choosing a value for $k$ is thus a key efficiency consideration when using this technique.
 
 \BackMatter  % =======================================================
 	\bibliographystyle{plain}
@@ -580,6 +670,393 @@
 
 \appendix{Source code for EMS-GT, with speedup technique}
 
+\begin{footnotesize}
+\setstretch{1.0}
+\begin{verbatimtab}[2]
+/** EMS-GT_32.java
+  * Solves the (l,d) planted motif problem.
+  * Bit-array width is 32 bits (Integer type).
+  * Optimized with block masking.
+  *
+  * @author Aia Sia, Julieta Nabos
+  * @version 1.0 9/09/2015
+  */
+
+import java.io.*;
+import java.util.*;
+
+public class EMS_GT_32 {
+
+  static String inputFileHeader = "../datasets/";
+  static String inputFileName = "";
+  static final int MAX_INDICES = 120000000;
+  static final int tPrime = 11;
+
+  // from input file
+  static int t, l, n, d;
+  static int[] plantedAlignment;
+  static String plantedMotif;
+  static String foundMotifs;
+  static char[][] seqS;
+
+  // for EMS-GT computations
+  static long mask, prefixMask, suffixMask;
+  static int pmt;
+  static int[] currNeighborhood;
+  static int[] candidateMotifs;
+  static long[][] lmerMappings;
+
+  // for masking
+  static int blockDegree = 5;
+  static int multByRow;
+  static int lmersInBlock;
+  static int rowsInBlock;
+  static int[][][] blockMasks;
+  static int[][] currBlockMasks;
+  static long prefix;
+  static long suffix;
+  static int currBlockRow;
+  static int currBlockCol;
+  
+//===================================================================
+// MAIN METHOD
+//===================================================================
+
+  public static void main(String args[]) throws Exception {
+    if( args.length > 0 ) {
+      inputFileName = args[0];
+      if( args.length > 1 ) {
+        blockDegree = Integer.parseInt(args[1]);
+      }
+    }
+
+    readInput( inputFileHeader + inputFileName );
+
+    // compute preliminaries
+    mask = (((long) 1) << 2*(l-1) ) - 1;
+    prefixMask = (((long) 1) << 2*(l-blockDegree-1) ) - 1;
+    suffixMask = (((long) 1) << 2*(blockDegree-1) ) - 1;
+    nl1 = n - l + 1;
+    pmt = (int) (( (long)1 << (2*l) ) >>> 5); // (4^l)/32
+    
+    System.out.print("\n" + inputFileName);
+    
+    // start EMS-GT
+    long sTime = System.nanoTime();
+    generateBlockMasks();
+    collectCandidateMotifs();
+    transformLmerSequences(tPrime);
+    searchMotif();    
+    long eTime = System.nanoTime();
+
+    // compute runtime and used memory
+    Runtime runtime = Runtime.getRuntime();
+    long memUse = runtime.totalMemory() - runtime.freeMemory();
+    runtime.gc();
+    long memUseGC = runtime.totalMemory() - runtime.freeMemory();
+
+    System.out.print(", " + (eTime - sTime) / 1000000000.0);
+    System.out.print(", " + (eTime - sTime) / 1000000000.0 / 60.0);
+    System.out.print(", " + memUse / 1024.0 / 1024.0);
+    System.out.print(", " + memUseGC / 1024.0 / 1024.0);
+    System.out.print(", " + plantedMotif + "," + foundMotifs);
+  }
+
+  public static void generateBlockMasks() throws Exception {
+    multByRow = 2*blockDegree - 5;
+    lmersInBlock = 1 << (2 * blockDegree);    // 4 ^ blockDegree
+    rowsInBlock = lmersInBlock >> 5;      // 4 ^ blockDegree / 32
+    blockMasks = new int[lmersInBlock][blockDegree - 1][rowsInBlock];
+    for(int i=0; i < lmersInBlock; i++) {
+      for(int k=0; k < blockDegree - 1; k++) {
+        Arrays.fill( blockMasks[i][k], 0);
+      }
+      for(int row=0; row < rowsInBlock; row++) {
+        for(int col=31; col > -1; col--) {
+          int distance = computeHD(i, row*32+col);
+          for(int k=0; k < blockDegree - 1; k++) {
+            if(distance <= k+1) {
+              blockMasks[i][k][row]++;
+            }
+            if(col > 0) {
+              blockMasks[i][k][row] = blockMasks[i][k][row] << 1;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  public static void readInput(String filename) throws Exception {
+    Scanner input = new Scanner (new File (filename ));
+    t = input.nextInt();    
+    n = input.nextInt();    
+    l = input.nextInt();
+    d = input.nextInt();
+    plantedAlignment = new int[t];
+    seqS = new char[t][n];
+    int a = 0;
+    while (input.hasNextInt()) {  
+      plantedAlignment[a] = input.nextInt();
+      a++;
+    }    
+    plantedMotif = input.next().toUpperCase();
+    int n = 0;
+    while (input.hasNext()) {
+      String seq = input.next().toUpperCase();
+      seqS[n] = seq.toCharArray();
+      n++;
+    }
+    input.close();
+  }
+
+
+
+
+//===================================================================
+// COLLECT CANDIDATES: intersect d-neighborhoods of S[0] to S[tPrime]
+//===================================================================
+
+  public static void collectCandidateMotifs() throws Exception {
+    generateNeighborhood(0);    
+    candidateMotifs = currNeighborhood;
+    for(int i=1; i < tPrime; i++) {
+      generateNeighborhood(i);
+      for(int j=0; j < pmt; j++)
+        candidateMotifs[j] &= currNeighborhood[j];
+    }
+  }
+
+  public static void generateNeighborhood(int s) throws Exception {
+    currNeighborhood = new int[pmt];
+    char[] currSeq = seqS[s];
+
+    prefix = 0;              // first l-k characters of l-mer
+    suffix = 0;              // last  k characters of l-mer
+    for(int i=0; i < l; i++) {
+      char c = currSeq[i];
+      int base = 0;
+      switch(c) {
+        case 'C': base=1; break;
+        case 'G': base=2; break;
+        case 'T': base=3; break;
+      }
+      if( i < l - blockDegree )
+        prefix = (prefix << 2) + base;
+      else
+        suffix = (suffix << 2) + base;
+    }
+
+    // set blockOffsets, currBlockMasks
+    currBlockRow = (int) (suffix / rowsInBlock);
+    currBlockCol = (int) (suffix \% 32);
+    currBlockMasks = blockMasks[(int)suffix];
+    int blockStart = (int) (prefix << (2*blockDegree - 5));
+    for(int offset=0; offset < rowsInBlock; offset++) {
+      if(d >= blockDegree)
+        currNeighborhood[blockStart+offset] = Integer.MAX_VALUE;
+      else
+        currNeighborhood[blockStart+offset]
+                       |= currBlockMasks[d - 1][offset];
+    }
+    addNeighbors(prefix, 0, d);
+    
+    
+    for(int i=l; i < n; i++) {      
+      prefix = (prefix & prefixMask) << 2;
+      suffix = (suffix & suffixMask) << 2;
+
+      char c = currSeq[i-blockDegree];   // next char for prefix
+      switch(c) {
+        case 'C': prefix+=1; break;
+        case 'G': prefix+=2; break;
+        case 'T': prefix+=3; break;
+      }
+
+      c = currSeq[i];           // next char for suffix
+      switch(c) {
+        case 'C': suffix+=1; break;
+        case 'G': suffix+=2; break;
+        case 'T': suffix+=3; break;
+      }
+      
+      // housekeeping: set blockOffsets, currBlockMasks
+      currBlockRow = (int) suffix / rowsInBlock;
+      currBlockCol = (int) suffix % 32;
+      currBlockMasks = blockMasks[(int)suffix];
+      blockStart = (int) prefix << (2*blockDegree - 5);
+      for(int offset=0; offset < rowsInBlock; offset++) {
+        if(d >= blockDegree)
+          currNeighborhood[blockStart+offset] = Integer.MAX_VALUE;
+        else
+          currNeighborhood[blockStart+offset]
+                       |= currBlockMasks[d-1][offset];
+      }
+      addNeighbors(prefix, 0, d);
+    }
+  }
+
+  public static void addNeighbors(long prefix, 
+                                  int start, int d) throws Exception {
+    int shift = (l-blockDegree-start)*2;
+    for(int i=start; i < l-blockDegree; ++i) {
+      shift -= 2;
+      long alt1 = prefix ^ (((long) 1) << shift);
+      long alt2 = prefix ^ (((long) 2) << shift);
+      long alt3 = prefix ^ (((long) 3) << shift);
+
+      int blockStart1 = (int) alt1 << multByRow;
+      int blockStart2 = (int) alt2 << multByRow;
+      int blockStart3 = (int) alt3 << multByRow;
+
+      // masking part
+      int allow_d = d - 1;
+      if( allow_d >= blockDegree ) {    // all 1's
+        for(int offset=0; offset < rowsInBlock; offset++) {
+          currNeighborhood[blockStart1 + offset] = Integer.MAX_VALUE;
+          currNeighborhood[blockStart2 + offset] = Integer.MAX_VALUE;
+          currNeighborhood[blockStart3 + offset] = Integer.MAX_VALUE;
+        }
+      }
+      else if( allow_d > 0 ) {      // select a mapping from 1 to k-1
+        for(int offset=0; offset < rowsInBlock; offset++) {
+          currNeighborhood[blockStart1+offset]
+                       |= currBlockMasks[allow_d-1][offset];
+          currNeighborhood[blockStart2+offset]
+                       |= currBlockMasks[allow_d-1][offset];
+          currNeighborhood[blockStart3+offset]
+                       |= currBlockMasks[allow_d-1][offset];
+        }
+      }
+      else {      // only [currBlockRow][currBlockCol] = 1
+        currNeighborhood[blockStart1 + currBlockRow] |= 1 << (currBlockCol);
+        currNeighborhood[blockStart2 + currBlockRow] |= 1 << (currBlockCol);
+        currNeighborhood[blockStart3 + currBlockRow] |= 1 << (currBlockCol);
+      }
+
+      // recursive call
+      if(allow_d > 0) {
+        addNeighbors(alt1, i+1, allow_d);
+        addNeighbors(alt2, i+1, allow_d);
+        addNeighbors(alt3, i+1, allow_d);
+      }
+
+    }
+  }
+
+//===================================================================
+// TRANSFORM L-MER SEQUENCES: map all l-mers in S[tPrime+1] to S[t].
+//===================================================================
+
+  public static void transformLmerSequences(int tPrime) {
+    lmerMappings = new long[t][nl1];
+    for(int i=tPrime; i < t; i++) {
+      char[] currSeq = seqS[i];
+      long mapping = 0;
+
+      for(int j=0; j < l; j++) {
+        char c = currSeq[j];
+        int base = 0;
+        switch(c) {
+          case 'C': base=1; break;
+          case 'G': base=2; break;
+          case 'T': base=3; break;
+        }
+        mapping = (mapping << 2) + base;
+      }
+      lmerMappings[i][0] = mapping;
+
+      int k=0;
+      for(int j=l; j < n;j++) {
+        char c = currSeq[j];
+        int base = 0;
+        switch(c) {
+          case 'C': base=1; break;
+          case 'G': base=2; break;
+          case 'T': base=3; break;
+        }
+        mapping = ((mapping & mask) << 2) + base;
+        lmerMappings[i][++k]=mapping;
+      }
+
+    }
+  }
+
+//===================================================================
+// SEARCH MOTIF: search each candidateMotif in S[tPrime+1] to S[t].
+//===================================================================
+
+  public static void searchMotif() throws Exception {
+    int value, numMotifs = 0;
+    foundMotifs = "";
+    for(int i=0; i < pmt; i++) {
+      if( (value = candidateMotifs[i]) == 0)
+        continue;
+
+      /*System.out.println("Nonzero: candidateMotifs[" + i + "]\t= "
+        + Long.toBinaryString(candidateMotifs[i]));*/
+      long base = ((long) i) << 5;
+      for(int j=0; j < 32; j++) {
+        if( (value & 1) != 0) {
+          long candidate = base + j;
+          if( isMotif(candidate, tPrime) ) {
+            foundMotifs += " " + decode(candidate, l);
+            // System.out.println("Motif found:\t" + decode(candidate, l) );
+            numMotifs++;
+          }
+        }
+        value = value >> 1;
+      }
+    }
+  }
+
+  public static boolean isMotif(long mapping, 
+                                int tPrime) throws Exception {
+    for(int i=tPrime; i < t; i++) {
+      boolean found = false;
+      for(int j=0; j < nl1; j++) {
+        long lmer = lmerMappings[i][j];
+        int hd = computeHD(mapping, lmer);
+        if( hd <= d ) {
+          found=true;
+          break;
+        }
+      }
+      if(!found) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  public static int computeHD(long lmer1, long lmer2) throws Exception {
+    int distance=0;
+    long result = lmer1 ^ lmer2;
+    for(int i=0; i < l; i++) {
+      if( (result & 3) != 0 )
+        distance++;
+      result = result >>> 2;
+    }
+    return distance;
+  }
+
+  public static String decode(long mapping, int strlen) throws Exception {
+    String decoding = "";
+    for(int i=0; i < strlen; i++) {
+      int base = (int) mapping & 3;
+      switch(base) {
+        case 0: decoding = "A" + decoding; break;
+        case 1: decoding = "C" + decoding; break;
+        case 2: decoding = "G" + decoding; break;
+        case 3: decoding = "T" + decoding; break;
+      }
+      mapping = mapping >>> 2;
+    }
+    return decoding;
+  }
+}
+\end{verbatimtab}
+\end{footnotesize}
 % to-do: indent and copy source code
 
 \end{document}
