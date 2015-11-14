@@ -21,5 +21,8 @@ done
 cd ..
 git add --all .
 git commit -m 'Shell script worked!'
-git status
-git push --repo https://aiiasiia:ghh3lln0@github.com/aiiasiia/thesis
+while[ -n "git status --porcelain" ]
+do
+	echo "git push to aiiasiia/thesis"
+	git push --repo https://aiiasiia:ghh3lln0@github.com/aiiasiia/thesis > log
+done
