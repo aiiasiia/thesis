@@ -20,9 +20,13 @@ done
 
 cd ..
 git add --all .
-git commit -m 'Shell script worked!'
-s='git status --porcelain'
-while[ -n s ] do
-	echo "git push to aiiasiia/thesis"
-	git push --repo https://aiiasiia:ghh3lln0@github.com/aiiasiia/thesis > log
+git status --porcelain
+#git commit -m 'Shell script worked!'
+while true
+do
+ 	echo "git push to aiiasiia/thesis"
+ 	if [ git push -q --repo https://aiiasiia:ghh3lln0@github.com/aiiasiia/thesis ]
+ 	then
+ 		break
+ 	fi
 done
