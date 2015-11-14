@@ -16,8 +16,7 @@ javac -d bin src/*.java # compile java source files
 
 d=1
 cd datasets
-# (l,d): (9,2) (11,3) (13,4) (15,5) 
-for l in 9 11 13 15 17 # only include (17,6) for systems with > 10GB RAM
+for l in 9 11 13 15 17 # (l,d): (9,2) (11,3) (13,4) (15,5), and (17,6) for systems with > 10GB RAM
 do
 	((d++))
 	# print headers in EMS_GT result files
@@ -31,12 +30,12 @@ do
 		# test all programs on this dataset with all values of k	
 		for k in 3 4 6 7 8
 		do
-			if [ $d -gt 3 ] || [ $k -gt 4 ] # hey can i comment
-			then
-				java -cp ../bin EMS_GT    $l,$d,$i $k	>> ../results/E00-$l,$d,k=$k
-				java -cp ../bin EMS_GT_32 $l,$d,$i $k	>> ../results/E32-$l,$d,k=$k
-				java -cp ../bin EMS_GT_64 $l,$d,$i $k	>> ../results/E64-$l,$d,k=$k
-			fi
+			# if [ $d -gt 3 ] || [ $k -gt 4 ] # hey can i comment
+			# then
+			java -cp ../bin EMS_GT    $l,$d,$i $k	>> ../results/E00-$l,$d,k=$k
+			java -cp ../bin EMS_GT_32 $l,$d,$i $k	>> ../results/E32-$l,$d,k=$k
+			java -cp ../bin EMS_GT_64 $l,$d,$i $k	>> ../results/E64-$l,$d,k=$k
+			# fi
 			echo "k = $k : finished $l, $d, $i"
 		done
 	done
