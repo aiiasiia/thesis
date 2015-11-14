@@ -16,10 +16,9 @@ for((i=1; i <= r; i++)) do
 		java -cp ../bin EMS_GT_32 11,3,$i $k	>> ../results/E32-11,3,k=$k
 		echo "k = $k : finished 11,3,$i"
 	done
+done
 
 cd ..
 git add --all .
 git commit -m 'Shell script worked!'
 git push --repo https://aiiasiia:ghh3lln0@github.com/aiiasiia/thesis
-
-done
