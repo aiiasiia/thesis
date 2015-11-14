@@ -8,7 +8,7 @@
 # @author Aia Sia
 # @version 1.0 9/09/2015
 
-r=20 # number of experimental runs
+r=5 # number of experimental runs
 javac -d bin src/*.java # compile java source files
 
 # cd src/PMS8; make; mv Debug/PMS8  ../../bin/PMS8;  # uncomment these lines to compile PMS8 and qPMS9 from scratch.
@@ -36,17 +36,15 @@ do
 	done
 done
 
+# echo "l,d,run,time(s),time(min),memuse,memuse after GC,motif,motifs found" > ../results/E64-18,6,k=
+# for((i=1; i <= r; i++)) do
+	# # generate a unique (l,d) dataset for this run
+	# java -cp ../bin DatasetGenerator  18 6 $i
+		# # test all programs on this dataset
+	# for k in 3 4 6 7 8 do
+		# java -cp ../bin EMS_GT_64 $l,$d,$i $k	>> ../results/E64-18,6,k=$k
+	# done
+# done
+
 cd ..
-git add --all .
-git commit -m 'Server tests finished'
-while [ true ]
-do 
-    git push --repo=https://aiiasiia:ghh3lln0@github.com/aiiasiia/thesis
-	if [ $? -eq 0 ]
-	then
-		break
-	else
-		echo "retrying..."
-	fi
-done
 
