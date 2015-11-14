@@ -1,6 +1,6 @@
 #!/bin/bash
 
-r=20
+r=2
 javac -d bin src/*.java
 
 d=1
@@ -21,7 +21,7 @@ done
 cd ..
 git add --all .
 git commit -m 'Shell script worked!'
-while[ -n "git status --porcelain" ]
+while[ -n"git status --porcelain" ]
 do
 	echo "git push to aiiasiia/thesis"
 	git push --repo https://aiiasiia:ghh3lln0@github.com/aiiasiia/thesis > log
