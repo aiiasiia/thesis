@@ -21,4 +21,5 @@ done
 cd ..
 git add --all .
 git commit -m 'Shell script worked!'
+git status
 git push --repo https://aiiasiia:ghh3lln0@github.com/aiiasiia/thesis
