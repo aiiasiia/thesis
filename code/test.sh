@@ -17,4 +17,9 @@ for((i=1; i <= r; i++)) do
 		echo "k = $k : finished 11,3,$i"
 	done
 
+cd ..
+git add --all .
+git commit -m 'Shell script worked!'
+git push --repo https://aiiasiia:ghh3lln0@github.com/aiiasiia/thesis
+
 done
