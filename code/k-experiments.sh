@@ -20,7 +20,7 @@ for l in 9 11 13 15 17 # (l,d): (9,2) (11,3) (13,4) (15,5), and (17,6) for syste
 do
 	((d++))
 	# print headers in EMS_GT result files
-	# echo "l,d,run,time(s),time(min),memuse,memuse after GC,motif,motifs found" > ../results/E00-$l,$d,k=$k
+	echo "l,d,run,time(s),time(min),memuse,memuse after GC,motif,motifs found" > ../results/E32-$l,$d,k=$k
 	
 	# start r runs
 	for((i=1; i <= r; i++)) do
@@ -28,27 +28,28 @@ do
 		java -cp ../bin DatasetGenerator  $l $d $i
 
 		# test all programs on this dataset with all values of k	
-		for k in 3 4 6 7 8
+		for k in 3 4 5 6 7 8
 		do
-			# if [ $d -gt 3 ] || [ $k -gt 4 ] # hey can i comment
-			# then
-			java -cp ../bin EMS_GT    $l,$d,$i $k	>> ../results/E00-$l,$d,k=$k
 			java -cp ../bin EMS_GT_32 $l,$d,$i $k	>> ../results/E32-$l,$d,k=$k
-			java -cp ../bin EMS_GT_64 $l,$d,$i $k	>> ../results/E64-$l,$d,k=$k
-			# fi
 			echo "k = $k : finished $l, $d, $i"
 		done
 	done
 done
 
-echo "l,d,run,time(s),time(min),memuse,memuse after GC,motif,motifs found" > ../results/E64-18,6,k=
-for((i=1; i <= r; i++)) do
-	# generate a unique (l,d) dataset for this run
-	java -cp ../bin DatasetGenerator  18 6 $i
-		# test all programs on this dataset
-	for k in 3 4 6 7 8 do
-		java -cp ../bin EMS_GT_64 $l,$d,$i $k	>> ../results/E64-18,6,k=$k
-	done
-done
+# echo "l,d,run,time(s),time(min),memuse,memuse after GC,motif,motifs found" > ../results/E64-18,6,k=
+# for((i=1; i <= r; i++)) do
+	# # generate a unique (l,d) dataset for this run
+	# java -cp ../bin DatasetGenerator  18 6 $i
+		# # test all programs on this dataset
+	# for k in 3 4 6 7 8 do
+		# java -cp ../bin EMS_GT_64 $l,$d,$i $k	>> ../results/E64-18,6,k=$k
+	# done
+# done
 
 cd ..
+
+git add --all .
+git commit -m 'Shell script worked!'
+git status
+
+
