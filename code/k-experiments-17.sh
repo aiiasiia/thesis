@@ -23,25 +23,11 @@ for((i=1; i <= r; i++)) do
 	# java -cp ../bin DatasetGenerator  $l $d $i
 
 	# test all programs on this dataset with all values of k	
-	for k in 3 4 5 6 7 8
+	for k in 3 4 5 6
 	do
 		echo "l,d,run,time(s),time(min),memuse,memuse after GC,motif,motifs found" > ../results/E32-$l,$d,k=$k
-		java -cp ../bin -Xmax23g EMS_GT_32 $l,$d,$i $k	>> ../results/E32-$l,$d,k=$k
+		java -cp ../bin -Xmx14g EMS_GT_32 $l,$d,$i $k	>> ../results/E32-$l,$d,k=$k
 		echo "k = $k : EMS_GT_32 finished $l, $d, $i"
 	done
-done
-
-cd ..
-git add --all .
-git commit -m 'Server tests finished'
-while [ true ]
-do 
-    git push --repo=https://aiiasiia:ghh3lln0@github.com/aiiasiia/thesis
-	if [ $? -eq 0 ]
-	then
-		break
-	else
-		echo "retrying..."
-	fi
 done
 

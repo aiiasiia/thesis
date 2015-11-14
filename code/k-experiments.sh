@@ -16,7 +16,7 @@ javac -d bin src/*.java # compile java source files
 
 d=1
 cd datasets
-for l in 9 11 13 15 17 # (l,d): (9,2) (11,3) (13,4) (15,5), and (17,6) for systems with > 10GB RAM
+for l in 9 11 13 15 # (l,d): (9,2) (11,3) (13,4) (15,5), and (17,6) for systems with > 10GB RAM
 do
 	((d++))
 	# print headers in EMS_GT result files
@@ -24,7 +24,7 @@ do
 	# start r runs
 	for((i=1; i <= r; i++)) do
 		# generate a unique (l,d) dataset for this run
-		java -cp ../bin DatasetGenerator  $l $d $i
+		# java -cp ../bin DatasetGenerator  $l $d $i
 
 		# test all programs on this dataset with all values of k	
 		for k in 3 4 5 6 7 8
@@ -35,14 +35,28 @@ do
 		done
 	done
 done
+l=17
+d=6
+# start r runs
+for((i=1; i <= r; i++)) do
+	# generate a unique (l,d) dataset for this run
+	# java -cp ../bin DatasetGenerator  $l $d $i
 
+	# test all programs on this dataset with all values of k	
+	for k in 3 4 5 6
+	do
+		echo "l,d,run,time(s),time(min),memuse,memuse after GC,motif,motifs found" > ../results/E32-$l,$d,k=$k
+		java -cp ../bin -Xmx14g EMS_GT_32 $l,$d,$i $k	>> ../results/E32-$l,$d,k=$k
+		echo "k = $k : EMS_GT_32 finished $l, $d, $i"
+	done
+done
 cd ..
+
 git add --all .
 git commit -m 'Server tests finished'
 while [ true ]
-do 
-    git push --repo=https://aiiasiia:ghh3lln0@github.com/aiiasiia/thesis
-	if [ $? -eq 0 ]
+do    
+	if git push --repo=https://aiiasiia:ghh3lln0@github.com/aiiasiia/thesis
 	then
 		break
 	else
